@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "scope": "Partial report rendering and bounds only; no final experiment verification",
+  "manual_visual_review": "passed_all_9_pages",
+  "files": [
+    {
+      "file": "reports/Research_Report_V2_EN.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "width": 841.8900146484375,
+          "height": 595.280029296875,
+          "text_characters": 1773,
+          "outside_blocks": []
+        },
+        {
+          "page": 2,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 1398,
+          "outside_blocks": []
+        },
+        {
+          "page": 3,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 1413,
+          "outside_blocks": []
+        },
+        {
+          "page": 4,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 1226,
+          "outside_blocks": []
+        }
+      ],
+      "page_count": 4
+    },
+    {
+      "file": "reports/PERFORMANCE_DELTA_CN.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "width": 841.8900146484375,
+          "height": 595.280029296875,
+          "text_characters": 1370,
+          "outside_blocks": []
+        },
+        {
+          "page": 2,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 934,
+          "outside_blocks": []
+        },
+        {
+          "page": 3,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 584,
+          "outside_blocks": []
+        },
+        {
+          "page": 4,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 562,
+          "outside_blocks": []
+        },
+        {
+          "page": 5,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 563,
+          "outside_blocks": []
+        }
+      ],
+      "page_count": 5
+    }
+  ],
+  "reviewed_at_utc": "2026-10-17T18:01:32.542382+00:00"
+}

@@ -1,0 +1,30 @@
+{
+  "status": "BUDGET_EXPIRED_PARTIAL",
+  "complete": false,
+  "author": "Qidian (Martin) Xing",
+  "completed_screen_trials": 22,
+  "effective_distinct_screen_recipes": 21,
+  "completed_refinement_trials": 3,
+  "bridge_trials": 19,
+  "recorded_fit_calls": 267,
+  "completed_fold_fit_seconds": 7297.687657957111,
+  "fit_timing_scope": "Sum over completed folds only; excludes interrupted work and UTC gaps, not CPU-seconds",
+  "last_recorded_fit_start": "2026-10-17T12:16:50.137483+00:00",
+  "deadline_utc": "2026-10-17T14:53:18+00:00",
+  "closed_at_utc": "2026-10-17T17:56:25.272037+00:00",
+  "closeout_prepared_after_window": true,
+  "new_final_model_pipelines": 0,
+  "new_historical_batch_run": false,
+  "performance_improvement_established": false,
+  "publication": "NOT PUSHED: required final experiments and validation incomplete",
+  "missing": [
+    "Full numerical-embedding and paired TabM performance search",
+    "Target CatBoost/XGBoost and other family search coverage",
+    "Five-year, three-seed shortlist stability and final selection",
+    "One frozen 2014 confirmation batch",
+    "Same-cutoff 2014 final fits with five registered seeds",
+    "New frozen 2015-2018 historical batch and paired company intervals",
+    "New company-generalization stress tests and saved final model pipelines",
+    "Final publication checks and authenticated GitHub branch push"
+  ]
+}

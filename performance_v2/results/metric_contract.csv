@@ -1,0 +1,4 @@
+check,legacy_AP,sklearn_AP,absolute_difference,prediction_max_error,source_identity
+actual_saved_V1_ML,0.20564139803964948,0.20564139803964968,1.942890293094024e-16,8.881784197001252e-16,"Reloaded trusted V1 model; previously saved labels/scores, not a new V2 result"
+actual_saved_V1_DL,0.10534469838262085,0.10534469838262078,6.938893903907228e-17,4.7668457092697736e-07,"Reloaded trusted V1 model; previously saved labels/scores, not a new V2 result"
+synthetic_ties,0.55,0.55,0.0,,Synthetic metric contract only

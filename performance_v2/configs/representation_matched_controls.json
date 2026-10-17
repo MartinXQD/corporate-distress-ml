@@ -1,0 +1,8 @@
+{
+  "tabm20": {
+    "without": "repr_r2_tabm20_none",
+    "with_embedding": "repr_r2_tabm20_piecewise",
+    "maximum_epochs": 20,
+    "scope": "Both use the same 20-epoch ceiling; independent of the full 200-epoch no-embedding trial. A one-seed three-year mechanism control, not fully tuned TabM."
+  }
+}

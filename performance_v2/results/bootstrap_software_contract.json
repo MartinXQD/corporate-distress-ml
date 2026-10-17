@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "weighted_metric_fixtures": 25,
+  "tied_and_zero_weight_scores": true,
+  "paired_bootstrap_draws_compared": 40,
+  "reference": "Preserved V1 bootstrap implementation and sklearn metrics",
+  "absolute_tolerance": 1e-12,
+  "performance_evidence": false
+}

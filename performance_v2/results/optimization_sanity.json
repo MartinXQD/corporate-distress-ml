@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "training_subset_rows": 64,
+  "training_subset_AP": 1.0,
+  "training_subset_BCE": 0.0003096159555970744,
+  "scope": "Optimization sanity only on a deliberately balanced training subset; not a performance result or independent experiment"
+}

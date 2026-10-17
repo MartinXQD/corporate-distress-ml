@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "checks": 12,
+  "names": [
+    "legacy_parameter_counts",
+    "binary_masks_bypass_quantile",
+    "transform_does_not_refit",
+    "official_or_legacy_forward_mlp_none",
+    "official_or_legacy_forward_legacy_residual_none",
+    "official_or_legacy_forward_num_mlp_piecewise",
+    "official_or_legacy_forward_num_mlp_periodic",
+    "official_or_legacy_forward_tabm_none",
+    "official_or_legacy_forward_tabm_piecewise",
+    "official_or_legacy_forward_official_ft_none",
+    "future_input_invariance",
+    "real_subset_overfit_sanity"
+  ],
+  "checked_at_utc": "2026-10-17T07:32:22.721639+00:00",
+  "scope": "Software/numerical contracts; no synthetic research scores"
+}

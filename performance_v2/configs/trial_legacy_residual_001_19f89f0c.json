@@ -1,0 +1,20 @@
+{
+  "family": "legacy_residual",
+  "features": "RATIO_CORE",
+  "preprocess": "quantile",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "none",
+  "refit_rule": "steps",
+  "max_epochs": 200,
+  "patience": 25,
+  "per_fit_seconds": 720,
+  "width": 192,
+  "depth": 4,
+  "dropout": 0.25,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0002,
+  "batch_size": 512,
+  "schedule": "fixed"
+}

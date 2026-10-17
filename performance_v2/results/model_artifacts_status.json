@@ -1,0 +1,5 @@
+{
+  "new_final_pipelines": 0,
+  "status": "NOT_DELIVERED",
+  "note": "Development predictions, configurations, metadata and learning curves are saved. The copied legacy checkpoint in the private audit is an original artifact, not a newly trained V2 final model."
+}

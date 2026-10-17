@@ -1,0 +1,17 @@
+{
+  "family": "catboost",
+  "features": "V1_S0",
+  "preprocess": "v1",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "none",
+  "refit_rule": "steps",
+  "max_epochs": 200,
+  "patience": 25,
+  "per_fit_seconds": 720,
+  "clip": true,
+  "iterations": 180,
+  "depth": 5,
+  "learning_rate": 0.05
+}

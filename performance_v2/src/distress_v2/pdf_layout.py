@@ -35,7 +35,7 @@ def render(pages,pdf_path,source_path,language):
             if b['type']=='paragraph':story.append(paragraph(b['text']));markdown.extend([b['text'],''])
             elif b['type']=='table':
                 n=len(b['header'])
-                if n==11:fractions=[.13,.052,.14,.036,.041,.075,.075,.065,.065,.065,.156]
+                if n==11:fractions=[.13,.075,.18,.045,.045,.075,.075,.065,.065,.065,.18]
                 elif n>3:fractions=[.38]+[.62/(n-1)]*(n-1)
                 else:fractions=[.60]+[.40/(n-1)]*(n-1)
                 rows=[[paragraph(v,'V2Cell') for v in b['header']]]+[[paragraph(v,'V2Cell') for v in row] for row in b['rows']]
