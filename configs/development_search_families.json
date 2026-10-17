@@ -1,0 +1,6 @@
+{
+  "selected_at_utc": "2026-10-17T04:57:02.267498+00:00",
+  "ML": "random_forest",
+  "DL": "residual_mlp",
+  "selection": "S1 equal-weight seven-year development AP only"
+}

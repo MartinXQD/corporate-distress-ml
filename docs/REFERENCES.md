@@ -10,3 +10,5 @@
 - Current upstream license (CC BY 4.0): https://github.com/sowide/bankruptcy_dataset/blob/main/LICENSE.md
 
 The installed package versions, not the current website version, are recorded in `results/public/environment.json` and the lock files. Reference links explain algorithm/protocol choices; they do not validate the local label as a forward default event. The local snapshot and live upstream comparison are recorded by hash. PyTorch loss uses BCEWithLogitsLoss and evaluation uses sigmoid; installed-runtime behavior is exercised by software tests. No FT-Transformer paper performance is claimed for this compact implementation.
+
+The upstream README requests citations to its dataset papers. Publisher full-text retrieval returned HTTP 429 during this run, so no additional paper-specific empirical or event-timing claim is inferred from those inaccessible pages. Their citation request is attributed to the checked README, not presented as a full-text review.

@@ -38,4 +38,6 @@ def load_data(role="development", path=None):
     x["y"] = labels.status_label.eq("failed").astype("int8").to_numpy()
     assert not x.duplicated(["company_name", "year"]).any()
     assert np.isfinite(x[RAW]).all().all()
-    return x.reset_index(drop=True)
+    result=x.reset_index(drop=True)
+    result.attrs['raw_columns']=columns
+    return result

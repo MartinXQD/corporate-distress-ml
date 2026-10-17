@@ -22,7 +22,7 @@ The original source manifest is in the ignored audit directory. Recompute hashes
 
 ## Tests and dependencies
 
-CI runs only synthetic software fixtures. It never downloads the research data or triggers full training. The lock file pins direct runtime packages; `results/public/environment.json` records versions used, while the complete inherited-environment freeze remains local. A clean installation should also preserve a resolved environment lock for its own platform.
+CI runs only synthetic software fixtures. It never downloads the research data or triggers full training. The lock file pins the installed macOS dependency closure; `results/public/environment.json` records versions used, while the complete inherited-environment freeze remains local. A clean installation should also preserve a resolved environment lock for its own platform.
 
 To initialize the fresh training directory without copying old result tables or deleting the current evidence, run:
 

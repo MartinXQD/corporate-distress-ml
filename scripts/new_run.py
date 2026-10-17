@@ -12,7 +12,7 @@ a=p.parse_args();destination=a.destination.resolve()
 if destination.exists():raise SystemExit('Destination already exists; choose a new directory. Nothing was overwritten.')
 destination.mkdir(parents=True)
 for name in ['src','scripts','tests','docs']:
-    shutil.copytree(ROOT/name,destination/name,ignore=shutil.ignore_patterns('__pycache__'))
+    shutil.copytree(ROOT/name,destination/name,ignore=shutil.ignore_patterns('__pycache__','MODEL_CARD.md'))
 for name in ['pyproject.toml','requirements-lock.txt','.gitignore','.env.example','ACKNOWLEDGEMENTS.md','LICENSE_NOTICE.md']:
     shutil.copy2(ROOT/name,destination/name)
 for name in ['artifacts/logs','artifacts/models','artifacts/predictions','artifacts/audit','artifacts/cache','artifacts/rendered','results/public','reports','notebooks','configs']:

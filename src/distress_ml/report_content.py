@@ -24,6 +24,22 @@ def ablation_wide(c):
     a=c['ablations']
     return a.pivot(index='recipe',columns='family',values='macro_year_AP').reset_index()
 
+def calibration_comparison(c):
+    rows=[]
+    for kind,item in c['selected'].items():
+        for role,source in [('2014 decision',c['pre_evaluation_metrics'][c['pre_evaluation_metrics'].role=='threshold_selection']),('2015-2018',c['historical_metrics'])]:
+            data=source[source.label==item['label']].set_index('score_type')
+            rows.append(dict(representative=kind,period=role,raw_Brier=data.loc['uncalibrated','Brier'],cal_Brier=data.loc['calibrated','Brier'],raw_logloss=data.loc['uncalibrated','log_loss'],cal_logloss=data.loc['calibrated','log_loss']))
+    return pd.DataFrame(rows)
+
+def novelty_with_intervals(c):
+    labels=[x['label'] for x in c['selected'].values()]
+    points=c['historical_seen_unseen']
+    points=points[points.label.isin(labels)&(points.seen_cutoff==2012)]
+    ci=c['seen_unseen_company_bootstrap']
+    ci=ci[(ci.metric=='AP')&(ci.seen_cutoff==2012)][['model','novelty','lower','upper']]
+    return points.merge(ci,left_on=['label','novelty'],right_on=['model','novelty'],validate='one_to_one')
+
 def measured_interpretation(c):
     core=core_comparison(c)
     learned=core[~core.family.isin(['dummy','altman'])]
@@ -46,9 +62,11 @@ def measured_interpretation(c):
 def english_pages(c):
     ml=c['representative']['ML'];dl=c['representative']['DL'];base=c['baseline'];r=representative_rows(c)
     core=core_comparison(c)
-    h=c['historical'];main=h[((h.feature_set=='S1')&(~h.family.isin(['dummy','altman'])))|h.label.isin([base.label,c['selected']['ML']['label'],c['selected']['DL']['label']])|(h.family.isin(['dummy','altman'])&(h.feature_set=='S1'))]
+    h=c['historical'];main=h[((h.feature_set=='S1')&(~h.family.isin(['dummy','altman'])))|h.label.isin([base.label,c['selected']['ML']['label'],c['selected']['DL']['label']])|(h.family.isin(['dummy','altman'])&(h.feature_set=='S1'))|h.family.eq('equal_rank_ensemble')]
     main=main.drop_duplicates(['family','feature_set','config_id'])
-    novelty=c['historical_seen_unseen'];novelty=novelty[(novelty.label.isin([v['label'] for v in c['selected'].values()]))&(novelty.seen_cutoff==2012)]
+    selected_ids=set(c['freeze']['representatives'].values())
+    main=main.assign(pipeline=[DISPLAY[x.family]+(' (ensemble)' if x.family=='equal_rank_ensemble' else (' (selected)' if x.config_id in selected_ids else ' (core)')) for x in main.itertuples()])
+    novelty=novelty_with_intervals(c)
     seeds=c['seed_results'];seeds=seeds[seeds.config_id.isin(c['freeze']['representatives'].values())].groupby(['family','feature_set']).agg(seeds=('seed','nunique'),AP_mean=('AP','mean'),AP_min=('AP','min'),AP_max=('AP','max'),ROC_mean=('ROC_AUC','mean')).reset_index()
     stress=c['group_stress_metrics'].groupby('family').agg(groups=('group_fold','nunique'),AP_min=('AP','min'),AP_mean=('AP','mean'),AP_max=('AP','max'),ROC_mean=('ROC_AUC','mean')).reset_index()
     seq=c['development_summary'];seq=seq[seq.stage.isin(['sequence_control','sequence_extension'])]
@@ -104,19 +122,20 @@ def english_pages(c):
         p('Elastic Net chooses C and L1 ratio in an inner tail-year split, then selects nonzero coefficients after an outer-training refit. Group-aware selection ranks economic groups using two earlier cross-fitted tree validations, then chooses top 2, top 4 or all groups on a later inner year. Neither selector sees outer scoring labels. No selection remains a genuine candidate.'),
         p('A negative AP delta is retained as a failed improvement, not removed. Clipping, selecting variables, resampling and adding architecture are empirical choices with costs; none is assumed to improve every model or year.')),
       page('8. Frozen historical ranking',
-        table(main,['family','feature_set','AP','ROC_AUC','macro_recall_top5'],['Pipeline','Set','AP','ROC-AUC','Annual R@5%']),
+        table(main,['pipeline','feature_set','AP','ROC_AUC','macro_recall_top5'],['Pipeline','Set','AP','ROC-AUC','Annual R@5%']),
         fig('ranking_curves','The PR and ROC curves use identical historical rows for the S0 Logistic baseline and development-selected representatives. AP is sklearn average_precision_score, not trapezoidal PR area.'),
         p(f'The evaluation contains {int(base.rows):,} records and {int(base.positive_rows)} positive rows, from {int(base.positive_companies)} positive companies. Its prevalence is {base.prevalence:.4f}. Pooled AP and macro-year AP answer different weighting questions; both are saved. Use same-row paired differences, not an AP ratio across years with different prevalence.'),
         p('Core S1 rows provide a controlled family comparison. Representative rows describe optimized pipelines, including their information set. Extra tuned configurations from the same family remain identifiable by config_id in the machine tables. Old team scores follow different roles and are not used as an improvement denominator.')),
       page('9. Screening and probability quality',
         fig('screening_calibration','Left: average recall under fixed annual review capacities. Right: reliability bins. Sparse high-score bins require their counts and positive counts; a line alone is not evidence of calibration.'),
         table(r,['representative','precision','recall','F1','alert_fraction','Brier'],['Rep.','Precision','Recall','F1','Alert share','Brier']),
+        table(calibration_comparison(c).query('period == "2015-2018"'),['representative','raw_Brier','cal_Brier','raw_logloss','cal_logloss'],['Historical','Raw Brier','Platt Brier','Raw log loss','Platt log loss']),
         p('Annual Top 1%, 5% and 10% use score-only ordering, ceil(budget*n) and a deterministic company/year hash for ties. The capacity is fixed before looking at outcomes. Lift divides selected precision by the same year\'s positive fraction. It is a risk-screening statistic, not a realized financial return.'),
         p('One fixed threshold maximizes F1 on 2014 calibrated predictions. Historical precision, recall, F1 and confusion counts use that frozen threshold. A large change in the historical alarm fraction is possible under distribution shift; threshold metrics must be interpreted alongside review budgets.'),
         p('Platt calibration fits only on natural-prevalence 2013 data, without refitting the base model afterward. Uncalibrated scores, 2014 probability quality, historical Brier/log loss and reliability-bin counts are preserved. Brier and log loss assess probability prediction quality, not pure calibration error. A calibrated failed-label probability is still not an annual default PD.')),
       page('10. Time and company generalization',
         fig('annual_performance','Yearly AP and annual recall at Top 5% reveal changing performance. Only four historical years are available, so no strong time-series significance claim follows.'),
-        table(novelty,['family','novelty','companies','positive_companies','AP','ROC_AUC'],['Family','Seen by 2012','Companies','Failed firms','AP','ROC-AUC']),
+        table(novelty,['family','novelty','companies','positive_companies','AP','lower','upper'],['Family','Seen by 2012','Companies','Failed firms','AP','CI low','CI high']),
         table(stress,['family','groups','AP_min','AP_mean','AP_max'],['Untuned stress','Groups','Min AP','Mean AP','Max AP']),
         p('Seen/unseen is relative to the actual 2012 base-fit cutoff. The unseen subset contains only 16 failed companies; its score can be unstable even with many rows. A separate 2014-cutoff sensitivity includes an even smaller positive cohort and is not silently omitted.'),
         p('Company stress holds out each of three fixed SHA256 groups from all fitting, stopping and calibration roles. Logistic, Boosting and Residual MLP use the recipes fixed before development, not globally tuned winners. This is explicitly an untuned sensitivity analysis. Its training population is smaller, so direct differences from full-company models mix training coverage and novelty.')),
@@ -130,6 +149,7 @@ def english_pages(c):
         p('Company bootstrap does not fully represent shared macroeconomic shocks, upstream data revisions, point-in-time label availability or future-regime uncertainty. Four historical years provide descriptive temporal evidence rather than broad coverage of economic states.')),
       page('12. Annual trajectories and finite ensemble',
         table(seq,['family','feature_set','macro_year_AP','mean_fit_seconds'],['Optional family','History set','Development AP','Mean fit seconds']),
+        table(pd.DataFrame(list(c['ensemble_choice']['macro_year_AP'].items()),columns=['candidate','AP']),['candidate','AP'],['Fixed-rank OOF candidate','Development AP']),
         p('The GRU receives [batch, 3 calendar slots, feature] rather than treating financial columns as time. A shared snapshot preprocessor is fitted only on current training-role records. For missing calendar slots, numerical inputs are zeroed and an observed flag is zero; target-year rows remain present. The recurrent output at the target year feeds a logit head.'),
         p('Snapshot S0 tree/MLP, flattened three-year tree/MLP and GRU are evaluated on identical target rows. This separates the availability of historical inputs from a recurrent architecture. The flattened controls may learn lag-specific transforms; the GRU shares feature scaling over time. They compare practical pipelines on the same information, not perfectly identical parameterizations.'),
         p('The optional window is fixed at three years. No ordinary SMOTE is applied to sequence tensors. Short histories and internal gaps are retained rather than filtering failure companies away. Calendar masks carry coverage information and can themselves reflect selection processes; their presence is disclosed.'),
@@ -157,7 +177,7 @@ def chinese_pages(c):
     profiles=c['confusion_cell_profiles'];profiles=profiles[profiles.representative=='DL']
     seeds=c['seed_results'];seeds=seeds[seeds.config_id.isin(c['freeze']['representatives'].values())].groupby('family').agg(seeds=('seed','nunique'),AP_mean=('AP','mean'),AP_min=('AP','min'),AP_max=('AP','max')).reset_index()
     sequence=c['development_summary'];sequence=sequence[sequence.stage.isin(['sequence_control','sequence_extension'])]
-    novelty=c['historical_seen_unseen'];novelty=novelty[(novelty.label.isin([x['label'] for x in c['selected'].values()]))&(novelty.seen_cutoff==2012)]
+    novelty=novelty_with_intervals(c)
     interpretation=measured_interpretation(c)
     pages=[
       page('从财务记录到可核查的研究',
@@ -275,16 +295,17 @@ def chinese_pages(c):
         p('两个模型可能排序相同，但一个把最高风险样本打 0.9，另一个打 0.2。AP 可能相同，概率质量却不同。校准要让相近分数的一组样本，其实际标签比例与分数更接近。'),
         p('Platt calibration 对基础 raw score 拟合一个 sigmoid 映射，数据来自自然比例的 2013 年。之后不把 2013 加回基础模型再沿用原校准器，否则映射所针对的分数机制已改变。'),
         fig('screening_calibration','左图按年度固定审查比例，右图为历史期可靠性分箱。右图每个点必须结合 reliability_bins.csv 的样本数和正类数理解；高分箱很小可能大幅波动。'),
+        table(calibration_comparison(c),['representative','period','raw_Brier','cal_Brier'],['代表','检验期','未校准 Brier','Platt Brier']),
         p('Brier 是概率与 0/1 标签的平方误差均值，log loss 对高置信度错误更敏感。两者包含区分度和概率刻度等影响，不是纯粹的“校准误差”。本项目同时保留未校准对照、2014 检验与历史可靠性分箱。'),
         p('2014 选一个 F1 阈值并固定应用到 2015-2018。Top 5% 则按年度排序分配固定工作量。不要在历史 PR 曲线上挑最好阈值后称为部署效果，更不要把 failed 标签下的校准概率称作已验证的一年期 PD。'),
         code('calibration.py: fit_calibration\nevaluation.py: choose_threshold, reliability')),
       page('18. 一条记录如何穿过整个 pipeline',
-        p('第一步，读取 company/year 与 X1-X18；company/year 只用于对齐、历史查询和审查并列规则，不进入财务特征 tensor。第二步，按登记公式构造 S0/S1/S2 或历史窗口；无效比率保留 NaN 与 mask。'),
-        p('第三步，加载同一正式 checkpoint 的 preprocessor，而不是对当前数据重新 fit。按已保存顺序填 median、应用训练分位点和尺度，再执行已冻结的特征名单。若特征顺序错了，数值即使形状一样，也不再代表原模型。'),
-        p('第四步，tensor 送入 model.eval() 和 inference_mode。网络输出 logit z；sigmoid(z) 是未校准分数。正式 Platt 映射再得到校准分数 q。第五步，与 2014 固定阈值比较得到 predicted_label；年度 Top 5% 则在完整年度 cohort 中排序。'),
-        p('完整数值 walkthrough 留在本地：local_failure_cases.json 按预登记规则保存 TP/FP/FN/TN 各一条，包括原行定位、特征、raw logit、校准分数和阈值。Notebook 04 会重载该正式工件并核对预测；公开输出只显示是否一致及聚合统计，避免发布整份逐行数据。'),
-        table(profiles,['cell','records','median_score','median_net_income_to_assets','median_liabilities_to_assets'],['DL 错误类别','记录数','分数中位数','净利润/资产中位数','总负债率中位数']),
-        p('这些是各混淆单元的真实聚合画像，不代表每家公司都符合该模式。如何自查：从本地选定 row_id 开始，逐步检查 build_features、preprocessor.transform、predict_raw、calibrated_predict、threshold，最后与保存预测逐项比较。')),
+        p('以下数值纯属教学示意，不是实测模型、训练参数或研究成绩：设净利润=-5、资产=100、总负债=80、流动资产=30、流动负债=60。'),
+        {'type':'table','header':['示意步骤','数值'],'rows':[['财务结构','ROA=-0.05，负债率=0.8，流动比率=0.5'],['假设训练均值/标准差','分别用 (0,0.1)、(0.5,0.25)、(1,0.5)'],['标准化 tensor','[[-0.5, 1.2, -1.0]]'],['定义的教学权重','w=[-1,0.8,-0.4]，b=-1，因此 z=0.86'],['sigmoid 与示意校准','sigmoid(z)=0.703；sigmoid(0.8z-1.5)=0.307'],['示意判断','若阈值0.25，则标高风险；这些都不是正式参数']]},
+        p('正式流程先用 company/year 对齐与查询历史，再构造财务特征；ID 不进入 tensor。随后加载原 checkpoint 的 median、截尾边界、尺度及列顺序，不能对当前数据重新 fit。'),
+        p('tensor 在 eval/inference 模式输出 logit，sigmoid 得到未校准分数，2013 Platt 映射得到 q，再比较 2014 固定阈值。年度 Top 5% 则在完整年度 cohort 中排序。形状正确但列顺序错误，仍不是原模型。'),
+        p('正式模型的完整实测数值链另见本地 Local_Case_Walkthrough_EN_CN.md 与 local_numerical_walkthrough.json：包含预登记案例的原始字段、实际截尾/尺度、完整 tensor、logit、校准和固定阈值。Notebook 04 重载正式工件核对；公开输出只显示一致性与聚合统计。'),
+        p('真实 TP/FP/FN/TN 组的计数、分数及财务比率中位数另见 confusion_cell_profiles.csv，不代表每家公司都符合组内画像。亲自核查时，从注册案例逐项追踪 build_features、transform、predict_raw、calibrated_predict 和 threshold。')),
       page('19. 真实结果：哪些变化有效，哪些无效',
         table(core,['family','S0','S1'],['固定配方','S0 开发 AP','S1 开发 AP']),
         p(interpretation['h4_cn']),
@@ -293,7 +314,7 @@ def chinese_pages(c):
         p('失败实验也有研究价值：没有提升的筛选或采样说明该干预在当前信息集/优化设置下未获支持，而不是方法永远无效。先解释变化因素和成本，再谈是否值得保留。完整 ablation 表的负差异不能删除。'),
         p('旧报告采用不同训练/验证角色，其保存成绩只属于档案。新结果只能与本轮同协议重训的基准配对比较。本报告不将旧 AUC 与新 AP 混算提升，也不把不同正类比例年份的 AP 随意相除。')),
       page('20. 公司泛化、区间与种子波动',
-        table(novelty,['family','novelty','companies','positive_companies','AP'],['模型','相对2012','公司数','failed公司','AP']),
+        table(novelty,['family','novelty','companies','positive_companies','AP','lower','upper'],['模型','相对2012','公司数','failed公司','AP','区间下界','区间上界']),
         table(ci_rows(c),['model','lower','upper','delta_lower','delta_upper'],['代表','AP下界','AP上界','相对基准差下界','差上界']),
         p(interpretation['ci_cn']),
         p('未见公司按基础模型真实拟合截止 2012 定义。该子集仅 16 家 failed 公司，所以即使有很多年度行，结论仍可能很不稳定。另有截至 2014 的敏感性表，正类更少时也不能静默隐藏。'),

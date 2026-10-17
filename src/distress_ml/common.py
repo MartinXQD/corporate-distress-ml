@@ -46,7 +46,9 @@ def fit_event(tag, rows, companies=None, **kwargs):
     protocol()
     path = ART / "logs/fit_ledger.jsonl"
     lines = path.read_text().splitlines() if path.exists() else []
-    if len(lines) >= 600:
+    software_path=ART/'logs/software_fit_accounting.json'
+    software_calls=json.loads(software_path.read_text()).get('model_fit_calls',0) if software_path.exists() else 0
+    if len(lines)+software_calls >= 600:
         raise RuntimeError("Hard fit-call budget reached")
     start = json.loads((ROOT / "RUN_STATUS.json").read_text())["started_at_utc"]
     elapsed = (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(start)).total_seconds()

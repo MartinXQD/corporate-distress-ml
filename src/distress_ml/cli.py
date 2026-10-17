@@ -54,9 +54,20 @@ def main():
         import pandas as pd
         from .train import load_pipeline
         from .calibration import calibrated_predict
-        p=load_pipeline(args.model); df=pd.read_csv(args.input)
+        from .common import ART,protocol,sha
+        output=Path(args.output).resolve()
+        if not output.is_relative_to(ART.resolve()):
+            raise ValueError('Prediction outputs must remain under the ignored local artifacts directory')
+        if output.exists():raise FileExistsError('Refusing to overwrite an existing prediction output')
+        output.parent.mkdir(parents=True,exist_ok=True)
+        p=load_pipeline(args.model)
+        names=pd.read_csv(args.input,nrows=0).columns
+        df=pd.read_csv(args.input,usecols=[name for name in names if name not in ['status_label','y','y_true','bankrupt']])
         raw,cal=calibrated_predict(p,df)
-        pd.DataFrame({'raw_score':raw,'calibrated_score':cal,'predicted_label':cal>=p.threshold}).to_csv(args.output,index=False)
+        result=df[['company_name','year']].copy().rename(columns={'company_name':'company_id'})
+        result.insert(0,'row_id',range(len(df)))
+        result=result.assign(protocol_id=protocol()['protocol_id'],training_dataset_hash=protocol()['implementation']['source_data_hash'],input_file_hash=sha(args.input),raw_score=raw,calibrated_score=cal,fixed_threshold=p.threshold,predicted_label=(cal>=p.threshold).astype(int))
+        result.to_csv(output,index=False)
     elif args.command=='reproduce':
         from .finalize import reproduce
         reproduce(args.model)

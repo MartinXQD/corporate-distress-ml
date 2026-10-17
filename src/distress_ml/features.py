@@ -94,6 +94,6 @@ def feature_registry():
         rows.append(dict(feature=name,formula=formula,source_columns="X6" if "loss" in name else "X10,X9,calendar history",interpretation="Historical change or coverage",group="dynamics",time="through target year only",invalid_rule="No backward fill",set="S2"))
     for lag in [2,1,0]:
         for c in [x for x in RAW if x!='X16']:
-            rows.append(dict(feature=f'lag{lag}_{c}',formula=f'{c}(t-{lag})',source_columns=c,interpretation='Exact calendar snapshot for flattened/sequence controls',group='calendar_snapshot',time=f't-{lag}',invalid_rule='Absent slot -> NaN; observed mask retained; no target-row filtering',set='LAGS'))
-        rows.append(dict(feature=f'observed_lag{lag}',formula=f'1 if exact t-{lag} exists else 0',source_columns='company/year alignment only',interpretation='Calendar-slot observation mask',group='calendar_snapshot',time=f't-{lag}',invalid_rule='Binary; current slot always observed',set='LAGS'))
+            rows.append(dict(feature=f'lag{lag}_{c}',formula=f'{c}(t-{lag})',source_columns=c,interpretation='Exact calendar snapshot for flattened/sequence controls',group=feature_group(f'lag{lag}_{c}'),time=f't-{lag}',invalid_rule='Absent slot -> NaN; observed mask retained; no target-row filtering',set='LAGS'))
+        rows.append(dict(feature=f'observed_lag{lag}',formula=f'1 if exact t-{lag} exists else 0',source_columns='company/year alignment only',interpretation='Calendar-slot observation mask',group=feature_group(f'observed_lag{lag}'),time=f't-{lag}',invalid_rule='Binary; current slot always observed',set='LAGS'))
     return pd.DataFrame(rows)

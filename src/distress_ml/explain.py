@@ -42,6 +42,7 @@ def explain():
     pd.DataFrame(rows).to_csv(PUBLIC/'group_permutation_importance.csv',index=False)
     pd.DataFrame(costs).to_csv(PUBLIC/'confusion_cell_profiles.csv',index=False)
     dump(ART/'audit/local_failure_cases.json',cases)
+    numerical_walkthrough(df,selected,cases)
     stability=[]; coeff=[]
     for cfg_path in (ART/'logs').glob('config_*.json'):
         cfg=json.loads(cfg_path.read_text())
@@ -65,3 +66,36 @@ def explain():
     p=load_pipeline(ROOT/linear['path'])
     pd.DataFrame({'feature':p.columns,'coefficient':p.model.coef_[0],'interpretation':'Conditional standardized association; correlated inputs prevent causal interpretation'}).to_csv(PUBLIC/'final_logistic_coefficients.csv',index=False)
     return selected
+
+def numerical_walkthrough(df,selected,cases):
+    """Keep a complete one-record numerical trace local; publish no row dataset."""
+    from scipy.special import expit
+    item=selected['DL'];model=load_pipeline(ROOT/item['path'])
+    case=next((x for x in cases if x['representative']=='DL' and x['cell']=='FN'),next(x for x in cases if x['representative']=='DL'))
+    mask=df.row_id==case['row_id'];f=build_features(df,model.cfg['feature_set']).loc[mask]
+    if model.cfg['family']=='gru':
+        from .sequences import sequence_tensor,snapshot_from_lags
+        tensor=sequence_tensor(f,model.preprocessor)
+        input_frame=snapshot_from_lags(f,0)
+        feature='X6' if 'X6' in model.preprocessor.columns else model.preprocessor.columns[0]
+        j=model.preprocessor.columns.index(feature);transformed=float(tensor[0,-1,j])
+    else:
+        input_frame=f[model.selected]
+        tensor=model.preprocessor.transform(input_frame)
+        preferences=['net_income_to_assets','X6','slog_X6','lag0_X6']
+        feature=next((x for x in preferences if x in model.preprocessor.columns and x in input_frame),next(x for x in model.preprocessor.columns if x in input_frame))
+        j=model.preprocessor.columns.index(feature);transformed=float(tensor[0,j])
+    i=model.preprocessor.input_columns.index(feature)
+    value=float(input_frame.iloc[0][feature]);median=float(model.preprocessor.medians[i])
+    imputed=value if np.isfinite(value) else median
+    clipped=float(np.clip(imputed,model.preprocessor.lower[i],model.preprocessor.upper[i]))
+    mean=float(model.preprocessor.means[j]);std=float(model.preprocessor.stds[j])
+    assert np.isclose((clipped-mean)/std,transformed,atol=1e-5)
+    raw,score=calibrated_predict(model,df.loc[mask],f)
+    assert np.isclose(raw[0],case['raw_score'],atol=1e-6)
+    assert np.isclose(score[0],case['calibrated_score'],atol=1e-6)
+    financial=df.loc[mask,[f'X{k}' for k in range(1,19)]].iloc[0].to_dict()
+    trace=dict(case_rule=case['rule'],cell=case['cell'],model_label=item['label'],row_id=case['row_id'],company_id=case['company_id'],year=case['year'],raw_financial_fields=financial,traced_feature=feature,feature_value=value,training_median=median,imputed=imputed,training_clip_lower=float(model.preprocessor.lower[i]),training_clip_upper=float(model.preprocessor.upper[i]),clipped=clipped,training_mean=mean,training_std=std,tensor_feature_value=transformed,tensor_shape=list(tensor.shape),full_tensor=tensor.tolist(),raw_logit=float(raw[0]),uncalibrated_sigmoid=float(expit(raw[0])),calibrated_score=float(score[0]),fixed_2014_threshold=model.threshold,predicted_label=int(score[0]>=model.threshold),y_true=case['y_true'],checkpoint_reloaded=True)
+    dump(ART/'audit/local_numerical_walkthrough.json',trace)
+    text=f'''# Local numerical case walkthrough / 本地数值核验\n\nLocal only. Do not publish this individual record, financial inputs or full tensor. 此文件只供本人核查，不上传 GitHub。\n\n## 1. Registered case / 预登记案例\n\nModel: {item['label']}. Cell: {case['cell']}. Row: {case['row_id']}; company: {case['company_id']}; fiscal year: {case['year']}. Selection follows the registered hash rule, without choosing a persuasive anecdote.\n\n## 2. Raw financial inputs / 原始财务输入\n\nX6 net income = {financial['X6']:.9g}; X10 current total assets = {financial['X10']:.9g}; X17 total liabilities = {financial['X17']:.9g}.\n\nWhen X10 is positive, net-income/assets = {financial['X6']/financial['X10']:.9g}. This ratio is illustrative of feature construction; the traced model input below is an actually retained input in this checkpoint, not a forced ratio for a model that did not use it.\n\n## 3. Actual preprocessing / 正式预处理\n\nTraced input: {feature}. Input value = {value:.9g}. Training median = {median:.9g}; imputed value = {imputed:.9g}. Training clip interval = [{trace['training_clip_lower']:.9g}, {trace['training_clip_upper']:.9g}]; clipped value = {clipped:.9g}. Saved training mean = {mean:.9g}; std = {std:.9g}.\n\nThe actual tensor value is (clipped - mean) / std = {transformed:.9g}. Tensor shape = {list(tensor.shape)}. The complete tensor and all 18 source values are saved in artifacts/audit/local_numerical_walkthrough.json. Only one component is displayed here; the network logit uses the entire actual tensor. 不能把这一个变量的数值误认为整个网络的解释。\n\n## 4. Logit, calibration and decision / 分数到判断\n\nSaved checkpoint raw logit z = {raw[0]:.9g}. Uncalibrated sigmoid(z) = {expit(raw[0]):.9g}. The independently fitted 2013 Platt calibrator gives q = {score[0]:.9g}. The frozen 2014 F1 threshold is {model.threshold:.9g}; predicted_label = {int(score[0]>=model.threshold)}, observed label = {case['y_true']}.\n\nThe case is therefore {case['cell']} at the fixed threshold. A different threshold can change this decision but cannot be chosen from this historical outcome in this version. The calibrated number refers to the company-constant label, not a verified annual default event.\n\n## 5. Recheck / 亲自验证\n\nNotebook 04 reconstructs the same model/features and checks logits and calibrated scores. Compare this file with local_failure_cases.json and the saved historical prediction file. All checks use the formal scoring checkpoint and its exact feature order; no explanatory model was retrained.\n'''
+    (ROOT/'reports/Local_Case_Walkthrough_EN_CN.md').write_text(text)

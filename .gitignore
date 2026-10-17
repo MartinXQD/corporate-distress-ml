@@ -11,5 +11,6 @@ __pycache__/
 *.pkl
 *.joblib
 reports/Resume_Bullets_EN_CN.md
+reports/Local_Case_Walkthrough_EN_CN.md
 RUN_STATUS.json
 NEXT_ACTIONS.md

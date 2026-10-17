@@ -65,7 +65,9 @@ def freeze():
         stopping=cfg['family'] in NEURAL+['xgboost','catboost','gru']
         if cfg['family'] in ['dummy','altman']:return 1
         return (2+2*selector if stopping else 1+selector)+1
-    used=len((ART/'logs/fit_ledger.jsonl').read_text().splitlines())
+    accounting=ART/'logs/software_fit_accounting.json'
+    software_calls=json.loads(accounting.read_text()).get('model_fit_calls',0) if accounting.exists() else 0
+    used=len((ART/'logs/fit_ledger.jsonl').read_text().splitlines())+software_calls
     planned_seeds=protocol()['runtime']['final_seeds']
     fixed_cost=sum(fit_cost(cfg) for cfg in configurations.values())+24+int(ensemble_choice['selected'])
     repeat_cost=sum(fit_cost(get_cfg(cid)) for cid in reps.values())
@@ -172,6 +174,16 @@ def historical_evaluate():
     bootstrap_scores={name:raw_predictions[name] for name in dict.fromkeys([baseline,*selected.values()])}
     ci=bootstrap_pairs(target,bootstrap_scores,baseline,2000,2026)
     ci.to_csv(PUBLIC/'paired_company_bootstrap.csv',index=False)
+    novelty_ci=[]
+    for cutoff,seen_set in [(2012,seen),(2014,seen2014)]:
+        for novelty in ['seen','unseen']:
+            mask=target.company_name.isin(seen_set).to_numpy()
+            if novelty=='unseen':mask=~mask
+            scores={name:np.asarray(value)[mask] for name,value in bootstrap_scores.items()}
+            subset_ci=bootstrap_pairs(target.loc[mask],scores,baseline,2000,2026+cutoff+(novelty=='unseen'))
+            subset_ci=subset_ci[subset_ci.metric.isin(['AP','ROC_AUC'])]
+            novelty_ci.append(subset_ci.assign(seen_cutoff=cutoff,novelty=novelty))
+    pd.concat(novelty_ci,ignore_index=True).to_csv(PUBLIC/'seen_unseen_company_bootstrap.csv',index=False)
     dump(ART/'logs/historical_evaluation_complete.json',dict(completed_at_utc=now(),models=len(freeze['models']),historical_rows=len(target),bootstrap_draws=2000,selected=selected,reference=baseline))
     state('historical_complete',complete=False)
 

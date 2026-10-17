@@ -21,7 +21,7 @@ def run():
     issues=[];records=[]
     for rel in paths:
         p=Path(rel)
-        if set(p.parts)&forbidden_parts or p.suffix.lower() in forbidden_suffixes or p.name in ['.DS_Store','Resume_Bullets_EN_CN.md','american_bankruptcy.csv']:
+        if set(p.parts)&forbidden_parts or p.suffix.lower() in forbidden_suffixes or p.name in ['.DS_Store','Resume_Bullets_EN_CN.md','Local_Case_Walkthrough_EN_CN.md','american_bankruptcy.csv']:
             issues.append(dict(path=rel,reason='Excluded file in index'))
         b=subprocess.check_output(['git','show',':'+rel],cwd=ROOT)
         if len(b)>20*1024*1024:issues.append(dict(path=rel,reason='File exceeds 20 MiB'))

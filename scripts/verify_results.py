@@ -50,7 +50,9 @@ def main():
         path=ROOT.parent/rel
         if not path.exists() or sha(path)!=h:changes.append(rel)
     assert not changes,'Original source changed: '+repr(changes)
-    result=dict(passed=True,models=len(checks),prediction_checks=checks,group_fit_events_checked=group_events,actual_fit_calls=len(ledger),fit_budget_passed=len(ledger)<=600,original_files_verified=len(original),original_changes=changes,frozen_artifact_hashes_verified=len(freeze['artifact_hashes']),all_primary_same_historical_rows=True)
+    software_path=ART/'logs/software_fit_accounting.json'
+    software_calls=json.loads(software_path.read_text()).get('model_fit_calls',0) if software_path.exists() else 0
+    result=dict(passed=True,models=len(checks),prediction_checks=checks,group_fit_events_checked=group_events,research_fit_calls=len(ledger),software_fit_calls=software_calls,actual_total_fit_calls=len(ledger)+software_calls,fit_budget_passed=len(ledger)+software_calls<=600,original_files_verified=len(original),original_changes=changes,frozen_artifact_hashes_verified=len(freeze['artifact_hashes']),all_primary_same_historical_rows=True)
     dump(PUBLIC/'verification_summary.json',{k:v for k,v in result.items() if k!='prediction_checks'})
     dump(ART/'audit/result_verification.json',result)
     print(json.dumps({k:v for k,v in result.items() if k not in ['prediction_checks','group_fit_events_checked']},indent=2))

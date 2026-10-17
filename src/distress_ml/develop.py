@@ -52,7 +52,10 @@ def run_config(df,cfg,stage):
 
 def summarize():
     t=pd.read_csv(PUBLIC/'development_yearly.csv')
-    summary=t.groupby(['config_id','family','feature_set','stage'],dropna=False).agg(macro_year_AP=('AP','mean'),macro_ROC_AUC=('ROC_AUC','mean'),macro_recall_top5=('macro_recall_top5','mean'),worst_year_AP=('AP','min'),score_years=('year','nunique'),mean_fit_seconds=('fit_seconds','mean'),mean_features=('features','mean')).reset_index()
+    keys=['config_id','family','feature_set','stage']
+    summary=t.groupby(keys,dropna=False).agg(macro_year_AP=('AP','mean'),macro_ROC_AUC=('ROC_AUC','mean'),macro_recall_top5=('macro_recall_top5','mean'),worst_year_AP=('AP','min'),score_years=('year','nunique')).reset_index()
+    cost=t.drop_duplicates(['config_id','run_id']).groupby(keys,dropna=False).agg(mean_fit_seconds=('fit_seconds','mean'),mean_features=('features','mean')).reset_index()
+    summary=summary.merge(cost,on=keys,validate='one_to_one')
     summary=summary.sort_values(['macro_year_AP','mean_fit_seconds','config_id'],ascending=[False,True,True])
     summary.to_csv(PUBLIC/'development_summary.csv',index=False)
     return summary
@@ -103,9 +106,11 @@ def develop(stage='all'):
 
 def optional_sequences():
     """Run after the mandatory core, within the same training ledger and budget."""
+    state('sequence_extension')
     df=load_data()
     for family in ['xgboost','mlp']:
         run_config(df,base_config(family,'LAGS'),'sequence_control')
     cfg=base_config('gru','LAGS',width=32,depth=1,dropout=.15,max_epochs=25,patience=4,batch_size=1024,learning_rate=.001,weight_decay=.0001)
     run_config(df,cfg,'sequence_extension')
     summarize()
+    state('development_and_sequences_complete',complete=False)

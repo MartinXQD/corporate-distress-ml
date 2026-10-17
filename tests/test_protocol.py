@@ -1,5 +1,8 @@
 """Meaningful leakage, metric and PyTorch contracts on synthetic software fixtures."""
 import copy
+import os
+import json
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
@@ -11,6 +14,11 @@ from distress_ml.preprocessing import Preprocessor,resample_train,positive_weigh
 from distress_ml.splits import groups,assert_disjoint,inner_masks
 from distress_ml.evaluation import metrics,budgets,choose_threshold,bootstrap_pairs
 from distress_ml.neural import TabularNet,seed_everything,predict_logits
+
+def software_event(kind,tag):
+    path=os.environ.get('DISTRESS_TEST_FIT_LOG')
+    if path:
+        with Path(path).open('a') as f:f.write(json.dumps(dict(kind=kind,tag=tag))+'\n')
 
 @pytest.fixture
 def panel():
@@ -122,6 +130,7 @@ def test_torch_shape_loss_update_reload(family,tmp_path):
     loss=torch.nn.BCEWithLogitsLoss()(score,y); assert torch.isfinite(loss)
     loss.backward(); assert all(torch.isfinite(p.grad).all() for p in m.parameters() if p.grad is not None)
     optimizer.step(); assert any(not torch.equal(before[k],v) for k,v in m.state_dict().items())
+    software_event('single_neural_update',family)
     m.eval(); a=predict_logits(m,x.numpy()); assert not m.training
     path=tmp_path/'own.pt'; torch.save(m.state_dict(),path)
     other=TabularNet(family,7,cfg); other.load_state_dict(torch.load(path,weights_only=True)); other.eval()
@@ -165,7 +174,9 @@ def test_nested_selector_external_mutation_not_used(panel,tmp_path,monkeypatch):
     (tmp_path/'models').mkdir()
     monkeypatch.setattr(module,'ART',tmp_path)
     counter=iter(range(1,1000))
-    monkeypatch.setattr(module,'fit_event',lambda *args,**kwargs:next(counter))
+    def spy(*args,**kwargs):
+        software_event('model_fit',args[0]);return next(counter)
+    monkeypatch.setattr(module,'fit_event',spy)
     tr=panel.year<=2004;f=build_features(panel,'S1')
     selected,_=module.select_features(f.loc[tr],panel.loc[tr],'elastic_net',42,'synthetic_test')
     changed=panel.copy();changed.loc[~tr,'y']=1-changed.loc[~tr,'y'];changed.loc[~tr,'X6']=1e15
@@ -175,9 +186,11 @@ def test_nested_selector_external_mutation_not_used(panel,tmp_path,monkeypatch):
 def test_calibration_roles_and_fixed_threshold(panel,monkeypatch):
     import distress_ml.calibration as module
     from types import SimpleNamespace
-    monkeypatch.setattr(module,'fit_event',lambda *args,**kwargs:1)
+    def spy(*args,**kwargs):
+        software_event('model_fit',args[0]);return 1
+    monkeypatch.setattr(module,'fit_event',spy)
     d=panel.copy();d['year']+=9
-    model=SimpleNamespace(metadata={},predict_raw=lambda df,features=None:df.X6.to_numpy())
+    model=SimpleNamespace(metadata={},cfg={'feature_set':'S0'},predict_raw=lambda df,features=None:df.X6.to_numpy())
     fit=d[d.year<=2012];cal=d[d.year==2013];decision=d[d.year==2014]
     p=module.fit_calibration(model,fit,cal,decision)
     assert p.metadata['calibration_year']==2013 and p.metadata['decision_year']==2014
@@ -201,3 +214,19 @@ def test_equal_rank_ensemble_uses_only_within_year_scores(panel):
     changed=panel.X6.copy();changed.loc[panel.year==2006]=1e12
     updated=annual_rank(panel.year,changed)
     np.testing.assert_array_equal(original[panel.year<2006],updated[panel.year<2006])
+
+def test_gru_checkpoint_roundtrip(tmp_path):
+    seed_everything(42)
+    x=np.random.default_rng(2).normal(size=(20,3,18)).astype(np.float32)
+    cfg=dict(width=16,dropout=.1)
+    m=TabularNet('gru',18,cfg);m.eval();before=predict_logits(m,x)
+    path=tmp_path/'own_gru.pt';torch.save(m.state_dict(),path)
+    other=TabularNet('gru',18,cfg);other.load_state_dict(torch.load(path,weights_only=True));other.eval()
+    np.testing.assert_allclose(before,predict_logits(other,x),atol=1e-6)
+
+def test_untrusted_pipeline_path_rejected(tmp_path):
+    from distress_ml.train import load_pipeline
+    path=tmp_path/'unknown.joblib'
+    path.write_bytes(b'not-a-project-checkpoint')
+    with pytest.raises(ValueError,match='trusted artifacts'):
+        load_pipeline(path)
