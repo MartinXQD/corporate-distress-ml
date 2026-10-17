@@ -17,8 +17,9 @@ def representative_rows(c):
 
 def ci_rows(c,metric='AP'):
     d=c['paired_company_bootstrap']
-    labels=[v['label'] for v in c['selected'].values()]
-    return d[(d.model.isin(labels))&(d.metric==metric)].assign(model=lambda x:x.model.map({v['label']:k for k,v in c['selected'].items()}))
+    mapping={v['label']:k for k,v in c['selected'].items()}
+    mapping.update({x['label']:'Ensemble' for x in c['freeze']['models'] if x['family']=='equal_rank_ensemble'})
+    return d[(d.model.isin(mapping))&(d.metric==metric)].assign(model=lambda x:x.model.map(mapping))
 
 def ablation_wide(c):
     a=c['ablations']

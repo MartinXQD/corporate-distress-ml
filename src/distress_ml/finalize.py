@@ -171,7 +171,8 @@ def historical_evaluate():
     for filename,rows in [('historical_metrics',metrics_rows),('historical_yearly',annual_rows),('historical_seen_unseen',subset_rows),('historical_budgets',budget_rows),('reliability_bins',cal_rows),('seed_results',seed_rows),('group_stress_metrics',group_rows)]:
         pd.DataFrame(rows).to_csv(PUBLIC/(filename+'.csv'),index=False)
     # Choices were frozen from development; never select a test winner here.
-    bootstrap_scores={name:raw_predictions[name] for name in dict.fromkeys([baseline,*selected.values()])}
+    ensemble_labels=[item['label'] for item in freeze['models'] if item['family']=='equal_rank_ensemble']
+    bootstrap_scores={name:raw_predictions[name] for name in dict.fromkeys([baseline,*selected.values(),*ensemble_labels])}
     ci=bootstrap_pairs(target,bootstrap_scores,baseline,2000,2026)
     ci.to_csv(PUBLIC/'paired_company_bootstrap.csv',index=False)
     novelty_ci=[]
