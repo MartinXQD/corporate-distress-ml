@@ -1,0 +1,11 @@
+{
+  "tabm": "0.0.3",
+  "rtdl-num-embeddings": "0.0.12",
+  "rtdl-revisiting-models": "0.0.2",
+  "optuna": "5.0.0",
+  "torch": "2.14.1",
+  "catboost": "1.2.10",
+  "xgboost": "3.4.1",
+  "numpy": "2.3.5",
+  "scikit-learn": "1.7.2"
+}

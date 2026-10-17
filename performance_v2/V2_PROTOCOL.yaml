@@ -1,0 +1,308 @@
+version: performance-v2
+status: registered_before_first_v2_fit
+author: Qidian (Martin) Xing
+budget:
+  total_wall_clock_hours: 8
+  paid_services: false
+  initial_diagnostics_max_fraction: 0.15
+  training_search_min_target_fraction: 0.65
+  neural_processes: 1
+  max_tree_processes: 2
+  checkpoint_and_resume: true
+  search_stop_hours: 5.9
+  stability_stop_hours: 7.15
+  hard_stop_hours: 8
+  fit_call_limit: 2400
+  per_fold_seconds: 720
+  delivery_reserve_minutes: 40
+data:
+  source: existing_authorized_local_snapshot
+  modify_raw: false
+  task: retrospective_failed_company_classification
+  historical_exposure: previously_inspected_multiple_versions
+  sha256: cff2c899a97ecd629415cb22f59186000e74e1c0a78cfae036c0a53025419b5e
+p1:
+  selection_label_cutoff: 2012
+  base_fit_cutoff: 2012
+  calibration_year: 2013
+  threshold_year: 2014
+  transfer_from_p2_requires_separate_label: true
+p2:
+  search_scoring_years:
+  - 2009
+  - 2010
+  - 2011
+  - 2012
+  - 2013
+  initial_screen_years:
+  - 2009
+  - 2011
+  - 2013
+  confirmation_year: 2014
+  final_ranking_fit_cutoff: 2014
+  ranking_first: true
+  reuse_p1_calibrator: false
+  historical_years:
+  - 2015
+  - 2016
+  - 2017
+  - 2018
+  tune_historical_labels: false
+selection:
+  primary_metric: macro_year_average_precision
+  secondary:
+  - recent_years_ap
+  - annual_recall_at_5_percent
+  - roc_auc
+  - cost
+  near_tie_tolerance: 0.005
+  roc_guardrail_delta: -0.01
+  recall_guardrail_delta: -0.02
+  shortlist_max: 8
+  shortlist_per_family_max: 2
+  screening_seed: 42
+  confirmation_seeds:
+  - 42
+  - 2026
+  - 31415
+  final_seeds:
+  - 42
+  - 2026
+  - 31415
+  - 7
+  - 2718
+  bootstrap_unit: company
+  paired_bootstrap_draws: 2000
+  seed_average_is_not_independent_test: true
+mandatory_routes:
+- legacy_residual_transfer
+- lighter_features_and_preprocessing
+- tuned_catboost
+- tuned_xgboost
+- tuned_rf_extratrees
+- tuned_mlp_residual
+- numeric_embeddings
+- tabm_or_explicitly_named_fallback
+conditional_routes:
+- ranking_losses
+- rolling_window_and_sample_weights
+- limited_nonnegative_blending
+- official_ft_transformer
+archive_observation_lines_not_optimization_stops:
+  ap: 0.3
+  roc_auc: 0.87
+  annual_recall_at_5_percent: 0.5
+publication:
+  new_branch: research/performance-v2
+  preserve_v0_v1: true
+  push_only_existing_authorized_remote: true
+  expose_raw_data_or_private_records: false
+registered_at_utc: '2026-10-17T06:55:18.194188+00:00'
+implementation:
+  directory: individual_extension/performance_v2
+  selection: three-year screen; five-year promotion; three-seed shortlist; guardrailed
+    near-tie choice
+  screen_minimum_completed_years_before_prune: 2
+  screen_pruning: After two years only, AP mean < 0.65 * fixed incumbent matching-year
+    AP; also retain family exploration first six complete configurations.
+  refit: New full-window model; same optimizer update count as inner best checkpoint
+    by default; epoch-equivalent and keep-best sensitivity explicitly labeled.
+  inner_stopping: Last fit year, sklearn AP for NN; CatBoost PRAUC and XGBoost aucpr
+    explicitly library-specific; selected candidates always externally scored with
+    sklearn AP.
+  sampling: Equal original-data optimizer-step budgets; separate epoch-equivalent
+    ROS control; no sampled validation rows.
+  scheduler: Cosine uses optimizer-step horizon fixed by inner maximum; same horizon/warmup
+    retained in refit.
+  weighting: Class alpha0/0.5/1; company beta0/.5/1, time half-life none/3/5 introduced
+    separately after strong baselines.
+  legacy_archive: Fixed archived13 list confined to archive-role reconstruction after
+    confirmation opened; P2 INNER_L1 selects in every fit role.
+  confirmation: Freeze candidate/blend choices before reading 2014 labels once; no
+    search restart after confirmation.
+  history: Freeze all final artifacts then batch read 2015-2018 labels once; preserve
+    source exposure disclosure.
+  no_historical_target_stop: true
+search_spaces:
+  feature_sets:
+  - RAW17
+  - RAW18
+  - SLOG17
+  - RATIO_CORE
+  - SLOG_RATIO
+  - LEGACY35
+  - LEGACY33
+  - INNER_L1
+  - LAGS_RAW3
+  - LAGS_SLOG3
+  - DYNAMIC_COMPACT
+  nn_preprocessing:
+  - std01
+  - std005
+  - robust
+  - quantile
+  tree_preprocessing:
+  - native
+  - none
+  - std01
+  catboost:
+    target: 36
+    iterations:
+    - 1500
+    - 3000
+    depth:
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    learning_rate:
+    - 0.01
+    - 0.15
+    l2:
+    - 1
+    - 50
+    random_strength:
+    - 0
+    - 2
+    bootstrap:
+    - Bayesian
+    - Bernoulli
+  xgboost:
+    target: 36
+    trees:
+    - 1500
+    - 3000
+    depth:
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    learning_rate:
+    - 0.01
+    - 0.15
+    min_child_weight:
+    - 1
+    - 64
+    subsample:
+    - 0.6
+    - 1
+    colsample:
+    - 0.5
+    - 1
+    reg_lambda:
+    - 0.01
+    - 100
+    reg_alpha:
+    - 1.0e-06
+    - 10
+  forest:
+    target_each: 12
+    trees:
+    - 300
+    - 600
+    - 1000
+    depth:
+    - 6
+    - 10
+    - 16
+    - null
+    leaf:
+    - 2
+    - 5
+    - 10
+    - 20
+    - 40
+    max_features:
+    - sqrt
+    - 0.5
+    - 0.8
+    - 1.0
+  neural:
+    target_each_legacy_residual_and_mlp: 18
+    width:
+    - 64
+    - 128
+    - 192
+    - 256
+    depth:
+    - 1
+    - 2
+    - 4
+    batch:
+    - 256
+    - 512
+    - 1024
+    dropout:
+    - 0
+    - 0.15
+    - 0.25
+    - 0.4
+    lr:
+    - 0.0001
+    - 0.003
+    wd:
+    - 0
+    - 1.0e-06
+    - 0.0001
+    - 0.0002
+    - 0.001
+    - 0.01
+    max_epochs: 200
+    patience: 25
+    schedule:
+    - fixed
+    - cosine
+  numeric_embeddings:
+    target: 14
+    backbone:
+    - mlp
+    - legacy_residual
+    type:
+    - piecewise
+    - periodic
+    bins:
+    - 8
+    - 16
+    - 32
+    dim:
+    - 8
+    - 16
+  tabm:
+    target: 14
+    k: 16
+    width:
+    - 128
+    - 256
+    - 512
+    depth:
+    - 2
+    - 3
+    - 4
+    embedding:
+    - none
+    - piecewise
+  official_ft:
+    target: 8
+    token:
+    - 32
+    - 64
+    - 96
+    layers:
+    - 2
+    - 3
+  ranking:
+    target: 8
+    xgb_objective:
+    - rank:map
+    - rank:pairwise
+    nn_pair_lambda:
+    - 0.05
+    - 0.2
+  seed: 42
+  sampler: Optuna TPE persistent SQLite; seeded, one trial process; deterministic
+    explicit diverse startup candidates; random fallback only if API failure recorded

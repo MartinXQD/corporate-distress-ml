@@ -1,0 +1,25 @@
+{
+  "selected_device": "cpu",
+  "selected_threads": 4,
+  "MPS_available": false,
+  "CUDA_available": false,
+  "benchmark": [
+    {
+      "device": "cpu",
+      "threads": 2,
+      "updates": 12,
+      "seconds": 0.1458769159798976,
+      "finite_loss": true,
+      "final_loss": 0.6312869787216187
+    },
+    {
+      "device": "cpu",
+      "threads": 4,
+      "updates": 12,
+      "seconds": 0.12694912499864586,
+      "finite_loss": true,
+      "final_loss": 0.5766063928604126
+    }
+  ],
+  "scope": "Synthetic optimizer/device throughput, not research scores"
+}
