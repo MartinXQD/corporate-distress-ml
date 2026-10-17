@@ -1,6 +1,7 @@
 # Corporate Financial Distress
 
-**A Reproducible ML & Deep Learning Benchmark - Independent Extension**  
+**A Reproducible ML & Deep Learning Benchmark - Independent Extension**
+
 **Qidian (Martin) Xing** | 2026-10-16 | Codex-assisted implementation and documentation
 
 This is retrospective failed-company classification on 78,682 firm-years and 8,971 companies. Company labels are constant over time; true event and financial-publication dates are unavailable. The previously inspected 2015-2018 period is a historical evaluation, not a new untouched external holdout or verified one-year default prediction.
