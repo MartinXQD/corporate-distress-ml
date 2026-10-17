@@ -30,7 +30,7 @@ def sample_weights(df,cfg):
     alpha=cfg.get('weight_alpha',0)
     w[y==1]*=((len(y)-y.sum())/y.sum())**alpha
     if cfg.get('company_beta',0):
-        factor=df.company_name.map(df.company_name.value_counts()).to_numpy()**(-cfg['company_beta']);w*=factor/factor.mean()
+        factor=df.company_name.map(df.company_name.value_counts()).to_numpy(dtype=float)**(-cfg['company_beta']);w*=factor/factor.mean()
     if cfg.get('half_life'):
         factor=2.**(-(df.year.max()-df.year.to_numpy())/cfg['half_life']);w*=factor/factor.mean()
     return w
