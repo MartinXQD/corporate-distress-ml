@@ -59,6 +59,20 @@ def export():
     for r in rows:
         if r['seed']==42:counts.setdefault(r['candidate'],set()).add(r['year'])
     trials['completed_development_years']=trials.trial_id.map(lambda k:len(counts.get(k,set())))
+    costs={}
+    for r in rows:
+        if r['seed']==42 and r['year'] in [2009,2011,2013]:costs[r['candidate']]=costs.get(r['candidate'],0.)+r['fit_seconds']
+    trials['completed_screen_fold_fit_seconds']=trials.trial_id.map(costs)
+    trials['timing_basis']='seconds=current attempt monotonic elapsed; fold-fit sum includes reused completed folds; UTC wall budget includes gaps'
+    def functional_recipe(raw):
+        c=json.loads(raw)
+        if c.get('embedding','none')=='none':
+            for field in ['embedding','embedding_dim','bins']:c.pop(field,None)
+            if c['family']=='num_mlp':c['family']='legacy_residual' if c.get('backbone')=='residual' else 'mlp'
+        if c.get('backbone','mlp')=='mlp':c.pop('backbone',None)
+        if c['family']=='official_ft':c.pop('width',None)
+        return digest(c)
+    trials['functional_recipe_hash']=trials.config_json.map(functional_recipe)
     trials['metric_identity']=trials.status.map(lambda s:'Complete registered trial' if s=='COMPLETE' else 'Partial/invalid/in-progress; not eligible as complete')
     trials.to_csv(RESULT/'trials.csv',index=False)
 
@@ -157,23 +171,19 @@ def search():
         sampler=joblib.load(sampler_path) if sampler_path.exists() else optuna.samplers.TPESampler(seed=42,n_startup_trials=8)
         studies[family]=optuna.create_study(study_name=family,storage='sqlite:///'+str(ART/'optuna.sqlite'),load_if_exists=True,direction='maximize',sampler=sampler)
         enqueue(studies[family],family)
-    for family,study in studies.items():
-        for pending in study.get_trials(states=[optuna.trial.TrialState.RUNNING]):
-            cfg=pending.user_attrs.get('actual_config')
-            if cfg is None:
-                study.tell(pending.number,state=optuna.trial.TrialState.FAIL);continue
-            trial_id=f'{family}_{pending.number:03d}_{digest(cfg)[:8]}'
-            status,value=execute(cfg,trial_id,'screen',[2009,2011,2013])
-            study.tell(pending.number,value if status=='COMPLETE' else None,state=optuna.trial.TrialState.COMPLETE if status=='COMPLETE' else optuna.trial.TrialState.FAIL)
     dump(ROOT/'configs/resource_reserve.json',dict(search_soft_stop_hours=4.8,registered_search_maximum=5.9,reason='Reserve measured full-fold three-seed stability, five-seed final baselines, company stress, verification and reports inside the eight-hour wall clock. May end earlier only when all search targets complete.'))
     # Measured residual trial 000 took 19 minutes. Cost-based scheduling gives
     # the two high-priority boosting families three turns per cycle. It does
     # not change spaces, scoring, seeds, or promote based on historical data.
     schedule=[f for f in TARGETS for _ in range(3 if f in ['catboost','xgboost'] else 1)]
-    dump(ROOT/'configs/search_schedule_revision.json',dict(at_utc=now(),cycle=schedule,reason='Observed CPU cost; preserve broad tree search within the same wall-clock cap. No score-based family elimination.',registered_protocol_unchanged=True))
+    dump(ROOT/'configs/search_schedule_revision.json',dict(at_utc=now(),cycle=schedule,coverage_priority='Mandatory high-priority families with fewer than two complete recipes go first, ordered by completed coverage; pending partial trials resume within their family turn',reason='Observed CPU cost; preserve broad tree search and avoid leaving numerical embeddings/TabM unattempted. No score-based family elimination.',registered_protocol_unchanged=True))
     while hours()<4.8:
         made=False
-        for family in schedule:
+        counts={f:sum(t.state==optuna.trial.TrialState.COMPLETE for t in s.trials) for f,s in studies.items()}
+        underexplored=[f for f in list(TARGETS)[:8] if counts[f]<2]
+        cycle=sorted(underexplored,key=lambda f:(counts[f],list(TARGETS).index(f)))+[f for f in schedule if f not in underexplored]
+        with (ART/'logs/dispatch_cycles.jsonl').open('a') as stream:stream.write(json.dumps(dict(at_utc=now(),complete_counts=counts,cycle=cycle))+'\n')
+        for family in cycle:
             target=TARGETS[family]
             study=studies[family]
             completed=sum(t.state==optuna.trial.TrialState.COMPLETE for t in study.trials)
@@ -181,13 +191,30 @@ def search():
             if completed>=target or attempts>=target+8:continue
             if family in ['official_ft','xgb_rank'] and min(sum(t.state==optuna.trial.TrialState.COMPLETE for t in studies[f].trials) for f in list(TARGETS)[:8])<6:continue
             if hours()>=4.8:break
-            trial=study.ask();cfg=propose(trial,family);trial_id=f'{family}_{trial.number:03d}_{digest(cfg)[:8]}'
-            trial.set_user_attr('actual_config',cfg);state('performance_search',current_trial=trial_id,hours_elapsed=hours())
+            pending=study.get_trials(states=[optuna.trial.TrialState.RUNNING])
+            if pending:
+                trial=pending[0];cfg=trial.user_attrs.get('actual_config')
+                if cfg is None:study.tell(trial.number,state=optuna.trial.TrialState.FAIL);continue
+            else:
+                trial=study.ask();cfg=propose(trial,family);trial.set_user_attr('actual_config',cfg)
+            trial_id=f'{family}_{trial.number:03d}_{digest(cfg)[:8]}'
+            state('performance_search',current_trial=trial_id,hours_elapsed=hours())
             joblib.dump(study.sampler,ART/f'sampler_{family}.joblib')
             status,value=execute(cfg,trial_id,'screen',[2009,2011,2013])
-            study.tell(trial,value if status=='COMPLETE' else None,state=optuna.trial.TrialState.COMPLETE if status=='COMPLETE' else optuna.trial.TrialState.FAIL)
+            study.tell(trial.number,value if status=='COMPLETE' else None,state=optuna.trial.TrialState.COMPLETE if status=='COMPLETE' else optuna.trial.TrialState.FAIL)
             joblib.dump(study.sampler,ART/f'sampler_{family}.joblib')
             made=True
         if not made:break
+    budget_rows=[]
+    for family,study in studies.items():
+        for pending in study.get_trials(states=[optuna.trial.TrialState.RUNNING]):
+            cfg=pending.user_attrs.get('actual_config')
+            if cfg:
+                key=f'{family}_{pending.number:03d}_{digest(cfg)[:8]}'
+                db=database();db.execute('UPDATE trial_records SET status=?,finished=?,error=? WHERE trial_id=?',('INCOMPLETE_BUDGET',now(),'Search budget ended before every registered scoring year completed; preserved folds not eligible for selection',key));db.commit();db.close()
+            study.tell(pending.number,state=optuna.trial.TrialState.FAIL)
+        complete=sum(t.state==optuna.trial.TrialState.COMPLETE for t in study.trials)
+        budget_rows.append(dict(family=family,target_complete=TARGETS[family],actual_complete=complete,failed_attempts=sum(t.state==optuna.trial.TrialState.FAIL for t in study.trials),waiting_enqueued=sum(t.state==optuna.trial.TrialState.WAITING for t in study.trials),completed_target_shortfall=max(0,TARGETS[family]-complete),family_closed_for_performance=False))
+    pd.DataFrame(budget_rows).to_csv(RESULT/'search_budget_summary.csv',index=False)
     export();state('search_completed_pending_shortlist')
 

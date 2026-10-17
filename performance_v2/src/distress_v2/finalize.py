@@ -74,8 +74,11 @@ def select_shortlist():
     neural=summary[summary.family.isin(NN)]
     near_nn=neural[neural.macro_AP>=neural.macro_AP.max()-.005]
     dl=near_nn.sort_values(order,ascending=[False,False,True,True]).iloc[0].candidate
+    trees=summary[summary.family.isin(['catboost','xgboost','random_forest','extra_trees','xgb_rank'])]
+    near_trees=trees[trees.macro_AP>=trees.macro_AP.max()-.005]
+    ml=near_trees.sort_values(order,ascending=[False,False,True,True]).iloc[0].candidate
     summary.to_csv(RESULT/'selection_trace.csv',index=False)
-    selected=dict(overall=winner,DL=dl,shortlist=chosen,selection_years=YEARS,selection_seeds=STABILITY_SEEDS,near_tie=.005,guardrail_reference=incumbent.candidate,chosen_at_utc=now(),history_exposed_before_version=True)
+    selected=dict(overall=winner,ML=ml,DL=dl,shortlist=chosen,selection_years=YEARS,selection_seeds=STABILITY_SEEDS,near_tie=.005,guardrail_reference=incumbent.candidate,chosen_at_utc=now(),history_exposed_before_version=True)
     selected['blend']=choose_blend(selected,summary)
     dump(ROOT/'configs/selection_freeze.json',selected);dump(RESULT/'selected_candidates.json',selected)
     state('selection_frozen_before_2014',overall=winner,DL=dl)
@@ -128,7 +131,7 @@ def choose_blend(selected,summary):
     return dict(admitted=chosen,candidate=best,reference_macro_AP=base_macro,admission='At least +0.005 macro-year development AP, ROC/Top5 guardrails, finite two-model nonnegative grid; NN weight may be zero',score_type='annual percentile rank',reference_cohorts_fixed_for_bootstrap=True)
 
 def all_final_configs(selected):
-    result={selected['overall']:cfg(selected['overall']),selected['DL']:cfg(selected['DL'])}
+    result={selected['overall']:cfg(selected['overall']),selected['ML']:cfg(selected['ML']),selected['DL']:cfg(selected['DL'])}
     if selected['blend']['admitted']:
         b=selected['blend']['candidate']
         for key in [b['component_a'],b['component_b']]:result[key]=cfg(key)
@@ -195,7 +198,7 @@ def logit_safe(x):
 def company_stress(selected,df):
     from distress_ml.splits import groups
     inventory=[]
-    for role,candidate in [('overall',selected['overall']),('DL',selected['DL'])]:
+    for role,candidate in [('ML',selected['ML']),('DL',selected['DL'])]:
         c=cfg(candidate);f=features(df,c['features'])
         for fold in [0,1,2]:
             name=f'post_selection_group{fold}_{role}';path=ART/f'models/{name}.joblib';mask=(groups(df)!=fold)&(df.year<=2014)
@@ -212,13 +215,16 @@ def score_historical():
     frozen=json.loads((ROOT/'configs/artifact_freeze.json').read_text())
     assert all(sha(ROOT/p)==h for p,h in frozen['artifacts'].items())
     dump(lock,dict(opened_at_utc=now(),freeze_sha256=sha(ROOT/'configs/artifact_freeze.json')))
-    df=load('historical');hist=df.year>=2015;rows=[];yearly=[];pred={};selected=json.loads((ROOT/'configs/selection_freeze.json').read_text())
+    df=load('historical');hist=df.year>=2015;rows=[];yearly=[];pred={};probability_rows=[];selected=json.loads((ROOT/'configs/selection_freeze.json').read_text())
     from distress_ml.splits import groups
     for item in frozen['models']:
         p=load_model(ROOT/item['path']);f=features(df,p.cfg['features']);mask=hist.copy()
         if item['channel']=='post_selection_company_stress':mask &= groups(df)==item['group_fold']
         inference_started=time.perf_counter();score=p.predict(f[mask]);inference_seconds=time.perf_counter()-inference_started;sub=df[mask];raw_score=score.copy()
         if item['channel']=='P1':score=p.calibrator.predict_proba(logit_safe(score).reshape(-1,1))[:,1]
+        if item['channel']=='P1':
+            from distress_ml.evaluation import metrics as probability_metrics
+            probability_rows.append(dict(name=item['name'],channel='P1_only',base_fit_cutoff=2012,calibration_year=2013,threshold_year=2014,**probability_metrics(sub,score,p.threshold)))
         out=sub[['row_id','company_name','year','y']].rename(columns={'company_name':'company_id','y':'y_true'}).copy();out['score']=score;out['raw_score']=raw_score;out.to_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',index=False)
         m=historical_metrics(sub,score);rows.append(dict(**item,**m,fit_seconds=p.metadata['fit_seconds'],inference_seconds=inference_seconds))
         for year,g in sub.groupby('year'):yearly.append(dict(**item,year=int(year),**measures(g,score[sub.index.get_indexer(g.index)])))
@@ -237,6 +243,7 @@ def score_historical():
         rows.append(dict(name='P2_fixed_rank_blend',candidate='frozen_blend',channel='P2_annual_rank_seed_ensemble',fit_cutoff=2014,score_type='fixed annual-rank blend',**historical_metrics(df[hist],q)))
         out=df.loc[hist,['row_id','company_name','year','y']].rename(columns={'company_name':'company_id','y':'y_true'}).copy();out['score']=q;out.to_csv(ART/'predictions/P2_fixed_rank_blend_historical.csv.gz',index=False)
     pd.DataFrame(rows).to_csv(RESULT/'historical_2015_2018.csv',index=False);pd.DataFrame(yearly).to_csv(RESULT/'historical_by_year.csv',index=False)
+    pd.DataFrame(probability_rows).to_csv(RESULT/'p1_probability_supplement.csv',index=False)
     pd.DataFrame([r for r in rows if r['channel']=='P2']).to_csv(RESULT/'seeds.csv',index=False)
     unseen_tables(df,mean_predictions)
     dump(ART/'historical_complete.json',dict(completed_at_utc=now(),pipelines=len(frozen['models']),rows=int(hist.sum()),new_fit_after_history=False));state('historical_complete')

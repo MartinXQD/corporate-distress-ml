@@ -22,8 +22,7 @@ def verify():
     assert (ART/'historical_complete.json').exists()
     frozen=json.loads((ROOT/'configs/artifact_freeze.json').read_text())
     assert all(sha(ROOT/p)==h for p,h in frozen['artifacts'].items())
-    original=json.loads((ART/'audit/protected_sources.json').read_text())
-    assert all((SOURCE/p).exists() and sha(SOURCE/p)==h for p,h in original.items()),'A protected V0/V1 file changed'
+    preservation=verify_protected()
     df=load('historical');hist=df[df.year>=2015];table=pd.read_csv(RESULT/'historical_2015_2018.csv',float_precision='round_trip').set_index('name');checked=[];families={}
     for item in frozen['models']:
         d=pd.read_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',float_precision='round_trip')
@@ -57,10 +56,22 @@ def verify():
         np.testing.assert_allclose(q,d.raw_score.to_numpy(),atol=1e-6,rtol=1e-6)
         selected.append(dict(model=item['name'],neural=neural,max_reload_error=float(np.max(abs(q-d.raw_score.to_numpy())))))
     development_checks=verify_development(df)
-    result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),development_prediction_sets_verified=development_checks,frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=len(original),same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
+    result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),development_prediction_sets_verified=development_checks,frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=preservation['verified'],protected_files_read_denied=preservation['read_denied'],full_preservation_hash_check_complete=preservation['read_denied']==0,preservation_scope='All readable protected files compared against the initial hash manifest; any system-denied private originals remain explicitly unverified, not asserted unchanged',same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
     uncertainty(df,hist,table)
     dump(RESULT/'verification.json',result)
     print(json.dumps(result,indent=2))
+
+def verify_protected():
+    original=json.loads((ART/'audit/protected_sources.json').read_text());changed=[];denied=[];verified=0
+    for path,expected in original.items():
+        try:
+            if sha(SOURCE/path)!=expected:changed.append(path)
+            else:verified+=1
+        except PermissionError:denied.append(path)
+        except FileNotFoundError:changed.append(path)
+    dump(ART/'audit/preservation_current.json',dict(at_utc=now(),verified=verified,read_denied=denied,changed_or_missing=changed,complete=not denied and not changed))
+    assert not changed,'A readable protected V0/V1 file changed or is missing; see local audit'
+    return dict(verified=verified,read_denied=len(denied))
 
 def verify_development(df):
     """Recalculate every saved development fold, including invalidated evidence."""
@@ -80,7 +91,8 @@ def verify_development(df):
     return count
 
 def uncertainty(df,hist,table):
-    from distress_ml.evaluation import bootstrap_pairs
+    from .uncertainty import bootstrap,contract
+    dump(RESULT/'bootstrap_software_contract.json',contract())
     selected=json.loads((ROOT/'configs/selection_freeze.json').read_text());benchmarks=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf'];keys=list(dict.fromkeys([selected['overall'],selected['DL'],*benchmarks]))
     predictions={}
     for key in keys:
@@ -93,11 +105,9 @@ def uncertainty(df,hist,table):
             for year in sorted(hist.year.unique()):
                 ix=np.flatnonzero(hist.year.to_numpy()==year);q[ix]=rankdata(q[ix],method='average')/len(ix)
             predictions[key]=q
-    rows=[]
-    for reference in benchmarks:
-        t=bootstrap_pairs(hist,predictions,reference,repetitions=2000,seed=2026)
-        t['score_convention']='annual percentile ranks, frozen cohorts' if selected['blend']['admitted'] else 'mean registered-seed uncalibrated scores'
-        rows.append(t)
-    pd.concat(rows).to_csv(RESULT/'paired_company_intervals.csv',index=False)
+    t,arrays=bootstrap(hist,predictions,benchmarks,repetitions=2000,seed=2026)
+    t['score_convention']='annual percentile ranks, frozen cohorts' if selected['blend']['admitted'] else 'mean registered-seed uncalibrated scores'
+    t.to_csv(RESULT/'paired_company_intervals.csv',index=False)
+    np.savez_compressed(ART/'audit/paired_bootstrap_draws.npz',**arrays)
 
 if __name__=='__main__':verify()

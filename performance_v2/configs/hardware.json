@@ -1,0 +1,16 @@
+{
+  "at_utc": "2026-10-17T09:28:26.647141+00:00",
+  "architecture": "arm64",
+  "operating_system": "Darwin",
+  "release": "25.6.0",
+  "cpu": "Apple M5",
+  "physical_cores": 10,
+  "logical_cores": 10,
+  "memory_bytes": 25769803776,
+  "memory_GiB": 24,
+  "model": "Mac17,4",
+  "selected_device": "CPU",
+  "threads_per_model": 4,
+  "paid_compute": false,
+  "source": "Read-only sysctl, MPS/CUDA availability and saved 2/4-thread optimizer benchmark"
+}

@@ -24,14 +24,17 @@ def delta_table(c):
             selected_id=json.loads((V1/'configs/final_freeze.json').read_text())['representatives']['ML' if label=='V1 RF' else 'DL'];d=h[h.config_id==selected_id]
         else:d=h[(h.family==family)&(h.feature_set==feature)]
         r=d.iloc[0];rows.append(dict(recipe=label,version='V1',fit_cutoff=2012,input=feature,selected='Yes' if label in ['V1 RF','V1 DL'] else 'No',seeds=1,annual_AP=r.macro_year_AP,pooled_AP=r.AP,ROC=r.ROC_AUC,R5=r.macro_recall_top5,seconds=r.fit_seconds,identity='Saved V1'))
-    selected=c['selected'];keys=list(dict.fromkeys(['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf',selected['overall'],selected['DL']]))
+    selected=c['selected'];keys=list(dict.fromkeys(['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf','baseline_v1_selected_dl_corrected_steps','baseline_logistic',selected['overall'],selected['DL']]))
     for key in keys:
         row=c['main'].loc['P2_seed_mean__'+key];config=json.loads((ROOT/f'configs/trial_{key}.json').read_text())
-        short={'baseline_legacy_strong_inner_l1':'P2 old L1','baseline_v1_lags_xgb':'P2 lag XGB','baseline_v1_raw_catboost':'P2 Cat raw','baseline_v1_selected_rf':'P2 V1 RF'}.get(key,'P2 overall' if key==selected['overall'] else 'P2 DL')
+        short={'baseline_legacy_strong_inner_l1':'P2 old L1','baseline_v1_lags_xgb':'P2 lag XGB','baseline_v1_raw_catboost':'P2 Cat raw','baseline_v1_selected_rf':'P2 V1 RF','baseline_v1_selected_dl_corrected_steps':'P2 V1 DL','baseline_logistic':'P2 Logistic'}.get(key,'P2 overall' if key==selected['overall'] else 'P2 DL')
         component=c['historical_2015_2018'];cost=component[(component.candidate==key)&(component.channel=='P2')].fit_seconds.sum()
         rows.append(dict(recipe=short,version='P2',fit_cutoff=2014,input=config['features']+'/'+config['preprocess'],selected='Yes' if key in [selected['overall'],selected['DL']] else 'Fixed',seeds=int(row.seed_count),annual_AP=row.macro_AP,pooled_AP=row.AP,ROC=row.ROC_AUC,R5=row.recall5,seconds=cost,identity='New seed mean'))
     if selected['blend']['admitted']:
         r=c['main'].loc['P2_fixed_rank_blend'];rows.append(dict(recipe='P2 blend',version='P2',fit_cutoff=2014,input='annual ranks',selected='Yes',seeds=5,annual_AP=r.macro_AP,pooled_AP=r.AP,ROC=r.ROC_AUC,R5=r.recall5,seconds=np.nan,identity='Frozen blend'))
+    for row in c['historical_2015_2018'].itertuples():
+        if row.channel not in ['P1','P2_selected__fit_cutoff_2012_transfer','V0_archive_role']:continue
+        rows.append(dict(recipe=row.name,version=row.channel,fit_cutoff=row.fit_cutoff,input='See frozen artifact configuration',selected='Pre' if row.channel!='P2_selected__fit_cutoff_2012_transfer' else 'P2',seeds=1,annual_AP=row.macro_AP,pooled_AP=row.AP,ROC=row.ROC_AUC,R5=row.recall5,seconds=row.fit_seconds,identity=row.score_type))
     table=pd.DataFrame(rows);table.to_csv(RESULT/'baseline_bridge.csv',index=False);return table
 
 def export_ablations(c):
@@ -92,16 +95,16 @@ def matched_numeric_controls(c):
     table=pd.DataFrame(rows);table.to_csv(RESULT/'numeric_matched_controls.csv',index=False);return table
 
 def verdict(c):
-    selected=c['selected'];main=c['main'].loc['P2_seed_mean__'+selected['overall']]
+    selected=c['selected'];blend=selected['blend']['admitted'];target='fixed_annual_rank_blend' if blend else selected['overall'];main=c['main'].loc['P2_fixed_rank_blend' if blend else 'P2_seed_mean__'+target]
     names=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf']
     refs={key:c['main'].loc['P2_seed_mean__'+key] for key in names}
     best=max(refs,key=lambda key:refs[key].macro_AP);gap=main.macro_AP-refs[best].macro_AP
     old=c['main'].loc['P2_seed_mean__baseline_legacy_strong_inner_l1']
-    ci=c['paired_company_intervals'];q=ci[(ci.model==selected['overall'])&(ci.metric=='macro_year_AP')]
+    ci=c['paired_company_intervals'];q=ci[(ci.model==target)&(ci.metric=='macro_year_AP')]
     positive=len(q)==4 and bool((q.delta_lower>0).all())
-    return dict(main=main,strongest_name=best,strongest=refs[best],gap=gap,old=old,all_point_benchmarks_beaten=gap>0,all_conditional_intervals_positive=positive,
-      en=f"The development-selected overall model has historical annual AP {main.macro_AP:.3f}, versus {refs[best].macro_AP:.3f} for the strongest frozen same-cutoff baseline point estimate ({best}). The difference is {gap:+.3f}. "+('It exceeds all four baseline point estimates. ' if gap>0 else 'It does not exceed every strong baseline; this is not a comprehensive performance upgrade. ')+('All four paired annual-AP lower bounds are positive under the conditional company bootstrap.' if positive else 'The paired intervals do not uniformly establish a positive improvement over all four strong baselines.'),
-      cn=f"开发期选定的整体模型，历史年度 AP={main.macro_AP:.3f}；冻结的同截止年强基准中，点估计最高的是 {best}（{refs[best].macro_AP:.3f}），差值 {gap:+.3f}。"+('点估计超过四条强基准。' if gap>0 else '没有超过所有强基准，不能称全面性能升级。')+('四组配对年度 AP 区间下界均为正，但仍只是固定模型与当前样本下的条件证据。' if positive else '配对区间没有一致支持对四条强基准都有确定的正向差异。'))
+    return dict(main=main,target=target,strongest_name=best,strongest=refs[best],gap=gap,old=old,all_point_benchmarks_beaten=gap>0,all_conditional_intervals_positive=positive,
+      en=f"The development-selected {'fixed annual-rank blend' if blend else 'overall single recipe'} has historical annual AP {main.macro_AP:.3f}, versus {refs[best].macro_AP:.3f} for the strongest frozen same-cutoff baseline point estimate ({best}). The difference is {gap:+.3f}. "+('It exceeds all four baseline point estimates. ' if gap>0 else 'It does not exceed every strong baseline; this is not a comprehensive performance upgrade. ')+('All four paired annual-AP lower bounds are positive under the conditional company bootstrap.' if positive else 'The paired intervals do not uniformly establish a positive improvement over all four strong baselines.'),
+      cn=f"开发期选定的{'固定年度rank融合' if blend else '整体单配方'}，历史年度 AP={main.macro_AP:.3f}；冻结的同截止年强基准中，点估计最高的是 {best}（{refs[best].macro_AP:.3f}），差值 {gap:+.3f}。"+('点估计超过四条强基准。' if gap>0 else '没有超过所有强基准，不能称全面性能升级。')+('四组配对年度 AP 区间下界均为正，但仍只是固定模型与当前样本下的条件证据。' if positive else '配对区间没有一致支持对四条强基准都有确定的正向差异。'))
 
 def figures(c):
     import matplotlib
@@ -124,8 +127,8 @@ def figures(c):
     axes[0].set(xlabel='Previously inspected historical year',ylabel='Mean individual-seed AP',title='Annual seed-average metrics');axes[1].set(xlabel='Year',ylabel='Mean individual-seed Recall@5%',title='Natural annual review population');axes[0].legend(fontsize=9);fig.tight_layout();fig.savefig(out/'historical_years.png',dpi=160);plt.close(fig)
     t=c['trials'];t=t[(t.status=='COMPLETE')&t.stage.isin(['screen','refinement'])]
     fig,ax=plt.subplots(figsize=(8,3.0))
-    for family,g in t.groupby('family'):ax.scatter(g.seconds,g.macro_AP,label=family,s=16,alpha=.65)
-    ax.set(xscale='log',xlabel='Measured three-year trial wall time (seconds)',ylabel='Screening mean annual AP',title='Optimization cost and development performance');ax.legend(fontsize=7,ncol=3);fig.tight_layout();fig.savefig(out/'search_cost.png',dpi=160);plt.close(fig)
+    for family,g in t.groupby('family'):ax.scatter(g.completed_screen_fold_fit_seconds,g.macro_AP,label=family,s=16,alpha=.65)
+    ax.set(xscale='log',xlabel='Sum of completed screen-fold fit seconds',ylabel='Screening mean annual AP',title='Optimization cost and development performance');ax.legend(fontsize=7,ncol=3);fig.tight_layout();fig.savefig(out/'search_cost.png',dpi=160);plt.close(fig)
 
 def block(text):return {'type':'paragraph','text':text}
 def image(name,caption):return {'type':'figure','path':f'results/figures/{name}.png','caption':caption}
@@ -142,7 +145,7 @@ def page(title,*blocks):return dict(title=title,subtitle=None,blocks=list(blocks
 
 def pages(c,delta,budget,language):
     cn=language=='cn';v=verdict(c);selected=c['selected']
-    overview=delta[~delta.recipe.isin(['V1 lag XGB','V1 Cat raw','P2 Cat raw'])].copy()
+    overview=delta[delta.version.isin(['V0','V1','P2'])&~delta.recipe.isin(['V1 lag XGB','V1 Cat raw','P2 Cat raw','P2 Logistic'])].copy()
     overview['input']=overview.input.replace({'INNER_L1/std01':'L1/01','V1_LAGS/v1':'Lag3/V1','V1_S1/v1':'S1/V1','fixed13/std01':'13/01','RAW18/std01':'18/01'})
     overview['input']=overview.input.str.replace('RATIO_CORE','Ratio',regex=False).str.replace('SLOG_RATIO','LogR',regex=False).str.replace('LAGS_RAW3','Lag3',regex=False).str.replace('LAGS_SLOG3','Log3',regex=False).str.replace('DYNAMIC_COMPACT','Dyn',regex=False).str.replace('quantile','QT',regex=False).str.replace('std005','005',regex=False).str.replace('std01','01',regex=False)
     overview['selected']=overview.selected.replace({'Yes':'Y','No':'N','Fixed':'Pre'});overview['minutes']=overview.seconds/60;overview['identity']=overview.identity.replace({'Archive only':'Archive','Saved V1':'V1','New seed mean':'Mean score','Frozen blend':'Rank blend'})
@@ -150,7 +153,7 @@ def pages(c,delta,budget,language):
     first=tab(overview,columns,['Recipe','Cutoff','Input','Sel','Seeds','Yr AP','Pool AP','ROC','R@5','Min','Source'])
     complete=c['trials'];screen=complete[complete.stage=='screen'];statuses=screen.status.map(lambda s:'FAIL' if s.startswith('FAIL') else s);coverage=pd.crosstab(screen.family,statuses).reindex(columns=['COMPLETE','FAIL','PRUNED'],fill_value=0).reset_index()
     bridge=c['bridge'][['candidate','AP','ROC_AUC','fit_seconds']].copy();bridge.candidate=bridge.candidate.str.replace('bridge_','',regex=False)
-    ci=c['paired_company_intervals'];ci=ci[(ci.model==selected['overall'])&(ci.metric=='macro_year_AP')][['reference','delta_lower','delta_upper','valid_draws']]
+    ci=c['paired_company_intervals'];ci=ci[(ci.model==v['target'])&(ci.metric=='macro_year_AP')][['reference','delta_lower','delta_upper','valid_draws']]
     seeds=c['seeds'];seed_summary=seeds.groupby('candidate').agg(seeds=('seed','nunique'),annual_AP_mean=('macro_AP','mean'),annual_AP_min=('macro_AP','min'),annual_AP_max=('macro_AP','max')).reset_index()
     seed_summary['candidate']=seed_summary.candidate.str.slice(0,38)
     if cn:
@@ -183,13 +186,17 @@ def actual_changes_page(c,matched,language):
     confirmation=c['confirmation_2014'];confirmation=confirmation[confirmation.candidate.isin(keys)][['candidate','AP','ROC_AUC','recall5']].copy()
     confirmation.candidate=confirmation.candidate.map(lambda k:'Overall' if k==selected['overall'] else ('DL' if k==selected['DL'] else k.replace('baseline_','')))
     rows.append(tab(confirmation,['candidate','AP','ROC_AUC','recall5'],['2014 一次确认','AP','ROC','R@5'] if cn else ['One 2014 confirmation','AP','ROC','R@5']))
-    rows.append(block('以上PLE差异是同主干、单seed、三个开发评分年的成对结果；没有把更大参数量本身当收益。最终配方常同时改变输入和优化，只能归因于整条流水线。2014结果不会触发重选；若确认或历史表现反转，同样保留。' if cn else 'The PLE deltas are matched-backbone, one-seed, three-year development comparisons. More parameters are not themselves a benefit. A final recipe often changes several factors and supports a pipeline-level comparison. The 2014 batch cannot trigger reselection; reversals in confirmation or historical evaluation are retained.'))
+    dl=c['main'].loc['P2_seed_mean__'+selected['DL']];old_dl=c['main'].loc['P2_seed_mean__baseline_v1_selected_dl_corrected_steps'];old_l1=c['main'].loc['P2_seed_mean__baseline_legacy_strong_inner_l1']
+    rows.append(block(f'神经网络单配方：选定DL年度 AP={dl.macro_AP:.3f}；同截止年V1 DL={old_dl.macro_AP:.3f}（差{dl.macro_AP-old_dl.macro_AP:+.3f}），旧强L1配方={old_l1.macro_AP:.3f}（差{dl.macro_AP-old_l1.macro_AP:+.3f}）。这些是先平均五seed预测再评分的历史点估计，稳定性与区间另列。' if cn else f'Neural single recipe: selected DL annual AP={dl.macro_AP:.3f}; same-cutoff V1 DL={old_dl.macro_AP:.3f} (difference {dl.macro_AP-old_dl.macro_AP:+.3f}), legacy L1={old_l1.macro_AP:.3f} (difference {dl.macro_AP-old_l1.macro_AP:+.3f}). These are historical point estimates from mean five-seed predictions; stability and intervals are reported separately.'))
+    rows.append(block('PLE差异仅是同主干、单seed、三个开发年的成对结果。最终配方同时改变多项时，只能归因于整条流水线；2014不会触发重选。' if cn else 'PLE deltas are matched-backbone, one-seed, three-year development results. Multivariable final changes support pipeline comparisons; the 2014 batch never triggers reselection.'))
     return page('本轮究竟改了什么：用新结果回答' if cn else 'What changed: measured recipe and confirmation',*rows)
 
 def write_summaries(c,matched):
     v=verdict(c);selected=c['selected'];ledger=[json.loads(s) for s in (ART/'logs/fits.jsonl').read_text().splitlines()]
     trial=c['trials'];coverage=trial.groupby(['stage','family','status']).size().rename('configurations').reset_index();coverage.to_csv(RESULT/'trial_coverage.csv',index=False)
-    summary=dict(author='Qidian (Martin) Xing',created_at_utc=now(),wall_clock_hours_to_report=hours(),hard_budget_hours=8,model_fit_calls=len(ledger),completed_screen_configurations=int(((trial.stage=='screen')&(trial.status=='COMPLETE')).sum()),completed_refinement_configurations=int(((trial.stage=='refinement')&(trial.status=='COMPLETE')).sum()),final_pipelines=len(json.loads((ROOT/'configs/final_inventory.json').read_text())),selected=selected,strongest_same_cutoff_baseline=v['strongest_name'],historical_annual_AP_difference=v['gap'],all_point_benchmarks_beaten=v['all_point_benchmarks_beaten'],all_conditional_intervals_positive=v['all_conditional_intervals_positive'],historical_exposure='Previously inspected across versions; not a new holdout',paid_services=False,publication='pending exact release audit and authenticated branch push')
+    preservation=json.loads((RESULT/'verification.json').read_text())
+    screened=trial[(trial.stage=='screen')&(trial.status=='COMPLETE')]
+    summary=dict(author='Qidian (Martin) Xing',created_at_utc=now(),wall_clock_hours_to_report=hours(),hard_budget_hours=8,model_fit_calls=len(ledger),completed_screen_configurations=int(len(screened)),unique_effective_screen_recipes=int(screened.functional_recipe_hash.nunique()),completed_refinement_configurations=int(((trial.stage=='refinement')&(trial.status=='COMPLETE')).sum()),final_pipelines=len(json.loads((ROOT/'configs/final_inventory.json').read_text())),selected=selected,strongest_same_cutoff_baseline=v['strongest_name'],historical_annual_AP_difference=v['gap'],all_point_benchmarks_beaten=v['all_point_benchmarks_beaten'],all_conditional_intervals_positive=v['all_conditional_intervals_positive'],historical_exposure='Previously inspected across versions; not a new holdout',paid_services=False,publication='pending exact release audit and authenticated branch push')
     dump(RESULT/'experiment_summary.json',summary)
     public_ledger=pd.DataFrame([{k:r.get(k) for k in ['fit_call','at_utc','tag','rows','max_fit_year','config_hash','optimizer_max_steps','resampled_rows','positive_weight','positive_fraction','weight_ESS','weight_min','weight_max','C']} for r in ledger]);public_ledger.to_csv(RESULT/'fit_accounting.csv',index=False)
     (ROOT/'README.md').write_text(f'''# Financial Distress - Performance V2
@@ -198,7 +205,7 @@ def write_summaries(c,matched):
 
 {v['en']}
 
-This version completed {summary['completed_screen_configurations']} three-year screening configurations and {summary['completed_refinement_configurations']} bounded local-refinement configurations, with {len(ledger)} recorded model-fit calls and {summary['final_pipelines']} frozen final pipelines. Folds, seeds and shared TabM heads are not counted as different methods. Coverage targets and actual shortfalls are in [trial coverage](results/trial_coverage.csv). Wall time to report: {hours():.2f} hours of the original eight-hour local cap; no paid compute.
+This version completed {summary['completed_screen_configurations']} three-year screening trials ({summary['unique_effective_screen_recipes']} effective distinct recipes, accounting for matched no-embedding controls) and {summary['completed_refinement_configurations']} bounded local-refinement configurations, with {len(ledger)} recorded model-fit calls and {summary['final_pipelines']} frozen final pipelines. Folds, seeds and shared TabM heads are not counted as different methods. Coverage targets and actual shortfalls are in [trial coverage](results/trial_coverage.csv). Wall time to report: {hours():.2f} hours of the original eight-hour local cap; no paid compute. Fit seconds use the monotonic process timer, while the UTC budget includes observed time gaps; these clocks are not interchangeable.
 
 The 2015-2018 historical labels were inspected in earlier versions. V2 is retrospective, not a new holdout or an annual probability-of-default study. All P2 strong baselines are retrained through 2014 on the same permitted records; P1 and P2-selected cutoff-2012 transfers remain separately identified.
 
@@ -224,6 +231,8 @@ scripts/run_performance_v2.sh -m distress_v2.inference --help
 Resume never resets the original wall clock or reopens search after confirmation. After the registered run is complete, preserve its freezes; a new search requires a newly registered version, not deleting a lock. Local model files are indexed by `configs/final_inventory.json`; each has a preprocessing/config sidecar, and neural states additionally have `.pt` files. Models are trusted local joblib artifacts, not safe files to load from strangers. Private data, company-level predictions, audit manifests, runtime state and resume drafts are excluded from public Git.
 
 The inherited V1 paths and historical lock are unchanged. The V2 bridge used a source snapshot before the compact-mask implementation; its purpose is a controlled mechanism diagnostic, explicitly distinct from P2 HPO. One migrated V1 ROS trial was invalidated for an epoch-refit step error and replaced before selection; it is retained in the ledger and does not explain original V1 performance.
+
+The final preservation check confirmed {preservation['protected_files_unchanged']} readable protected files against their initial hashes. {preservation['protected_files_read_denied']} private original file(s) could not be read under current system permissions, including an escalated read-only attempt; no current hash-equality claim is made for those files. Exact local exceptions remain in the private audit directory and are not published.
 ''',encoding='utf-8')
     interview=f'''# 性能优化 V2：中文面试增补
 
@@ -271,7 +280,7 @@ Author: Qidian (Martin) Xing. Use only after personally reviewing and understand
 
 ## English
 
-- Benchmarked {summary['completed_screen_configurations']} real configurations for financial-distress ranking across temporal folds, retaining failed trials and five-seed comparisons; the development-selected model recorded {m.macro_AP:.3f} historical annual AP versus {ref.macro_AP:.3f} for the strongest same-cutoff baseline.
+- Benchmarked {summary['unique_effective_screen_recipes']} financial-distress configurations with temporal folds and five-seed checks; a development-selected recipe achieved {m.macro_AP:.3f} historical annual AP against {ref.macro_AP:.3f} for the strongest same-cutoff baseline on previously inspected data.
 - Compared legacy residual networks, tuned tree models and numerical representations through a Codex-assisted local workflow, auditing sampling updates, company generalization and paired uncertainty while preserving original team results and source attribution.
 
 ## 中文
@@ -287,6 +296,8 @@ def report():
     if not (ART/'pdf_operation_started.json').exists():
         state('verified_awaiting_pdf_authoring_marker',complete=False)
         print('Numerical verification complete. PDF authoring marker required before report generation.');return
+    from .search import export
+    export()
     c=context();configuration_bridge();delta=delta_table(c);budget=export_ablations(c);matched=matched_numeric_controls(c);figures(c)
     from .pdf_layout import render
     (ROOT/'reports').mkdir(exist_ok=True)
