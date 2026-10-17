@@ -62,7 +62,12 @@ def run():
     records=[]
     for i,p in enumerate(plans):
         name=f'refine_r{p["round"]}_{i:02d}_{digest(p["config"])[:8]}'
+        db=database();prior=db.execute('SELECT status,macro_AP FROM trial_records WHERE trial_id=?',(name,)).fetchone();db.close()
+        if prior and prior[0]=='COMPLETE':
+            records.append(dict(trial_id=name,round=p['round'],parent=p['parent'],status='COMPLETE',macro_AP=prior[1],reason=p['reason']+'; reused completed trial'));continue
         if hours()+p['estimated_seconds']/3600>deadline:
+            if prior and prior[0]=='RUNNING':
+                db=database();db.execute('UPDATE trial_records SET status=?,finished=?,error=? WHERE trial_id=?',('INCOMPLETE_BUDGET',now(),'Local refinement budget ended; interrupted partial folds retained',name));db.commit();db.close()
             records.append(dict(trial_id=name,round=p['round'],parent=p['parent'],status='NOT_STARTED_BUDGET',reason=p['reason']));continue
         status,value=execute(p['config'],name,'refinement',[2009,2011,2013])
         records.append(dict(trial_id=name,round=p['round'],parent=p['parent'],status=status,macro_AP=value,reason=p['reason']))
