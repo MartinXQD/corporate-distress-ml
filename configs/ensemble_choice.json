@@ -1,0 +1,15 @@
+{
+  "registered_candidate": "equal-rank ML + DL, fixed 0.5/0.5",
+  "chosen_on": "development OOF macro-year AP only",
+  "selected": true,
+  "macro_year_AP": {
+    "DL": 0.27353205935133745,
+    "ML": 0.3380106454829522,
+    "equal_rank_ensemble": 0.3618662494557953
+  },
+  "representatives": {
+    "ML": "random_forest__S1__95d8315d2d",
+    "DL": "residual_mlp__S1__aaac4276aa"
+  },
+  "selected_at_utc": "2026-10-17T05:21:57.689196+00:00"
+}

@@ -1,0 +1,12 @@
+{
+  "seeds": [
+    42,
+    137,
+    2026,
+    31415,
+    27182
+  ],
+  "fit_calls_before_final": 468,
+  "estimated_final_calls": 101,
+  "reason": "Pre-historical budget check; never selected by seed performance"
+}
