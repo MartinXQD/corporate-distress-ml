@@ -15,7 +15,7 @@ Owner and new extension author: Qidian (Martin) Xing. Original team work is ackn
 - [x] Code, registered configs, executed notebooks, editable reports, aggregate tables/figures, claim index, model/data cards and attribution disclosures are available locally. Model states, preprocessors, calibration, thresholds, row predictions, full numerical case and bilingual resume drafts remain in ignored local artifacts/reports.
 - [x] HTTPS GitHub credential and connector identity were independently verified as MartinXQD. Credential material is never printed or committed. The publishing command rechecks authenticated identity before creation.
 - [x] Initial final-content staged-index audit passed: 123 files, 11,914,833 bytes, zero secret/private-path/forbidden-file/size/link issues. Prior Git history blobs were also scanned without findings. The index audit is refreshed after this receipt before upload.
-- [ ] New public remote visibility, commit and key-file verification are pending upload.
+- [x] Created a new public repository under MartinXQD; remote content commit `67764ef91116397c3be7488dc23ed6c68071c9fd`, public visibility and five key files verified. No existing repository was overwritten; no force push was used.
 
 ## Required eight-question audit
 
@@ -34,4 +34,4 @@ Development-selected RF historical AP = 0.205641 versus same-protocol S0 Logisti
 
 ## Publication
 
-Local content and prior-history audits passed. Pending final commit and new public repository upload. This is a local-complete state, not a publication claim. The publishing receipt must verify authenticated owner, public visibility, remote commit and key files. No existing remote is replaced and no force push is permitted.
+Published: https://github.com/MartinXQD/corporate-distress-ml. Authenticated owner and public visibility verified. Content commit: `67764ef91116397c3be7488dc23ed6c68071c9fd`. Both PDFs, the README, historical result table and Notebook 04 were verified through the remote API. Final publication metadata is committed as a follow-up documentation change; its HEAD is verified separately in the local final receipt. Public data/checkpoints/team materials remain excluded. No existing remote was replaced and no force push was used.

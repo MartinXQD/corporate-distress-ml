@@ -15,3 +15,5 @@ No source score is represented as a new experiment. Historical evaluation remain
 Supplementary synthetic diagnostic/unit model-fit attempts: 27. Total counted local model-fit attempts: 569/600. These software fixtures never enter research scores.
 
 Final local verification: 141 original files unchanged, 98 frozen artifact hashes verified, 41 prediction files aligned with the actual source rows. All 28 software tests passed (0 skipped). Both representative checkpoints reproduced; the inference CLI ignored supplied labels and matched frozen scores at 1e-6 tolerance. No research model was refitted after freeze.
+
+Public release: https://github.com/MartinXQD/corporate-distress-ml. Authenticated owner MartinXQD; public visibility, content commit `67764ef91116397c3be7488dc23ed6c68071c9fd` and five key files were verified remotely at 2026-10-17T05:50:23.753997+00:00. The publication receipt is saved in results/public/publication.json; follow-up documentation commits do not change the frozen research artifacts.

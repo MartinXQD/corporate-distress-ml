@@ -67,12 +67,14 @@
     27182
   ],
   "source_files_preserved": 141,
-  "publication": "pending final Git-index audit and new-repository upload",
+  "publication": "published and remote verified",
   "failed_pilot_fit_calls": [
     2
   ],
   "optional_sequences": "completed",
   "paid_services": false,
   "source_original_changes": 0,
-  "local_deliverables_complete": true
+  "local_deliverables_complete": true,
+  "repository": "https://github.com/MartinXQD/corporate-distress-ml",
+  "release_content_commit": "67764ef91116397c3be7488dc23ed6c68071c9fd"
 }
