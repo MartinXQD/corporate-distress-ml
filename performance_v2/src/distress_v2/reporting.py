@@ -99,6 +99,19 @@ def matched_numeric_controls(c):
         rows.append(dict(family=family,status='COMPLETE',without_id=pair[0].trial_id,with_id=pair[1].trial_id,input=a['features'],preprocess=a['preprocess'],no_embedding_AP=pair[0].macro_AP,piecewise_AP=pair[1].macro_AP,delta_AP=pair[1].macro_AP-pair[0].macro_AP,no_embedding_seconds=pair[0].seconds,piecewise_seconds=pair[1].seconds,scope='Same configured backbone/optimization and three development years; a single screening seed, not historical causal attribution'))
     table=pd.DataFrame(rows);table.to_csv(RESULT/'numeric_matched_controls.csv',index=False);return table
 
+def matched_input_controls(c):
+    table=c['trials'].set_index('trial_id');rows=[]
+    trace=pd.read_csv(RESULT/'local_refinement_trace.csv')
+    for row in trace.itertuples():
+        if row.status!='COMPLETE' or row.trial_id not in table.index:continue
+        parent=table.loc[row.parent];child=table.loc[row.trial_id]
+        a=json.loads(parent.config_json);b=json.loads(child.config_json)
+        changed={key for key in set(a)|set(b) if a.get(key)!=b.get(key)}
+        if changed!={'features'}:continue
+        rows.append(dict(parent=row.parent,candidate=row.trial_id,family=b['family'],parent_input=a['features'],input=b['features'],parent_AP=parent.macro_AP,AP=child.macro_AP,delta_AP=child.macro_AP-parent.macro_AP,scope='Same configured preprocessing, stopping/refit and optimization rules; three development years, seed42; realized stopping length may differ. Not historical causal attribution.'))
+    result=pd.DataFrame(rows,columns=['parent','candidate','family','parent_input','input','parent_AP','AP','delta_AP','scope'])
+    result.to_csv(RESULT/'matched_input_controls.csv',index=False);return result
+
 def verdict(c):
     selected=c['selected'];blend=selected['blend']['admitted'];target='fixed_annual_rank_blend' if blend else selected['overall'];main=c['main'].loc['P2_fixed_rank_blend' if blend else 'P2_seed_mean__'+target]
     names=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf']
@@ -168,7 +181,7 @@ def pages(c,delta,budget,language):
     seed_summary['candidate']=seed_summary.candidate.str.slice(0,38)
     if cn:
         return [
-          page('性能优化 V2：先看真实增量',block(f'Qidian (Martin) Xing | {cohort["rows"]:,}条公司年度记录、{cohort["companies"]:,}家公司；截至2014可用于拟合{cohort["fit_rows"]:,}条。2015-2018共{cohort["historical_rows"]:,}条，已被多轮查看。'),first,block(v['cn']),block('Yr AP 为历史四年AP等权均值；Pool AP与ROC为合并统计；R@5为逐年Top5%召回均值。Min为拟合计时分钟；seed mean先平均预测再评分。Sel表示各版本/家族内选定；Archive为旧档案，不是新实验。年度ROC guardrail另见selection_trace，完整身份见baseline_bridge.csv。')),
+          page('性能优化 V2：实测性能对照',block(f'Qidian (Martin) Xing | {cohort["rows"]:,}条公司年度记录、{cohort["companies"]:,}家公司；截至2014可用于拟合{cohort["fit_rows"]:,}条。2015-2018共{cohort["historical_rows"]:,}条，已被多轮查看。'),first,block(v['cn']),block('Yr AP 为历史四年AP等权均值；Pool AP与ROC为合并统计；R@5为逐年Top5%召回均值。Min为拟合计时分钟；seed mean先平均预测再评分。Sel表示各版本/家族内选定；Archive为旧档案，不是新实验。年度ROC guardrail另见selection_trace，完整身份见baseline_bridge.csv。')),
           page('2. 旧版为何曾经更好：证据与边界',tab(bridge,['candidate','AP','fit_seconds'],['单年控制配方','2012 AP','秒']),block('可确认：旧 Residual 为 192×4、约30万参数；V1 选定网络为64×2、36,801参数、ROS、18个最终epoch。输入、截尾、损失权重、停止与重拟合角色也不同。旧AP函数与sklearn在真实保存分数及ties样例上相同，不能把差距归咎于指标定义。'),block('这些控制实验固定2012评分年与seed42，只支持该环境下的机制诊断。大容量并非自动更优，单个高分也不能证明普遍欠拟合或过拟合。固定旧13列含原2012-2014选择信息，只用于档案角色重训；正式开发每折重新执行L1。原包中epoch31的checkpoint与桥接表epoch23不同，身份分别保留。')),
           page('3. 采样、数值处理与真实训练预算',image('update_budget','横轴是实际optimizer更新次数。右图是正类曝光次数，复制或插值不会产生新的独立公司。'),tab(budget[budget.candidate.str.contains('equal2000')][['candidate','actual_updates','positive_exposures','train_BCE']],['candidate','actual_updates','positive_exposures','train_BCE'],['固定更新控制','更新次数','正类曝光','训练BCE']),block('另做无采样、ROS、SMOTE各2,000次更新控制。NN比较旧1/99%截尾、0.5/99.5%、稳健尺度与训练内normal quantile；二元mask不做quantile。仅在训练角色移除常量和重复mask，保留全部记录。数值embedding使用官方模块，TabM逐head求BCE后平均，推断平均sigmoid概率。'),block('V2迁移的V1 ROS epoch重拟合曾遗漏采样后行数，已将那条trial标记无效、保留证据并重跑；这是本轮迁移修复，不能拿来解释原V1下降。主搜索固定step分支不受影响。')),
           page('4. 搜索不是模型名单：覆盖与选择',tab(coverage,['family','COMPLETE','FAIL','PRUNED'],['家族','完成配置','失败','剪枝']),image('search_cost','每个点是一个真实三年初筛配置，未把fold或seed计作不同方法。'),block('初筛2009/2011/2013；入围补齐2009-2013五年，再按42/2026/31415三seed×年度平均选择。每家最多2个、总共最多8个；AP差0.005以内按近期年度AP、Top5召回和成本取舍。强旧配方、LAGS、CatBoost与原RF基准均可入围，不强迫新模型或S1胜出。')),
@@ -244,7 +257,7 @@ The 2015-2018 historical labels were inspected in earlier versions. V2 is retros
 ## Evidence
 
 - [First comparison table](results/baseline_bridge.csv), [selection trace](results/selection_trace.csv), [2014 confirmation](results/confirmation_2014.csv), [historical results](results/historical_2015_2018.csv).
-- [All logical trials](results/trials.csv), [attempt history](results/trial_attempts.csv), [budget shortfalls](results/search_budget_summary.csv), [fold results](results/development_by_year.csv), [matched embedding controls](results/numeric_matched_controls.csv), [training-budget controls](results/training_budget_ablation.csv).
+- [All logical trials](results/trials.csv), [attempt history](results/trial_attempts.csv), [budget shortfalls](results/search_budget_summary.csv), [fold results](results/development_by_year.csv), [matched embedding controls](results/numeric_matched_controls.csv), [matched input controls](results/matched_input_controls.csv), [training-budget controls](results/training_budget_ablation.csv).
 - [Five-seed results](results/seeds.csv), [paired company intervals](results/paired_company_intervals.csv), [costs](results/costs.csv), [numerical verification](results/verification.json).
 - [English report](reports/Research_Report_V2_EN.pdf), [Chinese performance report](reports/PERFORMANCE_DELTA_CN.pdf), [Chinese interview addendum](reports/Interview_Addendum_V2_CN.md).
 - [Frozen protocol](V2_PROTOCOL.yaml), [execution corrections and deviations](PROTOCOL_EXECUTION_NOTES.md), [sources and installed versions](REFERENCES.md), [AI and contribution disclosure](CONTRIBUTIONS.md).
@@ -289,7 +302,7 @@ The final preservation check confirmed {preservation['protected_files_unchanged'
 
 ## 哪些改动有新证据？
 
-成对数值embedding结果见 numeric_matched_controls.csv；不同输入的桥接见 feature_preprocess_ablation.csv；预算见 training_budget_ablation.csv。最终选定配方与一次2014确认写在两份PDF。只对已完成成对控制讨论机制；随机搜索不同参数的两行只能比较整条配方。
+成对数值embedding结果见 numeric_matched_controls.csv；不同输入的桥接见 feature_preprocess_ablation.csv；相同树参数的三年输入对照见 matched_input_controls.csv；预算见 training_budget_ablation.csv。最终选定配方与一次2014确认写在两份PDF。只对已完成成对控制讨论机制；随机搜索不同参数的两行只能比较整条配方。
 
 ## 为什么主指标用年度AP？
 
@@ -334,7 +347,7 @@ def report():
     assert json.loads((ART/'pdf_operation_started.json').read_text()).get('actual_runtime_marker_success'),'Successful PDF skill marker must precede authoring'
     from .search import export
     export()
-    c=context();configuration_bridge();delta=delta_table(c);budget=export_ablations(c);matched=matched_numeric_controls(c);figures(c)
+    c=context();configuration_bridge();delta=delta_table(c);budget=export_ablations(c);matched=matched_numeric_controls(c);input_controls=matched_input_controls(c);figures(c)
     stress=c['historical_2015_2018'][c['historical_2015_2018'].channel=='post_selection_company_stress'].copy()
     stress['role']=stress.name.str.rsplit('_',n=1).str[-1]
     stress.to_csv(RESULT/'company_stress.csv',index=False)
@@ -358,6 +371,12 @@ def report():
                 p['blocks'].append(tab(stress_summary,['role','groups','AP_mean','AP_min','AP_max','recall5'],['Role','Groups','AP mean','Min','Max','R@5']))
                 p['blocks'].append(block(population))
         document.insert(5,actual_changes_page(c,matched,language))
+        if len(input_controls):
+            relevant=input_controls[input_controls.input.isin(['RAW17','RATIO_CORE','LAGS_RAW3'])]
+            if len(relevant):
+                values=', '.join(f'{r.input}={r.AP:.3f}' for r in relevant.itertuples())
+                scope='相同树配方的三年开发输入对照：' if language=='cn' else 'Three-year development input controls under the same tree recipe: '
+                document[5]['blocks'].append(block(scope+values+('。这是seed42的条件对照，完整配置和差值见matched_input_controls.csv。' if language=='cn' else '. These seed42 conditional controls retain exact configs/deltas in matched_input_controls.csv.')))
         # Readability fixes do not modify scientific results or their identities.
         for p in document:
             for b in p['blocks']:
