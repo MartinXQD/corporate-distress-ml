@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "Please cite this independent extension and the upstream dataset papers separately."
+title: "Corporate Financial Distress: A Reproducible ML & Deep Learning Benchmark - Independent Extension"
+type: software
+authors:
+  - family-names: Xing
+    given-names: "Qidian (Martin)"
+version: 1.0.0
+date-released: 2026-10-16

@@ -1,0 +1,10 @@
+# Decision log
+
+- 2026-10-17T04:15:09.589453+00:00: Registered before first training. Structural audit confirms both raw copies agree, company-constant labels and calendar gaps. Retain original labels. No new event dates inferred.
+- CPU selected for conservative tabular workload; MPS availability will be recorded but is not required. Default quantile clipping is controlled by an explicit no-clipping ablation. Positive ratio denominators are required; invalid ratios become NaN with masks. Units/currency remain unverified.
+- Writing uses the requested research format; no unrelated account or writing history is accessed.
+- Before formal development: the first pilot stopped at fit call 2 (XGBoost). Diagnostic synthetic subprocesses showed XGBoost alone succeeds, but co-loading PyTorch and two OpenMP libraries segfaults, including outside sandbox. A shared PyTorch OpenMP library via process-local DYLD_LIBRARY_PATH fixed combined operations. CLI re-exec and scripts/run.sh enforce it; no system libraries were edited. Failed diagnostic invocations are software checks, not research results. KD-tree SMOTE uses exact Euclidean neighbors and avoids a second crashing dispatcher.
+- Full-sample pilot completed after shared-OpenMP repair. Three-epoch FT-Transformer stopping plus full refit cost about 97.5 seconds. Proceed with the registered 25-epoch cap and patience 4, without altering the data roles.
+- Live upstream check: company IDs, fiscal years and labels match all local rows after renaming fyear; financial values differ widely. The public upstream also contains Division/MajorGroup. Local snapshot remains authoritative; no values or additional sector fields enter this version.
+- The editable-install .pth was marked hidden by the macOS environment and skipped by Python. scripts/run.sh now sets a project-relative PYTHONPATH explicitly. This changes import resolution, not model behavior.
+- Registered optional three-calendar-year GRU dimensions and same-row flattened/snapshot controls in configs/sequence_extension.yaml before any sequence experiment or historical evaluation.

@@ -1,0 +1,13 @@
+# Source audit and preservation
+
+Audit scripts inspected the user's current workspace and seven unique ZIP archives by SHA-256. Original files were read only. A complete byte-level manifest and safe archive-member inventory remain in `artifacts/audit/`; archive entries were checked for absolute paths, traversal and symlinks. No recursive archive expansion, old script execution or untrusted pickle/checkpoint loading occurred. Only two short local contribution notes were extracted into the ignored audit directory.
+
+The original `src/feature_engineering.py` documents 17 constructed financial variables. It separately constructs sales/assets and revenue/assets even though X9 equals X16. The extension removes that duplication, registers signed logs and exact-calendar dynamics, and refits every learned transform inside each role. This is a newly organized implementation; original model code and report prose are not copied into the public package.
+
+The original project already included Logistic, SVM, Random Forest, XGBoost and neural experiments, including Residual MLP and FT-Transformer. Saved scores and candidate grids are source evidence, not newly executed experiments. The original LASSO table selects 13 variables under an AUC parsimony rule; that selector score does not prove the same list is optimal for every downstream model. The extension therefore compares no selection against nested Elastic Net and grouped tree-permutation selection, optimizing development AP.
+
+The original RF/XGBoost source evaluates validation and historical test predictions for candidate configurations. This demonstrates historical test exposure; it does not, by itself, prove selection directly optimized that test. No old test score enters the extension's model-selection objective. Original protocol scores must not be subtracted from new scores to claim a controlled improvement.
+
+The original submitted PDF has 13 pages. Its cover lists May 23, 2026 and seven authors, transcribed in `ACKNOWLEDGEMENTS.md`. Original neural checkpoints are incomplete relative to all stored experiment rows. No claim of exact full-team reproduction is made. Source data preparation and contribution notes support historical context, not claims that the user manually wrote this extension's AI-assisted code.
+
+The source CSV has no event dates, filing dates or fixed prediction horizon. Labels are retained and interpreted as retrospective company status. No arbitrary lag or inferred exit date is used to manufacture an event-prediction target. The current upstream verification is recorded separately, and no local values are replaced with online values.

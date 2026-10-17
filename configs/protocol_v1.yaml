@@ -1,0 +1,293 @@
+protocol_id: distress_individual_extension_v1
+owner: Qidian (Martin) Xing
+project_slug: corporate-distress-ml
+source_root: environment_variable_DISTRESS_DATA_or_parent_raw_csv
+output_subdirectory: individual_extension
+original_sources_read_only: true
+task:
+  name: retrospective_failed_company_classification
+  label_column: status_label
+  positive_label: failed
+  negative_label: alive
+  entity_column: company_name
+  time_column: year
+  fixed_event_horizon_verified: false
+  publication_dates_available: false
+  historical_evaluation_previously_inspected: true
+splits:
+  development:
+  - id: D1
+    train_years:
+    - 1999
+    - 2005
+    score_years:
+    - 2006
+    - 2007
+  - id: D2
+    train_years:
+    - 1999
+    - 2007
+    score_years:
+    - 2008
+    - 2009
+  - id: D3
+    train_years:
+    - 1999
+    - 2009
+    score_years:
+    - 2010
+    - 2011
+  - id: D4
+    train_years:
+    - 1999
+    - 2011
+    score_years:
+    - 2012
+    - 2012
+  final_model_fit:
+  - 1999
+  - 2012
+  final_calibration:
+  - 2013
+  - 2013
+  final_threshold_selection:
+  - 2014
+  - 2014
+  historical_evaluation:
+  - 2015
+  - 2018
+  early_stopping: tail_year_within_current_training_window_then_refit_fixed_epochs
+  company_stress:
+    groups: 3
+    split_algorithm: sha256_fixed_salt_company_id_mod_3
+    salt: distress-group-stress-v1
+    families:
+    - logistic
+    - boosting
+    - residual_mlp
+    all_fitting_excludes_held_out_companies: true
+features:
+  S0: deduplicated_raw_accounting_variables
+  S1: S0_plus_interpretable_financial_structure_and_robust_transforms
+  S2: S1_plus_causal_historical_changes_and_rolling_summaries
+  selectors:
+  - none
+  - elastic_net
+  - inner_cross_fitted_model_aware
+  learned_transform_scope: current_training_role_only
+  primary_model_excludes_year: true
+  prohibit_id_features: true
+  prohibit_full_lifetime_features: true
+  calendar_gap_checks_required: true
+models:
+  baselines:
+  - dummy_prevalence
+  - altman_z
+  core:
+  - logistic
+  - random_forest
+  - xgboost
+  - mlp
+  - residual_mlp
+  - ft_transformer
+  xgboost_unavailable_fallback: hist_gradient_boosting
+  optional:
+  - catboost
+  - gru
+  - fixed_tree_nn_ensemble
+  report_fallback_and_skip_status: true
+selection:
+  primary: macro_year_average_precision_on_development_periods
+  secondary:
+  - recall_at_top_5pct
+  - roc_auc
+  - worst_year
+  - training_cost
+  select_final_models_before_historical_evaluation: true
+  report_same_protocol_baselines: true
+  historical_metrics_not_used_for_selection: true
+imbalance:
+  representative_ablations:
+  - none
+  - class_weight
+  - random_oversampling
+  - smote
+  class_weight_exponents:
+  - 0.0
+  - 0.5
+  - 1.0
+  sampling_scope: current_training_role_only
+  resample_calibration_or_evaluation: false
+  ordinary_smote_for_sequences: false
+calibration:
+  default_method: sigmoid
+  preserve_natural_prevalence: true
+  compare_uncalibrated: true
+metrics:
+  average_precision_implementation: sklearn.metrics.average_precision_score
+  main_review_budget: 0.05
+  all_review_budgets:
+  - 0.01
+  - 0.05
+  - 0.1
+  review_budget_grouping: calendar_year
+  auxiliary_fixed_threshold: maximize_f1_on_2014_only
+  confidence_intervals:
+    method: paired_company_cluster_bootstrap
+    repetitions: 2000
+    minimum_repetitions: 1000
+    uncertainty_conditional_on_fitted_models: true
+runtime:
+  local_only: true
+  paid_services: false
+  primary_seed: 42
+  final_seeds:
+  - 42
+  - 137
+  - 2026
+  - 31415
+  - 27182
+  minimum_final_seeds_with_disclosure: 3
+  soft_search_budget_hours: 6
+  hard_workflow_budget_hours: 8
+  reserved_delivery_minutes: 45
+  max_actual_fit_calls: 600
+  parallel_deep_training_per_device: 1
+  threads: 2
+release:
+  desired_visibility_after_audit: public
+  authenticated_owner_must_be_verified: true
+  publish_original_or_processed_data: false
+  publish_original_team_materials: false
+  publish_full_row_predictions: false
+  publish_new_code_aggregate_results_reports: true
+  license_must_not_be_assumed: true
+  source_attribution_required: true
+  ai_assistance_record_required: true
+frozen_at_utc: '2026-10-17T04:15:09.589453+00:00'
+implementation:
+  primary_device: cpu
+  device_reason: Small tabular networks; CPU provides a shared conservative device
+    and reproducible checkpoint reloads.
+  base_recipe:
+    clip: true
+    quantiles:
+    - 0.005
+    - 0.995
+    sampling: none
+    selector: none
+    weight_alpha: 0
+    seed: 42
+  models:
+    logistic:
+      C: 1
+      max_iter: 1500
+    random_forest:
+      n_estimators: 120
+      max_depth: 10
+      min_samples_leaf: 5
+    xgboost:
+      n_estimators: 180
+      max_depth: 3
+      learning_rate: 0.05
+      subsample: 0.9
+      colsample_bytree: 0.9
+    catboost:
+      iterations: 180
+      depth: 5
+      learning_rate: 0.05
+    mlp:
+      width: 64
+      depth: 2
+      dropout: 0.15
+    residual_mlp:
+      width: 64
+      depth: 2
+      dropout: 0.15
+    ft_transformer:
+      token_dim: 16
+      heads: 2
+      depth: 2
+      dropout: 0.15
+  neural_training:
+    max_epochs: 25
+    patience: 4
+    batch_size: 1024
+    learning_rate: 0.001
+    weight_decay: 0.0001
+    gradient_clip: 5
+  stage_2: 'Best development ML and best development DL family only; each two extra
+    S1 candidates: capacity and regularization. No test feedback.'
+  stage_2_candidates:
+    xgboost:
+    - max_depth: 2
+      learning_rate: 0.08
+    - max_depth: 5
+      learning_rate: 0.03
+    random_forest:
+    - max_depth: 6
+      min_samples_leaf: 10
+    - max_depth: 16
+      min_samples_leaf: 3
+    logistic:
+    - C: 0.1
+    - C: 10
+    catboost:
+    - depth: 3
+    - depth: 7
+    neural:
+    - width: 96
+      dropout: 0.1
+      learning_rate: 0.0007
+    - width: 48
+      dropout: 0.3
+      weight_decay: 0.001
+  ablation_representatives:
+  - xgboost
+  - residual_mlp
+  ablations: 'Each representative: S2 none, S1 no clipping, S1 weight alpha .5 and
+    1, S1 ROS and SMOTE, S1 elastic net and grouped permutation selection. Fixed recipe
+    otherwise.'
+  elastic_net_inner_grid:
+    C:
+    - 0.01
+    - 0.1
+    l1_ratio:
+    - 0.5
+    - 0.9
+  model_aware_inner: Two expanding tail-year folds; economic feature groups jointly
+    permuted; choose top 2, top 4, or all groups using last inner year AP.
+  selection_ties: Prefer lower cost, then lexicographic config id.
+  final_representatives: Best ML and DL config by equal-weight seven development-year
+    AP, plus same-protocol S0 baselines and all S1 core recipes at seed42. Repeat
+    best ML/DL across five seeds.
+  stress_fixed_recipe:
+    families:
+    - logistic
+    - xgboost
+    - residual_mlp
+    feature_set: S1
+    clip: true
+    sampling: none
+    selector: none
+    weight_alpha: 0
+    seed: 42
+    untuned: true
+  bootstrap:
+    repetitions: 2000
+    seed: 2026
+    metrics:
+    - AP
+    - ROC_AUC
+    - macro_year_AP
+    - macro_year_recall_top5
+    unit: company
+    paired: true
+  case_rule: 'For each TP/FP/FN/TN: smallest sha256(case-v1 + company + year), one
+    case per cell; local identifiers only, public aggregates.'
+  optional: 'After core: CatBoost if import works; GRU with fixed three calendar years
+    and flattened-lag XGBoost/MLP controls; equal-rank ML+DL ensemble selected on
+    OOF only.'
+  top_budget_rounding: ceil(budget*n_year); score descending, SHA256(company|year)
+    ascending for deterministic label-free ties.
+  source_data_hash: cff2c899a97ecd629415cb22f59186000e74e1c0a78cfae036c0a53025419b5e

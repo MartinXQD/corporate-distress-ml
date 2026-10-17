@@ -1,0 +1,15 @@
+.venv/
+artifacts/
+data/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+.DS_Store
+.env
+*.zip
+*.pt
+*.pkl
+*.joblib
+reports/Resume_Bullets_EN_CN.md
+RUN_STATUS.json
+NEXT_ACTIONS.md
