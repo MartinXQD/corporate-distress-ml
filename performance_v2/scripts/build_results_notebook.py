@@ -1,6 +1,7 @@
 """Create and freshly execute the final aggregate/reload research notebook."""
 from pathlib import Path
 import json
+import hashlib
 import nbformat
 from nbclient import NotebookClient
 
@@ -9,6 +10,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def main():
     verification=json.loads((ROOT/'results/verification.json').read_text())
     assert verification['passed'] and (ROOT/'artifacts/historical_complete.json').exists()
+    fit_log=ROOT/'artifacts/logs/fits.jsonl';fit_calls_before=len(fit_log.read_text().splitlines())
     md=nbformat.v4.new_markdown_cell
     code=nbformat.v4.new_code_cell
     cells=[
@@ -168,8 +170,11 @@ The original eight-hour window expired with a preserved partial delivery. The ow
     destination=ROOT/'notebooks/Performance_V2_Results.ipynb'
     destination.parent.mkdir(parents=True,exist_ok=True)
     nbformat.write(notebook,destination)
+    fit_calls_after=len(fit_log.read_text().splitlines());assert fit_calls_after==fit_calls_before
     result=dict(passed=True,fresh_kernel=True,code_cells=sum(c.cell_type=='code' for c in cells),
-                outputs_contain_only_aggregates=True,fit_calls_added=0,
+                outputs_contain_only_aggregates=True,fit_calls_added=fit_calls_after-fit_calls_before,
+                sha256=hashlib.sha256(destination.read_bytes()).hexdigest(),
+                source_verification_sha256=hashlib.sha256((ROOT/'results/verification.json').read_bytes()).hexdigest(),
                 file=str(destination.relative_to(ROOT)))
     (ROOT/'results/notebook_verification.json').write_text(json.dumps(result,indent=2))
     print(json.dumps(result,indent=2))

@@ -21,8 +21,21 @@ def api(path,token):
 def main():
     assert git('branch','--show-current')==BRANCH
     assert git('remote','get-url','origin')==f'https://github.com/{OWNER}/{SLUG}.git'
-    for path in ['results/verification.json','results/pdf_quality_checks.json','artifacts/audit/release_index_audit_v2.json']:
+    for path in ['results/verification.json','results/pdf_quality_checks.json','results/notebook_verification.json','artifacts/audit/release_index_audit_v2.json']:
         assert json.loads((ROOT/path).read_text())['passed'],path
+    verification_sha=hashlib.sha256((ROOT/'results/verification.json').read_bytes()).hexdigest()
+    qa=json.loads((ROOT/'results/pdf_quality_checks.json').read_text())
+    assert qa.get('reports_are_final') is True,'Old partial PDF QA cannot authorize publication'
+    assert qa['source_verification_sha256']==verification_sha
+    assert qa['manual_visual_review']==f'passed_all_{sum(f["page_count"] for f in qa["files"])}_pages'
+    assert {f['file'] for f in qa['files']}=={'reports/Research_Report_V2_EN.pdf','reports/PERFORMANCE_DELTA_CN.pdf'}
+    for record in qa['files']:
+        assert hashlib.sha256((ROOT/record['file']).read_bytes()).hexdigest()==record['sha256'],'Reviewed PDF changed'
+    notebook=json.loads((ROOT/'results/notebook_verification.json').read_text())
+    assert notebook['fresh_kernel'] and notebook['fit_calls_added']==0
+    assert notebook['source_verification_sha256']==verification_sha
+    assert notebook['file']=='notebooks/Performance_V2_Results.ipynb'
+    assert hashlib.sha256((ROOT/notebook['file']).read_bytes()).hexdigest()==notebook['sha256'],'Executed notebook changed'
     assert subprocess.run(['git','diff','--quiet'],cwd=REPO).returncode==0
     assert subprocess.run(['git','diff','--cached','--quiet'],cwd=REPO).returncode==0
     audit=json.loads((ROOT/'artifacts/audit/release_index_audit_v2.json').read_text())
