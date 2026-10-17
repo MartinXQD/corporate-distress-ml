@@ -112,6 +112,21 @@ def matched_input_controls(c):
     result=pd.DataFrame(rows,columns=['parent','candidate','family','parent_input','input','parent_AP','AP','delta_AP','scope'])
     result.to_csv(RESULT/'matched_input_controls.csv',index=False);return result
 
+def optimization_controls(c):
+    table=c['trials'].set_index('trial_id');records=[]
+    trace=pd.read_csv(RESULT/'local_refinement_trace.csv')
+    allowed={'window','half_life','company_beta','pair_lambda','learning_rate','schedule','dropout','depth','weight_alpha','iterations','leaf'}
+    for row in trace.itertuples():
+        if row.status!='COMPLETE' or row.trial_id not in table.index:continue
+        parent=table.loc[row.parent];child=table.loc[row.trial_id]
+        a=json.loads(parent.config_json);b=json.loads(child.config_json)
+        changed={key for key in set(a)|set(b) if a.get(key)!=b.get(key)}
+        if len(changed)!=1 or not changed.issubset(allowed) or a['family']!=b['family']:continue
+        factor=next(iter(changed))
+        records.append(dict(parent=row.parent,candidate=row.trial_id,family=b['family'],factor=factor,baseline_value=a.get(factor,'none'),value=b[factor],parent_AP=parent.macro_AP,AP=child.macro_AP,delta_AP=child.macro_AP-parent.macro_AP,scope='Single configured factor; same three development years and seed42. Not an independent historical or population causal effect.'))
+    result=pd.DataFrame(records,columns=['parent','candidate','family','factor','baseline_value','value','parent_AP','AP','delta_AP','scope'])
+    result.to_csv(RESULT/'optimization_controls.csv',index=False);return result
+
 def verdict(c):
     selected=c['selected'];blend=selected['blend']['admitted'];target='fixed_annual_rank_blend' if blend else selected['overall'];main=c['main'].loc['P2_fixed_rank_blend' if blend else 'P2_seed_mean__'+target]
     names=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf']
@@ -257,7 +272,7 @@ The 2015-2018 historical labels were inspected in earlier versions. V2 is retros
 ## Evidence
 
 - [First comparison table](results/baseline_bridge.csv), [selection trace](results/selection_trace.csv), [2014 confirmation](results/confirmation_2014.csv), [historical results](results/historical_2015_2018.csv).
-- [All logical trials](results/trials.csv), [attempt history](results/trial_attempts.csv), [budget shortfalls](results/search_budget_summary.csv), [fold results](results/development_by_year.csv), [matched embedding controls](results/numeric_matched_controls.csv), [matched input controls](results/matched_input_controls.csv), [training-budget controls](results/training_budget_ablation.csv).
+- [All logical trials](results/trials.csv), [attempt history](results/trial_attempts.csv), [budget shortfalls](results/search_budget_summary.csv), [fold results](results/development_by_year.csv), [matched embedding controls](results/numeric_matched_controls.csv), [matched input controls](results/matched_input_controls.csv), [training-budget controls](results/training_budget_ablation.csv), [one-factor optimization controls](results/optimization_controls.csv).
 - [Five-seed results](results/seeds.csv), [paired company intervals](results/paired_company_intervals.csv), [costs](results/costs.csv), [numerical verification](results/verification.json).
 - [English report](reports/Research_Report_V2_EN.pdf), [Chinese performance report](reports/PERFORMANCE_DELTA_CN.pdf), [Chinese interview addendum](reports/Interview_Addendum_V2_CN.md).
 - [Frozen protocol](V2_PROTOCOL.yaml), [execution corrections and deviations](PROTOCOL_EXECUTION_NOTES.md), [sources and installed versions](REFERENCES.md), [AI and contribution disclosure](CONTRIBUTIONS.md).
@@ -347,7 +362,7 @@ def report():
     assert json.loads((ART/'pdf_operation_started.json').read_text()).get('actual_runtime_marker_success'),'Successful PDF skill marker must precede authoring'
     from .search import export
     export()
-    c=context();configuration_bridge();delta=delta_table(c);budget=export_ablations(c);matched=matched_numeric_controls(c);input_controls=matched_input_controls(c);figures(c)
+    c=context();configuration_bridge();delta=delta_table(c);budget=export_ablations(c);matched=matched_numeric_controls(c);input_controls=matched_input_controls(c);optimizations=optimization_controls(c);figures(c)
     stress=c['historical_2015_2018'][c['historical_2015_2018'].channel=='post_selection_company_stress'].copy()
     stress['role']=stress.name.str.rsplit('_',n=1).str[-1]
     stress.to_csv(RESULT/'company_stress.csv',index=False)
@@ -377,6 +392,11 @@ def report():
                 values=', '.join(f'{r.input}={r.AP:.3f}' for r in relevant.itertuples())
                 scope='相同树配方的三年开发输入对照：' if language=='cn' else 'Three-year development input controls under the same tree recipe: '
                 document[5]['blocks'].append(block(scope+values+('。这是seed42的条件对照，完整配置和差值见matched_input_controls.csv。' if language=='cn' else '. These seed42 conditional controls retain exact configs/deltas in matched_input_controls.csv.')))
+        if len(optimizations):
+            temporal=optimizations[optimizations.factor.isin(['window','half_life','company_beta'])].sort_values('AP',ascending=False).groupby('family').head(1)
+            values='; '.join(f'{r.family} {r.factor}={r.value}: {r.parent_AP:.3f} -> {r.AP:.3f}' for r in temporal.itertuples())
+            explanation='开发单因素对照：'+values+'。半衰期3年使早3年的记录相对权重减半，再归一化均值为1；评分群体不变。改进机制的经济解释仍需事件日期验证，不能把历史增量全部归因于单项。' if language=='cn' else 'Development-only one-factor controls: '+values+'. A three-year half-life halves relative weight at three years of age, normalized to mean one; evaluation records are unchanged. Economic explanations require event dates, and historical pipeline gains are not isolated causal effects.'
+            document[5]['blocks'].append(block(explanation))
         # Readability fixes do not modify scientific results or their identities.
         for p in document:
             for b in p['blocks']:
