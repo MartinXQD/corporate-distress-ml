@@ -17,7 +17,7 @@ def independent(df,q):
         order=np.lexsort((keys,-q[ix]));n=int(np.ceil(.05*len(ix)))
         valid=len(np.unique(y[ix]))==2
         annual.append(average_precision_score(y[ix],q[ix]) if valid else np.nan);roc.append(roc_auc_score(y[ix],q[ix]) if valid else np.nan);recall.append(y[ix][order[:n]].sum()/y[ix].sum() if y[ix].sum() else np.nan)
-    return dict(AP=float(average_precision_score(y,q)),ROC_AUC=float(roc_auc_score(y,q)) if len(np.unique(y))==2 else np.nan,macro_AP=float(np.mean(annual)),macro_ROC=float(np.mean(roc)),recall5=float(np.nanmean(recall)))
+    return dict(AP=float(average_precision_score(y,q)) if len(np.unique(y))==2 else np.nan,ROC_AUC=float(roc_auc_score(y,q)) if len(np.unique(y))==2 else np.nan,macro_AP=float(np.mean(annual)),macro_ROC=float(np.mean(roc)),recall5=float(np.nanmean(recall)))
 
 def verify():
     assert (ART/'historical_complete.json').exists()
@@ -38,7 +38,16 @@ def verify():
         window=windows[event.get('window','original')]
         assert dt.datetime.fromisoformat(window['started_at_utc'])<=dt.datetime.fromisoformat(event['at_utc'])<=dt.datetime.fromisoformat(window['deadline_utc']),'A recorded fit started outside its authorized window'
     df=load('historical');hist=df[df.year>=2015];table=pd.read_csv(RESULT/'historical_2015_2018.csv',float_precision='round_trip').set_index('name');checked=[];families={}
+    populations=json.loads((ART/'audit/final_training_company_sets.json').read_text())['populations'];population_checks=0
     for item in frozen['models']:
+        metadata=json.loads((ROOT/item['path']).with_suffix('.json').read_text())
+        if item['channel']=='P2':
+            registered=populations[item['candidate']]
+            assert metadata['company_hash']==registered['company_hash'] and metadata['row_hash']==registered['row_hash']
+            assert metadata['fit_rows']==registered['natural_rows']
+            configured=json.loads((ROOT/f'configs/trial_{item["candidate"]}.json').read_text())
+            assert {k:v for k,v in configured.items() if k!='seed'}=={k:v for k,v in metadata['config'].items() if k!='seed'}
+            population_checks+=1
         d=pd.read_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',float_precision='round_trip')
         expected=hist if item['channel']!='post_selection_company_stress' else hist[groups(hist)==item['group_fold']]
         assert set(d.row_id)==set(expected.row_id)
@@ -82,6 +91,7 @@ def verify():
     result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),development_prediction_sets_verified=development_checks,frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=preservation['verified'],protected_files_read_denied=preservation['read_denied'],full_preservation_hash_check_complete=preservation['read_denied']==0,preservation_scope='All readable protected files compared against the initial hash manifest; any system-denied private originals remain explicitly unverified, not asserted unchanged',authorized_time_windows_verified=len(windows),recorded_fit_starts_verified=len(fit_ledger),fit_starts_outside_authorized_windows=0,same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
     uncertainty(df,hist,table)
     result['confirmation_prediction_sets_verified']=confirmation_checks
+    result['final_training_population_models_verified']=population_checks
     dump(RESULT/'verification.json',result)
     print(json.dumps(result,indent=2))
 

@@ -139,12 +139,14 @@ def choose_blend(selected,summary):
     for d in scores.values():assert np.array_equal(reference.row_id,d.row_id)
     overall=selected['overall'];dl=selected['DL'];pairs=[]
     if overall!=dl:pairs.append(tuple(sorted([overall,dl])))
-    alternatives=summary[summary.candidate!=overall].sort_values('macro_AP',ascending=False)
+    family_by_candidate=summary.set_index('candidate').family.to_dict()
+    alternatives=summary[(summary.candidate!=overall)&(summary.family!=family_by_candidate[overall])].sort_values('macro_AP',ascending=False)
     if len(alternatives):pairs.append(tuple(sorted([overall,alternatives.iloc[0].candidate])))
     trees=summary[~summary.family.isin(NN)].sort_values('macro_AP',ascending=False)
     if len(trees) and trees.iloc[0].candidate!=dl:pairs.append(tuple(sorted([trees.iloc[0].candidate,dl])))
     rows=[];best=None;baseline=measure_frame(reference,ranks[overall])
     for a,b in dict.fromkeys(pairs):
+        if family_by_candidate[a]==family_by_candidate[b]:continue
         for weight in [0,.25,.5,.75,1]:
             score=weight*ranks[a]+(1-weight)*ranks[b];m=measure_frame(reference,score)
             row=dict(component_a=a,component_b=b,weight_a=weight,weight_b=1-weight,**m);rows.append(row)
@@ -186,6 +188,17 @@ def confirm_and_fit(selected):
     if not lock.exists():dump(lock,dict(opened_at_utc=now(),selection_sha256=sha(ROOT/'configs/selection_freeze.json'),rule='Single frozen batch; no selection changes after this point'))
     df=load('confirmation');configurations=all_final_configs(selected);confirmation=[];inventory=[]
     assert int((df.year<=2014).sum())==66400
+    populations={};population_rows=[]
+    for key,c in configurations.items():
+        natural=df[df.year<=2014]
+        if c.get('window'):natural=natural[natural.year>2014-c['window']]
+        companies=sorted(natural.company_name.unique())
+        populations[key]=dict(companies=companies,company_hash=digest(companies),natural_rows=len(natural),row_hash=digest(sorted(natural.row_id.tolist())))
+        population_rows.append(dict(candidate=key,channel='P2',fit_cutoff=2014,start_year=int(natural.year.min()),natural_rows=len(natural),companies=len(companies),positive_companies=int(natural.loc[natural.y==1,'company_name'].nunique()),identity='Registered natural final fitting population; completion verified separately'))
+    population_path=ART/'audit/final_training_company_sets.json'
+    if population_path.exists():assert json.loads(population_path.read_text())['populations']==populations
+    else:dump(population_path,dict(registered_before_final_fits_at_utc=now(),populations=populations))
+    pd.DataFrame(population_rows).to_csv(RESULT/'final_training_populations.csv',index=False)
     for key,c in configurations.items():
         f=features(df,c['features']);done=ART/f'logs/confirmation_{key}.json'
         if done.exists():confirmation.append(json.loads(done.read_text()))
@@ -239,6 +252,8 @@ def confirm_and_fit(selected):
     for item in inventory:
         p=(ROOT/item['path']).with_suffix('.pt')
         if p.exists():hashes[str(p.relative_to(ROOT))]=sha(p)
+    for p in [population_path,RESULT/'final_training_populations.csv']:
+        hashes[str(p.relative_to(ROOT))]=sha(p)
     for p in (ROOT/'src').rglob('*.py'):
         if p.name not in ['reporting.py','pdf_layout.py','verify.py','inference.py']:hashes[str(p.relative_to(ROOT))]=sha(p)
     dump(ROOT/'configs/artifact_freeze.json',dict(frozen_at_utc=now(),selection_sha256=sha(ROOT/'configs/selection_freeze.json'),artifacts=hashes,models=inventory,historical_exposure='Previously inspected; diagnostics also rechecked saved V1 scores/labels',new_candidate_historical_scoring_not_started=True))
@@ -280,14 +295,16 @@ def score_historical():
             probability_rows.append(dict(name=item['name'],channel='P1_only',base_fit_cutoff=2012,calibration_year=2013,threshold_year=2014,**probability_metrics(sub,score,p.threshold)))
         out=sub[['row_id','company_name','year','y']].rename(columns={'company_name':'company_id','y':'y_true'}).copy();out['score']=score;out['raw_score']=raw_score;out.to_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',index=False)
         m=historical_metrics(sub,score);rows.append(dict(**item,**m,fit_seconds=p.metadata['fit_seconds'],inference_seconds=inference_seconds))
-        for year,g in sub.groupby('year'):yearly.append(dict(**item,year=int(year),**measures(g,score[sub.index.get_indexer(g.index)])))
+        for year,g in sub.groupby('year'):yearly.append(dict(**item,year=int(year),**historical_metrics(g,score[sub.index.get_indexer(g.index)])))
         if item['channel']=='P2':pred.setdefault(item['candidate'],[]).append(out)
     mean_predictions={}
     for key,frames in pred.items():
         for f in frames:assert np.array_equal(f.row_id,frames[0].row_id)
-        out=frames[0].copy();out['score']=np.mean([f.score.to_numpy() for f in frames],axis=0);mean_predictions[key]=out
+        out=frames[0].copy();out['score']=np.mean([f.score.to_numpy() for f in frames],axis=0);out['raw_score']=out.score;mean_predictions[key]=out
         out.to_csv(ART/f'predictions/P2_seed_mean__{key}_historical.csv.gz',index=False)
         sub=df.loc[hist];m=historical_metrics(sub,out.score.to_numpy());rows.append(dict(name='P2_seed_mean__'+key,candidate=key,channel='P2_seed_ensemble',fit_cutoff=2014,seed_count=len(frames),score_type='mean uncalibrated score across registered seeds',**m))
+        for year,g in sub.groupby('year'):
+            yearly.append(dict(name='P2_seed_mean__'+key,candidate=key,channel='P2_seed_ensemble',fit_cutoff=2014,seed_count=len(frames),year=int(year),**historical_metrics(g,out.loc[out.year==year,'score'].to_numpy())))
     # Same annual-rank score type for every fusion comparison.
     ranked={key:annual_ranks(frame,frame.score.to_numpy()) for key,frame in mean_predictions.items()}
     for key,q in ranked.items():rows.append(dict(name='P2_annual_rank__'+key,candidate=key,channel='P2_annual_rank_seed_ensemble',fit_cutoff=2014,score_type='annual percentile rank of mean seed score',**historical_metrics(df[hist],q)))
@@ -295,6 +312,8 @@ def score_historical():
         b=selected['blend']['candidate'];q=b['weight_a']*ranked[b['component_a']]+b['weight_b']*ranked[b['component_b']]
         rows.append(dict(name='P2_fixed_rank_blend',candidate='frozen_blend',channel='P2_annual_rank_seed_ensemble',fit_cutoff=2014,score_type='fixed annual-rank blend',**historical_metrics(df[hist],q)))
         out=df.loc[hist,['row_id','company_name','year','y']].rename(columns={'company_name':'company_id','y':'y_true'}).copy();out['score']=q;out.to_csv(ART/'predictions/P2_fixed_rank_blend_historical.csv.gz',index=False)
+        for year,g in df[hist].groupby('year'):
+            yearly.append(dict(name='P2_fixed_rank_blend',candidate='frozen_blend',channel='P2_annual_rank_seed_ensemble',fit_cutoff=2014,year=int(year),**historical_metrics(g,out.loc[out.year==year,'score'].to_numpy())))
     pd.DataFrame(rows).to_csv(RESULT/'historical_2015_2018.csv',index=False);pd.DataFrame(yearly).to_csv(RESULT/'historical_by_year.csv',index=False)
     pd.DataFrame(probability_rows).to_csv(RESULT/'p1_probability_supplement.csv',index=False)
     pd.DataFrame([r for r in rows if r['channel']=='P2']).to_csv(RESULT/'seeds.csv',index=False)
@@ -303,6 +322,7 @@ def score_historical():
 
 def historical_metrics(df,q):
     m=measures(df,q)
+    if df.y.nunique()<2:m.update(AP=np.nan,ROC_AUC=np.nan)
     valid=all(g.y.nunique()==2 for _,g in df.groupby('year'))
     m['macro_AP']=float(np.mean([average_precision_score(g.y,q[df.index.get_indexer(g.index)]) for _,g in df.groupby('year')])) if valid else np.nan
     m['macro_ROC']=float(np.mean([roc_auc_score(g.y,q[df.index.get_indexer(g.index)]) for _,g in df.groupby('year')])) if valid else np.nan
@@ -315,5 +335,5 @@ def unseen_tables(df,predictions):
         for group in ['seen','unseen']:
             mask=hist.company_name.isin(seen).to_numpy()
             if group=='unseen':mask=~mask
-            rows.append(dict(candidate=key,cutoff=2014,novelty=group,companies=int(hist[mask].company_name.nunique()),**historical_metrics(hist[mask],frame.score.to_numpy()[mask])))
+            rows.append(dict(candidate=key,cutoff=2014,novelty=group,novelty_definition='Common permitted pre-2015 company population; actual recipe fitting sets registered separately',companies=int(hist[mask].company_name.nunique()),**historical_metrics(hist[mask],frame.score.to_numpy()[mask])))
     pd.DataFrame(rows).to_csv(RESULT/'seen_unseen.csv',index=False)

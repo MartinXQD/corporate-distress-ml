@@ -41,7 +41,7 @@ def run():
         for change in [dict(iterations=600),dict(iterations=600,leaf=5),dict(iterations=600,depth=10,leaf=5),dict(iterations=1000,leaf=10)]:
             add(1,tree,change,'Capacity/regularization repair around the strongest development-only tree incumbent; multivariable variants are pipeline comparisons')
     else:
-        for change in [dict(learning_rate=.02),dict(learning_rate=.08),dict(depth=max(2,int(json.loads(tree.config_json)['depth'])-1)),dict(weight_alpha=.5),dict(features='LEGACY33'),dict(features='SLOG_RATIO')]:
+        for change in [dict(learning_rate=.02),dict(learning_rate=.08),dict(depth=max(2,int(json.loads(tree.config_json)['depth'])-1)),dict(weight_alpha=.5),*[dict(features=f) for f in ['RAW17','RATIO_CORE','LAGS_RAW3','LEGACY33','SLOG_RATIO']]]:
             if tree.family=='xgb_rank' and 'weight_alpha' in change:continue
             add(1,tree,change,'Bounded development-only neighborhood of strongest tree')
     ncfg=json.loads(neural.config_json)

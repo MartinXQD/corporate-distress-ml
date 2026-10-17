@@ -44,14 +44,18 @@ def bootstrap(df,predictions,references,repetitions=2000,seed=2026):
                 aps.append(a);order=reviews[name][year];weight=w[order]
                 k=int(np.ceil(.05*weight.sum()));before=np.cumsum(weight)-weight;chosen=np.minimum(weight,np.maximum(k-before,0))
                 recalls.append(float((chosen*y[order]).sum()/(weight*y[order]).sum()))
-            samples[name].append([ap,roc,np.mean(aps),np.mean(recalls)])
+            # Preserve the fixed-year estimand. A resample lacking a class
+            # in any year cannot silently average a different set of years.
+            full_years=len(aps)==len(indices)
+            samples[name].append([ap,roc,np.mean(aps) if full_years else np.nan,np.mean(recalls) if full_years else np.nan])
         all_year_valid+=int(complete_years)
     arrays={name:np.asarray(values) for name,values in samples.items()};rows=[]
     for reference in references:
         for name in names:
             for j,metric in enumerate(METRICS):
-                v=arrays[name][:,j];delta=v-arrays[reference][:,j]
-                rows.append(dict(model=name,reference=reference,metric=metric,lower=float(np.quantile(v,.025)),upper=float(np.quantile(v,.975)),delta_mean=float(delta.mean()),delta_lower=float(np.quantile(delta,.025)),delta_upper=float(np.quantile(delta,.975)),valid_draws=len(v),invalid_draws=invalid,all_year_valid_draws=all_year_valid,repetitions=repetitions,unit='company',conditional_on_fitted_models=True))
+                v=arrays[name][:,j];ref=arrays[reference][:,j];valid=np.isfinite(v)&np.isfinite(ref);delta=(v-ref)[valid];v=v[valid]
+                quantile=lambda values,q:float(np.quantile(values,q)) if len(values) else np.nan
+                rows.append(dict(model=name,reference=reference,metric=metric,lower=quantile(v,.025),upper=quantile(v,.975),delta_mean=float(delta.mean()) if len(delta) else np.nan,delta_lower=quantile(delta,.025),delta_upper=quantile(delta,.975),valid_draws=len(v),invalid_draws=repetitions-len(v),invalid_global_draws=invalid,all_year_valid_draws=all_year_valid,repetitions=repetitions,unit='company',conditional_on_fitted_models=True,fixed_year_set_required=True))
     return pd.DataFrame(rows),arrays
 
 def contract():
@@ -67,4 +71,10 @@ def contract():
     old=bootstrap_pairs(d,predictions,'a',repetitions=40,seed=2026).sort_values(['model','metric'])
     new,_=bootstrap(d,predictions,['a'],repetitions=40,seed=2026);new=new.sort_values(['model','metric'])
     np.testing.assert_allclose(old[['lower','upper','delta_mean','delta_lower','delta_upper']],new[['lower','upper','delta_mean','delta_lower','delta_upper']],atol=1e-12)
-    return dict(passed=True,weighted_metric_fixtures=25,tied_and_zero_weight_scores=True,paired_bootstrap_draws_compared=40,reference='Preserved V1 bootstrap implementation and sklearn metrics',absolute_tolerance=1e-12,performance_evidence=False)
+    rare=pd.DataFrame([(company,year,int(company in [0,1])) for company in range(8) for year in [2015,2016] if not (company==0 and year==2016) and not (company==1 and year==2015)],columns=['company_name','year','y'])
+    q=np.arange(len(rare),dtype=float)
+    sparse,_=bootstrap(rare,{'a':q},['a'],repetitions=128,seed=2026)
+    valid=sparse.set_index('metric').valid_draws
+    assert 0<valid['macro_year_AP']<valid['AP']<=128
+    assert valid['macro_year_AP']==valid['macro_year_recall_top5']
+    return dict(passed=True,weighted_metric_fixtures=25,tied_and_zero_weight_scores=True,paired_bootstrap_draws_compared=40,rare_class_fixed_year_draws=128,annual_single_class_draws_excluded_without_changing_years=True,reference='Preserved V1 bootstrap on complete-class fixtures and sklearn metrics; sparse-year correction explicitly verified',absolute_tolerance=1e-12,performance_evidence=False)
