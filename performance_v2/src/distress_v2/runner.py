@@ -1,4 +1,4 @@
-"""Resume actual experiments without resetting the original eight-hour clock."""
+"""Resume experiments within an immutable, explicitly authorized time window."""
 import argparse
 import json
 import traceback
@@ -10,7 +10,7 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--phase',choices=['all','search','finalize','report'],default='all');args=parser.parse_args()
     current=json.loads((ROOT/'EXECUTION_STATE.json').read_text())
     if current.get('complete'):print('This registered run is complete; preserve its freeze.');return
-    state('runner_started',active_command='scripts/run_performance_v2.sh -u -m distress_v2.runner --phase '+args.phase,running_pid=os.getpid(),error=None,elapsed_hours=hours())
+    state('runner_started',active_command='scripts/run_performance_v2.sh -u -m distress_v2.runner --phase '+args.phase,running_pid=os.getpid(),training_running=args.phase!='report',error=None,elapsed_hours=hours())
     try:
         if args.phase in ['all','search']:
             assert not (ART/'confirmation_opened.json').exists(),'Search cannot restart after confirmation opened'
@@ -41,7 +41,7 @@ def main():
             from .reporting import report
             verify();report()
     except BaseException as exc:
-        state('interrupted_or_budget_limited',complete=False,error=type(exc).__name__+': '+str(exc),elapsed_hours=hours(),resume_command='scripts/resume_performance_v2.sh --phase '+args.phase)
+        state('interrupted_or_budget_limited',complete=False,training_running=False,running_pid=None,error=type(exc).__name__+': '+str(exc),elapsed_hours=hours(),resume_command='scripts/resume_performance_v2.sh --phase '+args.phase)
         with (ART/'logs/runner_failures.log').open('a') as f:f.write(now()+'\n'+traceback.format_exc()+'\n')
         raise
 

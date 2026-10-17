@@ -26,14 +26,17 @@ def delta_table(c):
             selected_id=json.loads((V1/'configs/final_freeze.json').read_text())['representatives']['ML' if label=='V1 RF' else 'DL'];d=h[h.config_id==selected_id]
         else:d=h[(h.family==family)&(h.feature_set==feature)]
         r=d.iloc[0];rows.append(dict(recipe=label,version='V1',fit_cutoff=2012,input=feature,selected='Yes' if label in ['V1 RF','V1 DL'] else 'No',seeds=1,annual_AP=r.macro_year_AP,pooled_AP=r.AP,ROC=r.ROC_AUC,R5=r.macro_recall_top5,seconds=r.fit_seconds,identity='Saved V1'))
-    selected=c['selected'];keys=list(dict.fromkeys(['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf','baseline_v1_selected_dl_corrected_steps','baseline_logistic',selected['overall'],selected['DL']]))
+    selected=c['selected'];keys=list(dict.fromkeys(['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf','baseline_v1_selected_dl_corrected_steps','baseline_logistic',selected['overall'],selected['ML'],selected['DL']]))
     for key in keys:
         row=c['main'].loc['P2_seed_mean__'+key];config=json.loads((ROOT/f'configs/trial_{key}.json').read_text())
-        short={'baseline_legacy_strong_inner_l1':'P2 old L1','baseline_v1_lags_xgb':'P2 lag XGB','baseline_v1_raw_catboost':'P2 Cat raw','baseline_v1_selected_rf':'P2 V1 RF','baseline_v1_selected_dl_corrected_steps':'P2 V1 DL','baseline_logistic':'P2 Logistic'}.get(key,'P2 overall' if key==selected['overall'] else 'P2 DL')
+        short={'baseline_legacy_strong_inner_l1':'P2 old L1','baseline_v1_lags_xgb':'P2 lag XGB','baseline_v1_raw_catboost':'P2 Cat raw','baseline_v1_selected_rf':'P2 V1 RF','baseline_v1_selected_dl_corrected_steps':'P2 V1 DL','baseline_logistic':'P2 Logistic'}.get(key,'P2 overall' if key==selected['overall'] else ('P2 ML' if key==selected['ML'] else 'P2 DL'))
         component=c['historical_2015_2018'];cost=component[(component.candidate==key)&(component.channel=='P2')].fit_seconds.sum()
-        rows.append(dict(recipe=short,version='P2',fit_cutoff=2014,input=config['features']+'/'+config['preprocess'],selected='Yes' if key in [selected['overall'],selected['DL']] else 'Fixed',seeds=int(row.seed_count),annual_AP=row.macro_AP,pooled_AP=row.AP,ROC=row.ROC_AUC,R5=row.recall5,seconds=cost,identity='New seed mean'))
+        rows.append(dict(recipe=short,version='P2',fit_cutoff=2014,input=config['features']+'/'+config['preprocess'],selected='Yes' if key in [selected['overall'],selected['ML'],selected['DL']] else 'Fixed',seeds=int(row.seed_count),annual_AP=row.macro_AP,pooled_AP=row.AP,ROC=row.ROC_AUC,R5=row.recall5,seconds=cost,identity='New seed mean'))
     if selected['blend']['admitted']:
         r=c['main'].loc['P2_fixed_rank_blend'];rows.append(dict(recipe='P2 blend',version='P2',fit_cutoff=2014,input='annual ranks',selected='Yes',seeds=5,annual_AP=r.macro_AP,pooled_AP=r.AP,ROC=r.ROC_AUC,R5=r.recall5,seconds=np.nan,identity='Frozen blend'))
+        for key,label in [('baseline_legacy_strong_inner_l1','Rank old L1'),('baseline_v1_lags_xgb','Rank lag XGB'),('baseline_v1_raw_catboost','Rank Cat raw'),('baseline_v1_selected_rf','Rank V1 RF')]:
+            r=c['main'].loc['P2_annual_rank__'+key]
+            rows.append(dict(recipe=label,version='P2',fit_cutoff=2014,input='annual ranks',selected='Fixed',seeds=5,annual_AP=r.macro_AP,pooled_AP=r.AP,ROC=r.ROC_AUC,R5=r.recall5,seconds=np.nan,identity='Rank reference'))
     for row in c['historical_2015_2018'].itertuples():
         if row.channel not in ['P1','P2_selected__fit_cutoff_2012_transfer','V0_archive_role']:continue
         rows.append(dict(recipe=row.name,version=row.channel,fit_cutoff=row.fit_cutoff,input='See frozen artifact configuration',selected='Pre' if row.channel!='P2_selected__fit_cutoff_2012_transfer' else 'P2',seeds=1,annual_AP=row.macro_AP,pooled_AP=row.AP,ROC=row.ROC_AUC,R5=row.recall5,seconds=row.fit_seconds,identity=row.score_type))
@@ -198,6 +201,8 @@ def actual_changes_page(c,matched,language):
     rows.append(block('PLE差异仅是同主干、单seed、三个开发年的成对结果。最终配方同时改变多项时，只能归因于整条流水线；2014不会触发重选。' if cn else 'PLE deltas are matched-backbone, one-seed, three-year development results. Multivariable final changes support pipeline comparisons; the 2014 batch never triggers reselection.'))
     early=c['main'].loc['P2_selected__fit_cutoff_2012_transfer__overall'];late=c['main'].loc[f'P2__{selected["overall"]}__seed42']
     rows.append(block(f'固定选定配方和seed42，仅改变训练截止规则：截至2012的年度AP={early.macro_AP:.3f}，截至2014={late.macro_AP:.3f}。这是用过2013选择信息的P2迁移，不能冒称严格P1；滚动窗配方同时按相同窗长规则移动起点。' if cn else f'Fixed selected recipe and seed42, changed fit cutoff: annual AP={early.macro_AP:.3f} through 2012 versus {late.macro_AP:.3f} through 2014. This P2-selected transfer used 2013 selection information and is not strict P1; rolling recipes shift the start with the same window-length rule.'))
+    if json.loads((ROOT/'EXECUTION_STATE.json').read_text()).get('active_window_registration'):
+        rows.append(block('计算预算：首个8小时窗口到期时仅有部分开发结果；用户随后明确授权续跑，另登记最多8小时。两次时钟、原部分交付和已完成fold均保留；本次最终结果使用额外授权计算，不能写成首轮8小时内全部完成。实际计时与fit调用见experiment_summary和fit_accounting。' if cn else 'Compute disclosure: the first eight-hour window expired with partial development evidence. The owner explicitly authorized a separately registered additional eight-hour continuation. Both clocks and prior partial outputs are preserved; final results use additional authorized compute. Actual timing and fit calls are in experiment_summary and fit_accounting.'))
     return page('本轮究竟改了什么：用新结果回答' if cn else 'What changed: measured recipe and confirmation',*rows)
 
 def write_summaries(c,matched):
@@ -213,15 +218,23 @@ def write_summaries(c,matched):
         pd.DataFrame(records).to_csv(RESULT/'trial_attempts.csv',index=False)
     screened=trial[(trial.stage=='screen')&(trial.status=='COMPLETE')]
     summary=dict(author='Qidian (Martin) Xing',created_at_utc=now(),wall_clock_hours_to_report=hours(),hard_budget_hours=8,model_fit_calls=len(ledger),completed_screen_configurations=int(len(screened)),unique_effective_screen_recipes=int(screened.functional_recipe_hash.nunique()),completed_refinement_configurations=int(((trial.stage=='refinement')&(trial.status=='COMPLETE')).sum()),final_pipelines=len(json.loads((ROOT/'configs/final_inventory.json').read_text())),selected=selected,strongest_same_cutoff_baseline=v['strongest_name'],historical_annual_AP_difference=v['gap'],all_point_benchmarks_beaten=v['all_point_benchmarks_beaten'],all_conditional_intervals_positive=v['all_conditional_intervals_positive'],historical_exposure='Previously inspected across versions; not a new holdout',paid_services=False,publication='pending exact release audit and authenticated branch push')
+    execution=json.loads((ROOT/'EXECUTION_STATE.json').read_text())
+    continuation=execution.get('active_window_registration')
+    summary['active_window_hours_to_report']=hours()
+    summary['original_window_started_at_utc']=execution['started_at_utc']
+    summary['original_window_deadline_utc']=execution['deadline_utc']
+    summary['separate_user_authorized_continuation']=json.loads((ROOT/continuation).read_text()) if continuation else None
+    summary['completed_fold_fit_seconds']=float(c['development_by_year'].fit_seconds.sum())
+    summary['budget_qualification']='Original eight-hour window expired partial; a separate owner-authorized eight-hour continuation reused saved development evidence. Neither clock resets on resume.' if continuation else 'One registered eight-hour local window.'
     dump(RESULT/'experiment_summary.json',summary)
-    public_ledger=pd.DataFrame([{k:r.get(k) for k in ['fit_call','at_utc','tag','rows','max_fit_year','config_hash','optimizer_max_steps','resampled_rows','positive_weight','positive_fraction','weight_ESS','weight_min','weight_max','C']} for r in ledger]);public_ledger.to_csv(RESULT/'fit_accounting.csv',index=False)
+    public_ledger=pd.DataFrame([{k:r.get(k) for k in ['fit_call','at_utc','window','tag','rows','max_fit_year','config_hash','optimizer_max_steps','resampled_rows','positive_weight','positive_fraction','weight_ESS','weight_min','weight_max','C']} for r in ledger]);public_ledger.to_csv(RESULT/'fit_accounting.csv',index=False)
     (ROOT/'README.md').write_text(f'''# Financial Distress - Performance V2
 
 **Qidian (Martin) Xing.** An owner-directed, Codex-assisted performance extension of the earlier team project; see [parent acknowledgements](../ACKNOWLEDGEMENTS.md) and [contribution statement](CONTRIBUTIONS.md).
 
 {v['en']}
 
-This version completed {summary['completed_screen_configurations']} three-year screening trials ({summary['unique_effective_screen_recipes']} effective distinct recipes, accounting for matched no-embedding controls) and {summary['completed_refinement_configurations']} bounded local-refinement configurations, with {len(ledger)} recorded model-fit calls and {summary['final_pipelines']} frozen final pipelines. Folds, seeds and shared TabM heads are not counted as different methods. Coverage targets and actual shortfalls are in [trial coverage](results/trial_coverage.csv). Wall time to report: {hours():.2f} hours of the original eight-hour local cap; no paid compute. Fit seconds use the monotonic process timer, while the UTC budget includes observed time gaps; these clocks are not interchangeable.
+This version completed {summary['completed_screen_configurations']} three-year screening trials ({summary['unique_effective_screen_recipes']} effective distinct recipes, accounting for matched no-embedding controls) and {summary['completed_refinement_configurations']} bounded local-refinement configurations, with {len(ledger)} recorded model-fit calls and {summary['final_pipelines']} frozen final pipelines. Folds, seeds and shared TabM heads are not counted as different methods. Coverage targets and actual shortfalls are in [trial coverage](results/trial_coverage.csv). Active-window time to report: {hours():.2f} hours. {summary['budget_qualification']} See [continuation registration](configs/continuation_window_02.json) for the separately authorized window; this is additional compute, not a claim that all work fit the first eight hours. No paid compute. Fit seconds use the monotonic process timer, while the UTC budget includes observed time gaps; these clocks are not interchangeable.
 
 The 2015-2018 historical labels were inspected in earlier versions. V2 is retrospective, not a new holdout or an annual probability-of-default study. All P2 strong baselines are retrained through 2014 on the same permitted records; P1 and P2-selected cutoff-2012 transfers remain separately identified.
 
@@ -245,7 +258,7 @@ scripts/run_performance_v2.sh -m distress_v2.inference --help
 scripts/run_performance_v2.sh scripts/create_local_replication.py --name rerun1
 ```
 
-Resume never resets the original wall clock or reopens search after confirmation. After the registered run is complete, preserve its freezes; a new search requires a newly registered version, not deleting a lock. Local model files are indexed by `configs/final_inventory.json`; each has a preprocessing/config sidecar, and neural states additionally have `.pt` files. Models are trusted local joblib artifacts, not safe files to load from strangers. Private data, company-level predictions, audit manifests, runtime state and resume drafts are excluded from public Git.
+Resume never resets either registered wall clock or reopens search after confirmation. After the registered run is complete, preserve its freezes; a new search requires a newly registered version, not deleting a lock. Local model files are indexed by `configs/final_inventory.json`; each has a preprocessing/config sidecar, and neural states additionally have `.pt` files. Models are trusted local joblib artifacts, not safe files to load from strangers. Private data, company-level predictions, audit manifests, runtime state and resume drafts are excluded from public Git.
 
 The replication command above is a read-only preflight. When the owner explicitly adds `--prepare`, it creates a new sibling directory, preserves this directory and clock, reuses the existing local runtime, and registers a separate eight-hour run; training still requires manually running its resume script. Full original-role reconstruction requires the owner's original authorized source archive and data, which are intentionally absent from a public clone. Earlier bridge source snapshots and adaptive budget-dependent HPO counts need not be bit-identical to a fresh corrected run; per-trial configs, source commits and saved predictions identify the original evidence. No additional replication was launched during this bounded run.
 

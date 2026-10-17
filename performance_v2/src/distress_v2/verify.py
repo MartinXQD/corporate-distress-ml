@@ -24,6 +24,17 @@ def verify():
     frozen=json.loads((ROOT/'configs/artifact_freeze.json').read_text())
     assert all(sha(ROOT/p)==h for p,h in frozen['artifacts'].items())
     preservation=verify_protected()
+    execution=json.loads((ROOT/'EXECUTION_STATE.json').read_text())
+    import datetime as dt
+    windows={'original':dict(started_at_utc=execution['started_at_utc'],deadline_utc=execution['deadline_utc'])}
+    if execution.get('active_window_registration'):
+        path=ROOT/execution['active_window_registration']
+        assert sha(path)==execution['active_window_registration_sha256']
+        windows[execution['active_window_registration']]=json.loads(path.read_text())
+    fit_ledger=[json.loads(line) for line in (ART/'logs/fits.jsonl').read_text().splitlines()]
+    for event in fit_ledger:
+        window=windows[event.get('window','original')]
+        assert dt.datetime.fromisoformat(window['started_at_utc'])<=dt.datetime.fromisoformat(event['at_utc'])<=dt.datetime.fromisoformat(window['deadline_utc']),'A recorded fit started outside its authorized window'
     df=load('historical');hist=df[df.year>=2015];table=pd.read_csv(RESULT/'historical_2015_2018.csv',float_precision='round_trip').set_index('name');checked=[];families={}
     for item in frozen['models']:
         d=pd.read_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',float_precision='round_trip')
@@ -57,7 +68,7 @@ def verify():
         np.testing.assert_allclose(q,d.raw_score.to_numpy(),atol=1e-6,rtol=1e-6)
         selected.append(dict(model=item['name'],neural=neural,max_reload_error=float(np.max(abs(q-d.raw_score.to_numpy())))))
     development_checks=verify_development(df)
-    result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),development_prediction_sets_verified=development_checks,frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=preservation['verified'],protected_files_read_denied=preservation['read_denied'],full_preservation_hash_check_complete=preservation['read_denied']==0,preservation_scope='All readable protected files compared against the initial hash manifest; any system-denied private originals remain explicitly unverified, not asserted unchanged',same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
+    result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),development_prediction_sets_verified=development_checks,frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=preservation['verified'],protected_files_read_denied=preservation['read_denied'],full_preservation_hash_check_complete=preservation['read_denied']==0,preservation_scope='All readable protected files compared against the initial hash manifest; any system-denied private originals remain explicitly unverified, not asserted unchanged',authorized_time_windows_verified=len(windows),recorded_fit_starts_verified=len(fit_ledger),fit_starts_outside_authorized_windows=0,same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
     uncertainty(df,hist,table)
     dump(RESULT/'verification.json',result)
     print(json.dumps(result,indent=2))
