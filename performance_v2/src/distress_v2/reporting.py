@@ -102,17 +102,17 @@ def matched_numeric_controls(c):
 def verdict(c):
     selected=c['selected'];blend=selected['blend']['admitted'];target='fixed_annual_rank_blend' if blend else selected['overall'];main=c['main'].loc['P2_fixed_rank_blend' if blend else 'P2_seed_mean__'+target]
     names=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf']
-    refs={key:c['main'].loc['P2_seed_mean__'+key] for key in names}
+    refs={key:c['main'].loc[('P2_annual_rank__' if blend else 'P2_seed_mean__')+key] for key in names}
     best=max(refs,key=lambda key:refs[key].macro_AP);gap=main.macro_AP-refs[best].macro_AP
     old=c['main'].loc['P2_seed_mean__baseline_legacy_strong_inner_l1']
     ci=c['paired_company_intervals'];q=ci[(ci.model==target)&(ci.metric=='macro_year_AP')]
     positive=len(q)==4 and bool((q.delta_lower>0).all())
     archive=pd.read_csv(RESULT/'legacy_archived_metrics.csv');archival_ap=float(archive.loc[archive.feature_set.str.contains('lasso'),'test_pr_auc'].iloc[0]);single=c['main'].loc['P2_seed_mean__'+selected['overall']]
     return dict(main=main,target=target,strongest_name=best,strongest=refs[best],gap=gap,old=old,all_point_benchmarks_beaten=gap>0,all_conditional_intervals_positive=positive,
-      en=f"The development-selected {'fixed annual-rank blend' if blend else 'overall single recipe'} has historical annual AP {main.macro_AP:.3f}, versus {refs[best].macro_AP:.3f} for the strongest frozen same-cutoff baseline point estimate ({best}). The difference is {gap:+.3f}. "+('It exceeds all four baseline point estimates. ' if gap>0 else 'It does not exceed every strong baseline; this is not a comprehensive performance upgrade. ')+('All four paired annual-AP lower bounds are positive under the conditional company bootstrap.' if positive else 'The paired intervals do not uniformly establish a positive improvement over all four strong baselines.'),
+      en=f"The development-selected {'fixed annual-rank blend' if blend else 'overall single recipe'} has historical annual AP {main.macro_AP:.3f}, versus {refs[best].macro_AP:.3f} for the strongest frozen same-cutoff baseline point estimate ({best}). The difference is {gap:+.3f}. "+('It exceeds all four annual-AP baseline point estimates. ' if gap>0 else 'It does not exceed every strong baseline; this is not a comprehensive performance upgrade. ')+('All four paired annual-AP lower bounds are positive under the conditional company bootstrap.' if positive else 'The paired intervals do not uniformly establish a positive improvement over all four strong baselines.'),
       archival_en=f"Descriptively, the overall single recipe's raw pooled AP is {single.AP:.3f}, versus archived legacy L1 {archival_ap:.3f} ({single.AP-archival_ap:+.3f}). Different cutoff/selection/seed roles prevent attributing this archive difference to the algorithm; it is separate from the same-cutoff annual-AP comparison.",
       archival_cn=f"描述性对照：整体单配方的原始 pooled AP={single.AP:.3f}，旧L1档案={archival_ap:.3f}（差{single.AP-archival_ap:+.3f}）。两者截止年、选择和seed角色不同，不能把这个档案差值归因于算法；它与同截止年的年度AP比较分开。",
-      cn=f"开发期选定的{'固定年度rank融合' if blend else '整体单配方'}，历史年度 AP={main.macro_AP:.3f}；冻结的同截止年强基准中，点估计最高的是 {best}（{refs[best].macro_AP:.3f}），差值 {gap:+.3f}。"+('点估计超过四条强基准。' if gap>0 else '没有超过所有强基准，不能称全面性能升级。')+('四组配对年度 AP 区间下界均为正，但仍只是固定模型与当前样本下的条件证据。' if positive else '配对区间没有一致支持对四条强基准都有确定的正向差异。'))
+      cn=f"开发期选定的{'固定年度rank融合' if blend else '整体单配方'}，历史年度 AP={main.macro_AP:.3f}；冻结的同截止年强基准中，点估计最高的是 {best}（{refs[best].macro_AP:.3f}），差值 {gap:+.3f}。"+('年度AP点估计超过四条强基准。' if gap>0 else '没有超过所有强基准，不能称全面性能升级。')+('四组配对年度 AP 区间下界均为正，但仍只是固定模型与当前样本下的条件证据。' if positive else '配对区间没有一致支持对四条强基准都有确定的正向差异。'))
 
 def figures(c):
     import matplotlib
@@ -220,6 +220,9 @@ def write_summaries(c,matched):
     summary=dict(author='Qidian (Martin) Xing',created_at_utc=now(),wall_clock_hours_to_report=hours(),hard_budget_hours=8,model_fit_calls=len(ledger),completed_screen_configurations=int(len(screened)),unique_effective_screen_recipes=int(screened.functional_recipe_hash.nunique()),completed_refinement_configurations=int(((trial.stage=='refinement')&(trial.status=='COMPLETE')).sum()),final_pipelines=len(json.loads((ROOT/'configs/final_inventory.json').read_text())),selected=selected,strongest_same_cutoff_baseline=v['strongest_name'],historical_annual_AP_difference=v['gap'],all_point_benchmarks_beaten=v['all_point_benchmarks_beaten'],all_conditional_intervals_positive=v['all_conditional_intervals_positive'],historical_exposure='Previously inspected across versions; not a new holdout',paid_services=False,publication='pending exact release audit and authenticated branch push')
     execution=json.loads((ROOT/'EXECUTION_STATE.json').read_text())
     continuation=execution.get('active_window_registration')
+    summary['scientific_evaluation_complete']=True
+    summary['delivery_complete']=False
+    summary['status']='VERIFIED_RESULTS_PENDING_VISUAL_AND_PUBLICATION_CHECKS'
     summary['active_window_hours_to_report']=hours()
     summary['original_window_started_at_utc']=execution['started_at_utc']
     summary['original_window_deadline_utc']=execution['deadline_utc']
@@ -328,13 +331,32 @@ def report():
     if not (ART/'pdf_operation_started.json').exists():
         state('verified_awaiting_pdf_authoring_marker',complete=False)
         print('Numerical verification complete. PDF authoring marker required before report generation.');return
+    assert json.loads((ART/'pdf_operation_started.json').read_text()).get('actual_runtime_marker_success'),'Successful PDF skill marker must precede authoring'
     from .search import export
     export()
     c=context();configuration_bridge();delta=delta_table(c);budget=export_ablations(c);matched=matched_numeric_controls(c);figures(c)
+    stress=c['historical_2015_2018'][c['historical_2015_2018'].channel=='post_selection_company_stress'].copy()
+    stress['role']=stress.name.str.rsplit('_',n=1).str[-1]
+    stress.to_csv(RESULT/'company_stress.csv',index=False)
+    stress_summary=stress.groupby('role').agg(groups=('group_fold','nunique'),AP_mean=('AP','mean'),AP_min=('AP','min'),AP_max=('AP','max'),recall5=('recall5','mean')).reset_index()
+    stress_summary.to_csv(RESULT/'company_stress_summary.csv',index=False)
+    novelty=c['seen_unseen'];novelty=novelty[(novelty.candidate==c['selected']['overall'])&(novelty.novelty=='unseen')].iloc[0]
+    control=c['bridge'].set_index('candidate').AP
     from .pdf_layout import render
     (ROOT/'reports').mkdir(exist_ok=True)
     for language,name in [('en','Research_Report_V2_EN'),('cn','PERFORMANCE_DELTA_CN')]:
         document=pages(c,delta,budget,language)
+        if language=='cn':
+            evidence=f"2012单年对照中，RAW18同配置将容量192×4改为64×2，AP从{control['bridge_legacy192_raw18']:.3f}到{control['bridge_legacy64_raw18']:.3f}，并不支持‘更大必更好’。仅去掉原始重复列为{control['bridge_legacy192_raw17']:.3f}，仅取消完整类别加权为{control['bridge_legacy192_unweighted']:.3f}。这些验证了局部机制的敏感性，尚不能解释整段历史的新旧差距。"
+            population=f"自然未见公司按共同的截至2014可用群体定义：{int(novelty.companies)}家公司，其中failed公司{int(novelty.positive_companies)}家。实际滚动窗拟合公司集合在最终拟合前另行登记。下表是三组排除公司后的pooled AP均值与范围，不是置信区间；参数已在更广公司上选择。"
+        else:
+            evidence=f"In the fixed 2012 control, reducing RAW18 capacity from 192 x 4 to 64 x 2 changes AP from {control['bridge_legacy192_raw18']:.3f} to {control['bridge_legacy64_raw18']:.3f}; this does not support bigger-is-always-better. Removing only the duplicate raw column gives {control['bridge_legacy192_raw17']:.3f}; removing full class weighting gives {control['bridge_legacy192_unweighted']:.3f}. These are local mechanism sensitivities, not a causal decomposition of the historical version gap."
+            population=f"The common pre-2015 population leaves {int(novelty.companies)} naturally unseen companies, including {int(novelty.positive_companies)} failed firms. Actual rolling-window fitting sets were registered separately before final fitting. The table reports mean/range of pooled AP over three company groups, not confidence intervals; hyperparameters were selected on broader companies."
+        document[1]['blocks'].append(block(evidence))
+        for p in document:
+            if p['title'].startswith('6.'):
+                p['blocks'].append(tab(stress_summary,['role','groups','AP_mean','AP_min','AP_max','recall5'],['Role','Groups','AP mean','Min','Max','R@5']))
+                p['blocks'].append(block(population))
         document.insert(5,actual_changes_page(c,matched,language))
         # Readability fixes do not modify scientific results or their identities.
         for p in document:
@@ -343,6 +365,6 @@ def report():
                     for old,new in [('width192','width 192'),('about302k','about 302k'),('versus36,801','versus 36,801'),('width64','width 64'),('used18','used 18'),('different16','different 16'),('seed42','seed 42'),('epoch31','epoch 31'),('epoch23','epoch 23'),('archived13','archived 13'),('receive2,000','receive 2,000'),('AP0.295332','AP 0.295332'),('through2014','through 2014'),('cutoff2012','cutoff 2012'),('uses2,000','uses 2,000'),('and2014','and 2014'),('MFE413','MFE 413')]:b['text']=b['text'].replace(old,new)
         render(document,ROOT/f'reports/{name}.pdf',ROOT/f'reports/{name}.md',language)
     write_summaries(c,matched);claims()
-    state('reports_generated_pending_visual_and_release_checks',complete=False,elapsed_hours=hours())
+    state('reports_generated_pending_visual_and_release_checks',complete=False,training_running=False,running_pid=None,active_command=None,elapsed_hours=hours())
 
 if __name__=='__main__':report()
