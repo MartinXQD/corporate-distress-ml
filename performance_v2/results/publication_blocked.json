@@ -1,7 +1,16 @@
 {
   "pushed": false,
   "reason": "Final experiments and independent final-result verification incomplete",
-  "identity_live_recheck": "Not performed for an ineligible release",
+  "identity_live_recheck": {
+    "checked_at_utc": "2026-10-17T18:03:25.329342+00:00",
+    "read_only": true,
+    "pushed": false,
+    "credential_available": true,
+    "expected_login": "MartinXQD",
+    "http_status": 200,
+    "authenticated_login": "MartinXQD",
+    "owner_matches": true
+  },
   "private_data_uploaded": false,
   "missing": [
     "Full numerical-embedding and paired TabM performance search",
