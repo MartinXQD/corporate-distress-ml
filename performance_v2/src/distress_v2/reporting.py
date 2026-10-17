@@ -89,17 +89,19 @@ def claims():
 def matched_numeric_controls(c):
     rows=[]
     for family in ['num_mlp','tabm']:
-        pair=[]
-        for number in [0,1]:
-            t=c['trials'][(c['trials'].family==family)&(c['trials'].stage=='screen')&c['trials'].trial_id.str.contains(f'_{number:03d}_')]
-            if len(t)!=1 or t.iloc[0].status!='COMPLETE':break
-            pair.append(t.iloc[0])
-        if len(pair)!=2:
-            rows.append(dict(family=family,status='INCOMPLETE_MATCHED_PAIR'));continue
-        a,b=[json.loads(r.config_json) for r in pair]
-        ignore={'embedding','bins','embedding_dim'}
-        assert {k:v for k,v in a.items() if k not in ignore}=={k:v for k,v in b.items() if k not in ignore}
-        rows.append(dict(family=family,status='COMPLETE',without_id=pair[0].trial_id,with_id=pair[1].trial_id,input=a['features'],preprocess=a['preprocess'],no_embedding_AP=pair[0].macro_AP,piecewise_AP=pair[1].macro_AP,delta_AP=pair[1].macro_AP-pair[0].macro_AP,no_embedding_seconds=pair[0].seconds,piecewise_seconds=pair[1].seconds,scope='Same configured backbone/optimization and three development years; a single screening seed, not historical causal attribution'))
+        for start in [0,2]:
+            pair=[]
+            for number in [start,start+1]:
+                t=c['trials'][(c['trials'].family==family)&(c['trials'].stage=='screen')&c['trials'].trial_id.str.contains(f'_{number:03d}_')]
+                if len(t)!=1 or t.iloc[0].status!='COMPLETE':break
+                pair.append(t.iloc[0])
+            if len(pair)!=2:
+                rows.append(dict(family=family,pair_start=start,status='INCOMPLETE_MATCHED_PAIR'));continue
+            a,b=[json.loads(r.config_json) for r in pair]
+            ignore={'embedding','bins','embedding_dim'}
+            assert {k:v for k,v in a.items() if k not in ignore}=={k:v for k,v in b.items() if k not in ignore}
+            label=('RAW' if a['features']=='RAW17' else 'Log')+'/'+('QT' if a['preprocess']=='quantile' else '01')
+            rows.append(dict(family=family,pair_start=start,pair=label,status='COMPLETE',without_id=pair[0].trial_id,with_id=pair[1].trial_id,input=a['features'],preprocess=a['preprocess'],no_embedding_AP=pair[0].macro_AP,piecewise_AP=pair[1].macro_AP,delta_AP=pair[1].macro_AP-pair[0].macro_AP,no_embedding_seconds=pair[0].seconds,piecewise_seconds=pair[1].seconds,scope='Same configured backbone/optimization and three development years; a single screening seed, not historical causal attribution'))
     table=pd.DataFrame(rows);table.to_csv(RESULT/'numeric_matched_controls.csv',index=False);return table
 
 def matched_input_controls(c):
@@ -221,7 +223,7 @@ def actual_changes_page(c,matched,language):
         details={k:cfg[k] for k in ['family','features','preprocess','width','depth','iterations','leaf','max_features','embedding','sampling','weight_alpha','learning_rate','schedule','window','half_life','company_beta'] if k in cfg}
         rows.append(block((f'{role} 选定配方：' if cn else f'{role} selected recipe: ')+json.dumps(details,ensure_ascii=False,sort_keys=True)+ (f'；五年×三seed AP={trace.macro_AP:.3f}。' if cn else f'; five-year/three-seed AP={trace.macro_AP:.3f}.')))
     valid=matched[matched.status=='COMPLETE']
-    if len(valid):rows.append(tab(valid,['family','no_embedding_AP','piecewise_AP','delta_AP'],['主干','无embedding AP','PLE AP','变化'] if cn else ['Backbone','No embedding AP','PLE AP','Change']))
+    if len(valid):rows.append(tab(valid,['family','pair','no_embedding_AP','piecewise_AP','delta_AP'],['主干','输入/尺度','无embedding AP','PLE AP','变化'] if cn else ['Backbone','Input/scale','No embedding AP','PLE AP','Change']))
     else:rows.append(block('未完成成对数值embedding控制，不声称其有独立增益。' if cn else 'Matched numerical-embedding pairs were incomplete; no isolated embedding benefit is claimed.'))
     keys=list(dict.fromkeys([selected['overall'],selected['DL'],'baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_selected_rf']))
     confirmation=c['confirmation_2014'];confirmation=confirmation[confirmation.candidate.isin(keys)][['candidate','AP','ROC_AUC','recall5']].copy()
