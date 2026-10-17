@@ -58,8 +58,8 @@ def verify():
         selected.append(dict(model=item['name'],neural=neural,max_reload_error=float(np.max(abs(q-d.raw_score.to_numpy())))))
     development_checks=verify_development(df)
     result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),development_prediction_sets_verified=development_checks,frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=len(original),same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
-    dump(RESULT/'verification.json',result)
     uncertainty(df,hist,table)
+    dump(RESULT/'verification.json',result)
     print(json.dumps(result,indent=2))
 
 def verify_development(df):

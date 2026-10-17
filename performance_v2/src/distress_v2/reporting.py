@@ -50,6 +50,21 @@ def export_ablations(c):
     pd.DataFrame(costs).to_csv(RESULT/'costs.csv',index=False)
     return pd.DataFrame(rows)
 
+def configuration_bridge():
+    """Keep unknown archive training lengths unknown; derive saved V1 updates."""
+    rows=[]
+    archive=pd.read_csv(RESULT/'legacy_archived_metrics.csv')
+    for r in archive.itertuples():
+        l1='lasso' in r.feature_set;columns=['log_market_value','long_term_debt_to_assets','log_total_assets','X8','X6','X3','X15','working_capital','current_ratio','operating_expense_to_revenue','ebit_to_assets','gross_margin','X17'] if l1 else [f'X{i}' for i in range(1,19)]
+        rows.append(dict(version='V0_archive',family='residual_mlp',configuration_identity=r.feature_set,feature_set='fixed_archive13' if l1 else 'RAW18',input_columns=json.dumps(columns),input_dim=len(columns),parameters=301249 if l1 else 302209,preprocessing='Train-only 1/99% clipping, median and standard scaling',fit_cutoff=2011,stop_years='2012-2014',weight_sampling='natural data, full train-recomputed pos_weight',width=192,depth=4,optimizer='AdamW',early_stop_metric='sklearn average precision',best_epoch=r.best_epoch,actual_optimizer_updates=np.nan,update_evidence='Actual executed length not recorded in bridge metrics; best epoch is not actual executed length',best_state_updates=int(r.best_epoch)*110,refit='Restore best checkpoint, no full-validation-window refit',device='CPU',source='Archived comparison row; not newly reproduced'))
+    freeze=json.loads((V1/'configs/final_freeze.json').read_text());events=[json.loads(s) for s in (V1/'artifacts/logs/fit_ledger.jsonl').read_text().splitlines()]
+    for role in ['ML','DL']:
+        item=next(m for m in freeze['models'] if role in m['representative'] and m['seed']==42)
+        m=json.loads((V1/item['path']).with_suffix('.json').read_text());cfg=m['config'];event=next(e for e in events if e['tag']==item['label']+'/full_refit');neural=role=='DL'
+        updates=int(m['epochs'])*int(np.ceil(event['rows']/cfg['batch_size'])) if neural else np.nan
+        rows.append(dict(version='V1_selected_'+role,family=cfg['family'],configuration_identity=item['config_id'],feature_set=cfg['feature_set'],input_columns=json.dumps(m.get('transformed_features',m['selected_features'])),input_dim=m['features'],parameters=m.get('parameters'),preprocessing='Train-only 0.5/99.5% clipping; V1 median/scale/masks',fit_cutoff=2012,stop_years=2012,weight_sampling=cfg['sampling']+f'; class alpha={cfg["weight_alpha"]}',width=cfg.get('width'),depth=cfg.get('depth',cfg.get('max_depth')),optimizer='AdamW' if neural else 'RandomForest fit',early_stop_metric='sklearn average precision' if neural else 'No early stop',best_epoch=m['epochs'] if neural else np.nan,actual_optimizer_updates=updates,update_evidence='Derived exactly from saved executed epochs and fit-ledger resampled rows' if neural else 'Tree rounds, not optimizer updates',best_state_updates=updates,refit='Inner-tail length then new full-window epoch-equivalent fit',device='CPU',source='Saved artifact reloaded; predictions checked'))
+    pd.DataFrame(rows).to_csv(RESULT/'legacy_vs_v1_config.csv',index=False)
+
 def claims():
     rows=[]
     for path in RESULT.glob('*.csv'):
@@ -133,7 +148,7 @@ def pages(c,delta,budget,language):
     overview['selected']=overview.selected.replace({'Yes':'Y','No':'N','Fixed':'Pre'});overview['minutes']=overview.seconds/60;overview['identity']=overview.identity.replace({'Archive only':'Archive','Saved V1':'V1','New seed mean':'Mean score','Frozen blend':'Rank blend'})
     columns=['recipe','fit_cutoff','input','selected','seeds','annual_AP','pooled_AP','ROC','R5','minutes','identity']
     first=tab(overview,columns,['Recipe','Cutoff','Input','Sel','Seeds','Yr AP','Pool AP','ROC','R@5','Min','Source'])
-    complete=c['trials'];coverage=pd.crosstab(complete.loc[complete.stage=='screen','family'],complete.loc[complete.stage=='screen','status']).reindex(columns=['COMPLETE','FAIL','PRUNED'],fill_value=0).reset_index()
+    complete=c['trials'];screen=complete[complete.stage=='screen'];statuses=screen.status.map(lambda s:'FAIL' if s.startswith('FAIL') else s);coverage=pd.crosstab(screen.family,statuses).reindex(columns=['COMPLETE','FAIL','PRUNED'],fill_value=0).reset_index()
     bridge=c['bridge'][['candidate','AP','ROC_AUC','fit_seconds']].copy();bridge.candidate=bridge.candidate.str.replace('bridge_','',regex=False)
     ci=c['paired_company_intervals'];ci=ci[(ci.model==selected['overall'])&(ci.metric=='macro_year_AP')][['reference','delta_lower','delta_upper','valid_draws']]
     seeds=c['seeds'];seed_summary=seeds.groupby('candidate').agg(seeds=('seed','nunique'),annual_AP_mean=('macro_AP','mean'),annual_AP_min=('macro_AP','min'),annual_AP_max=('macro_AP','max')).reset_index()
@@ -151,6 +166,140 @@ def pages(c,delta,budget,language):
       page('Performance V2: measured deltas',block('Qidian (Martin) Xing | Retrospective failed-company classification; previously inspected 2015-2018.'),first,block(v['en']),block('Yr AP is equal-weight annual AP; Pool AP is cross-year AP; R@5 is mean annual review recall. Min is measured fit time. Mean-score ensembles differ from averaging seed metrics. Archive rows are source observations, not new experiments. Full identities, score types and configurations are in baseline_bridge.csv.')),
       page('2. Why the legacy recipe could look stronger',tab(bridge.head(12),['candidate','AP','fit_seconds'],['2012 controlled recipe','AP','Seconds']),block('The legacy residual network has width192/four blocks and about302k parameters, versus36,801 for the V1 selected width64/two-block ROS pipeline. The latter used18 final epochs; the V1 core table used a different16-epoch configuration. Inputs, clipping, loss weights, stopping information and refitting also changed.'),block('Legacy and sklearn AP agree on actual saved predictions and tied-score fixtures. Capacity differences therefore establish a changed experiment, not an automatic explanation of generalization. These seed42/single-year controls provide conditional mechanism evidence, not universal causal attribution. The included epoch31 checkpoint is distinct from the bridge epoch23 record; exact archived13 selection never enters early P2 development folds.')),
       page('3. Training budgets and numerical representation',image('update_budget','Actual updates and positive exposures distinguish optimization budget from sampling.'),tab(budget[budget.candidate.str.contains('equal2000')],['candidate','actual_updates','positive_exposures','train_BCE'],['Fixed-update control','Updates','Positive exposures','Train BCE']),block('Three treatments receive2,000 actual updates. Numerical transforms and bin knots fit current training roles only; binary masks bypass quantile mapping. Constant/duplicate masks are removed without dropping records. Official numerical embedding modules and TabM are used; TabM averages per-head losses during training and per-head sigmoid probabilities at inference.'),block('A V2 migration error in the V1 ROS epoch-equivalent refit used the natural row count. That trial was invalidated, retained and replaced before selection. It was not a defect in preserved V1 code, and ordinary P2 step-refit HPO was unaffected.')),
-      page('4. Search coverage, selection and confirmation',tab(coverage,['family','status','configurations'],['Family','Status','Configurations']),image('search_cost','Real three-year screening configurations; folds/seeds are not additional methods.'),block('Screening years are2009/2011/2013. Shortlisted candidates complete all five2009-2013 years and three registered seeds. Selection averages seed/year AP, with0.005 near-tie tolerance, recent-year/review-capacity/cost tie-breaks and ROC/Top5 guardrails. Strong fixed baselines remain eligible. Candidate/blend choices freeze before one2014 confirmation batch; confirmation cannot reopen search.')),
+      page('4. Search coverage, selection and confirmation',tab(coverage,['family','COMPLETE','FAIL','PRUNED'],['Family','Complete','Failed','Pruned']),image('search_cost','Real three-year screening configurations; folds/seeds are not additional methods.'),block('Screening years are 2009/2011/2013. Shortlisted candidates complete all five 2009-2013 years and three registered seeds. Selection averages seed/year AP, with 0.005 near-tie tolerance, recent-year/review-capacity/cost tie-breaks and ROC/Top5 guardrails. Strong fixed baselines remain eligible. Candidate/blend choices freeze before one 2014 confirmation batch; confirmation cannot reopen search.')),
       page('5. Historical evidence against strong baselines',block(v['en']),tab(ci,['reference','delta_lower','delta_upper','valid_draws'],['Same-cutoff reference','Annual AP delta low','High','Draws']),image('historical_years','Averages of individual-seed metrics, distinct from mean-score ensemble metrics.'),block('The archived L1 pooled AP0.295332 came from one seed and different selection/training roles and was not the old validation-ROC-selected representative. P2 retrains every comparison baseline through2014. P2-selected cutoff2012 transfers are explicitly separate from strict P1. Annual-rank pooled AP is compared only with matching annual-rank baselines.')),
       page('6. Cost, uncertainty and reproducibility',tab(seed_summary,['candidate','seeds','annual_AP_mean','annual_AP_min','annual_AP_max'],['Recipe','Seeds','Mean annual AP','Min','Max']),block('Paired company bootstrap uses2,000 draws and carries all annual records together. Intervals condition on fitted models and the current historical sample; they omit full HPO/training uncertainty and common macro shocks. Rank comparisons additionally fix original cohort maps. The company holdouts are accurately labeled post-selection stress, and2014-cutoff naturally unseen failed firms are few.'),block('All trials, invalidated/failed attempts, prediction coverage, final artifacts and numerical checks are retained. The local model directory contains preprocessing, feature order, states, configs and fit histories; raw data, complete predictions and private cases are excluded from public Git. Reload/prediction commands and exact dependencies are in README and requirements_v2.txt.'),block('This is an owner-directed, Codex-assisted independent extension of an earlier UCLA MFE413 team project. Parent acknowledgements remain intact. Company-constant labels, missing event/publication dates and prior historical exposure preclude verified one-year PD or prospective deployment claims. Official primary implementation sources and versions are documented; no paper benchmark performance is assumed.'))]
+
+def actual_changes_page(c,matched,language):
+    cn=language=='cn';selected=c['selected'];rows=[]
+    for role in ['overall','DL']:
+        key=selected[role];cfg=json.loads((ROOT/f'configs/trial_{key}.json').read_text());trace=c['selection_trace'].set_index('candidate').loc[key]
+        details={k:cfg[k] for k in ['family','features','preprocess','width','depth','iterations','leaf','max_features','embedding','sampling','weight_alpha','learning_rate','schedule','window','half_life','company_beta'] if k in cfg}
+        rows.append(block((f'{role} 选定配方：' if cn else f'{role} selected recipe: ')+json.dumps(details,ensure_ascii=False,sort_keys=True)+ (f'；五年×三seed AP={trace.macro_AP:.3f}。' if cn else f'; five-year/three-seed AP={trace.macro_AP:.3f}.')))
+    valid=matched[matched.status=='COMPLETE']
+    if len(valid):rows.append(tab(valid,['family','no_embedding_AP','piecewise_AP','delta_AP'],['主干','无embedding AP','PLE AP','变化'] if cn else ['Backbone','No embedding AP','PLE AP','Change']))
+    else:rows.append(block('未完成成对数值embedding控制，不声称其有独立增益。' if cn else 'Matched numerical-embedding pairs were incomplete; no isolated embedding benefit is claimed.'))
+    keys=list(dict.fromkeys([selected['overall'],selected['DL'],'baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_selected_rf']))
+    confirmation=c['confirmation_2014'];confirmation=confirmation[confirmation.candidate.isin(keys)][['candidate','AP','ROC_AUC','recall5']].copy()
+    confirmation.candidate=confirmation.candidate.map(lambda k:'Overall' if k==selected['overall'] else ('DL' if k==selected['DL'] else k.replace('baseline_','')))
+    rows.append(tab(confirmation,['candidate','AP','ROC_AUC','recall5'],['2014 一次确认','AP','ROC','R@5'] if cn else ['One 2014 confirmation','AP','ROC','R@5']))
+    rows.append(block('以上PLE差异是同主干、单seed、三个开发评分年的成对结果；没有把更大参数量本身当收益。最终配方常同时改变输入和优化，只能归因于整条流水线。2014结果不会触发重选；若确认或历史表现反转，同样保留。' if cn else 'The PLE deltas are matched-backbone, one-seed, three-year development comparisons. More parameters are not themselves a benefit. A final recipe often changes several factors and supports a pipeline-level comparison. The 2014 batch cannot trigger reselection; reversals in confirmation or historical evaluation are retained.'))
+    return page('本轮究竟改了什么：用新结果回答' if cn else 'What changed: measured recipe and confirmation',*rows)
+
+def write_summaries(c,matched):
+    v=verdict(c);selected=c['selected'];ledger=[json.loads(s) for s in (ART/'logs/fits.jsonl').read_text().splitlines()]
+    trial=c['trials'];coverage=trial.groupby(['stage','family','status']).size().rename('configurations').reset_index();coverage.to_csv(RESULT/'trial_coverage.csv',index=False)
+    summary=dict(author='Qidian (Martin) Xing',created_at_utc=now(),wall_clock_hours_to_report=hours(),hard_budget_hours=8,model_fit_calls=len(ledger),completed_screen_configurations=int(((trial.stage=='screen')&(trial.status=='COMPLETE')).sum()),completed_refinement_configurations=int(((trial.stage=='refinement')&(trial.status=='COMPLETE')).sum()),final_pipelines=len(json.loads((ROOT/'configs/final_inventory.json').read_text())),selected=selected,strongest_same_cutoff_baseline=v['strongest_name'],historical_annual_AP_difference=v['gap'],all_point_benchmarks_beaten=v['all_point_benchmarks_beaten'],all_conditional_intervals_positive=v['all_conditional_intervals_positive'],historical_exposure='Previously inspected across versions; not a new holdout',paid_services=False,publication='pending exact release audit and authenticated branch push')
+    dump(RESULT/'experiment_summary.json',summary)
+    public_ledger=pd.DataFrame([{k:r.get(k) for k in ['fit_call','at_utc','tag','rows','max_fit_year','config_hash','optimizer_max_steps','resampled_rows','positive_weight','positive_fraction','weight_ESS','weight_min','weight_max','C']} for r in ledger]);public_ledger.to_csv(RESULT/'fit_accounting.csv',index=False)
+    (ROOT/'README.md').write_text(f'''# Financial Distress - Performance V2
+
+**Qidian (Martin) Xing.** An owner-directed, Codex-assisted performance extension of the earlier team project; see [parent acknowledgements](../ACKNOWLEDGEMENTS.md) and [contribution statement](CONTRIBUTIONS.md).
+
+{v['en']}
+
+This version completed {summary['completed_screen_configurations']} three-year screening configurations and {summary['completed_refinement_configurations']} bounded local-refinement configurations, with {len(ledger)} recorded model-fit calls and {summary['final_pipelines']} frozen final pipelines. Folds, seeds and shared TabM heads are not counted as different methods. Coverage targets and actual shortfalls are in [trial coverage](results/trial_coverage.csv). Wall time to report: {hours():.2f} hours of the original eight-hour local cap; no paid compute.
+
+The 2015-2018 historical labels were inspected in earlier versions. V2 is retrospective, not a new holdout or an annual probability-of-default study. All P2 strong baselines are retrained through 2014 on the same permitted records; P1 and P2-selected cutoff-2012 transfers remain separately identified.
+
+## Evidence
+
+- [First comparison table](results/baseline_bridge.csv), [selection trace](results/selection_trace.csv), [2014 confirmation](results/confirmation_2014.csv), [historical results](results/historical_2015_2018.csv).
+- [All logical trials](results/trials.csv), [fold results](results/development_by_year.csv), [matched embedding controls](results/numeric_matched_controls.csv), [training-budget controls](results/training_budget_ablation.csv).
+- [Five-seed results](results/seeds.csv), [paired company intervals](results/paired_company_intervals.csv), [costs](results/costs.csv), [numerical verification](results/verification.json).
+- [English report](reports/Research_Report_V2_EN.pdf), [Chinese performance report](reports/PERFORMANCE_DELTA_CN.pdf), [Chinese interview addendum](reports/Interview_Addendum_V2_CN.md).
+- [Frozen protocol](V2_PROTOCOL.yaml), [sources and installed versions](REFERENCES.md), [AI and contribution disclosure](CONTRIBUTIONS.md).
+
+## Local execution
+
+Work from this `performance_v2` directory. The wrapper uses an isolated environment and the preserved parent implementation; the installed package versions are in `requirements_v2.txt` and `configs/runtime_versions.json`. Supply the authorized original dataset at the parent project's documented path; raw records and all serialized models remain local.
+
+```bash
+scripts/run_performance_v2.sh scripts/progress_v2.py
+scripts/resume_performance_v2.sh --phase all
+scripts/run_performance_v2.sh -m distress_v2.verify
+scripts/run_performance_v2.sh -m distress_v2.inference --help
+```
+
+Resume never resets the original wall clock or reopens search after confirmation. After the registered run is complete, preserve its freezes; a new search requires a newly registered version, not deleting a lock. Local model files are indexed by `configs/final_inventory.json`; each has a preprocessing/config sidecar, and neural states additionally have `.pt` files. Models are trusted local joblib artifacts, not safe files to load from strangers. Private data, company-level predictions, audit manifests, runtime state and resume drafts are excluded from public Git.
+
+The inherited V1 paths and historical lock are unchanged. The V2 bridge used a source snapshot before the compact-mask implementation; its purpose is a controlled mechanism diagnostic, explicitly distinct from P2 HPO. One migrated V1 ROS trial was invalidated for an epoch-refit step error and replaced before selection; it is retained in the ledger and does not explain original V1 performance.
+''',encoding='utf-8')
+    interview=f'''# 性能优化 V2：中文面试增补
+
+作者：Qidian (Martin) Xing。以下是 Codex 辅助完成的新实验，原团队成果按父目录致谢；不把 AI 编写的全部代码声称为本人手写。
+
+## 结果先行
+
+{v['cn']}
+
+开发期 overall={selected['overall']}，DL={selected['DL']}。先按五年×三seed选定，再打开2014确认与已暴露历史期。没有事后把历史最高行补成winner。
+
+## 旧版为什么可能更好？
+
+配置确实不同：旧网络192×4约30万参数，V1选定网络64×2、36,801参数；输入、截尾、权重、采样、停止与重拟合角色也变了。旧AP实现与sklearn对真实分数和ties样例一致。不能仅凭小网络、epoch少或某个历史分数下降就诊断欠拟合。桥接实验固定2012和seed42逐项对照，其结果只支持该环境；全流程改动不能当单项因果效应。
+
+## 如何解释采样和训练充分性？
+
+相同epoch会给ROS/SMOTE更多更新。先比较各2,000次真实更新，再看正类曝光量、训练/内部停止AP和BCE、梯度范数及饱和比例。复制的正类记录不是新增独立公司。V2复现V1时的ROS重训步数错误已标无效并修复；这不是原V1代码的错误。
+
+## 哪些改动有新证据？
+
+成对数值embedding结果见 numeric_matched_controls.csv；不同输入的桥接见 feature_preprocess_ablation.csv；预算见 training_budget_ablation.csv。最终选定配方与一次2014确认写在两份PDF。只对已完成成对控制讨论机制；随机搜索不同参数的两行只能比较整条配方。
+
+## 为什么主指标用年度AP？
+
+任务是自然年度截面的少数类筛查。逐年AP等权避免跨年score尺度和样本量主导比较；每年Top5%对应固定审阅容量。概率均值、seed指标均值和年度rank融合是不同统计量。年度rank融合的pooled AP必须与同rank基准比较。
+
+## 如何说明不确定性和公司泛化？
+
+公司聚类配对bootstrap整家公司抽样2,000次；它条件于固定模型和当前历史样本，未涵盖完整HPO、未来宏观冲击或数据修订。留组拟合不读留组标签，但参数在更广公司上选过，因此称post-selection stress。2014截止下自然unseen的failed公司很少，单类年度指标保留NA。标签在公司内恒定且无事件日/发布日期，不能宣称真实一年期PD或前瞻预警。
+
+## 是否值得增加算力？
+
+先用 costs.csv 比较实际拟合分钟、参数/步数、跨seed范围，再检查对强旧配方、LAGS、CatBoost和V1 RF的同截止年差异及区间。若只恢复V1弱代表或区间跨零，应直接说局部改善或证据不确定。实际完成的配置数是{summary['completed_screen_configurations']}，不是预定目标，更不是fold/seed的总和。
+
+## 能诚实说的个人贡献
+
+本人提出并限定性能目标、授权本地数据与预算；Codex执行迁移、调参、核验和材料生成。可展示真实实验记录并解释取舍。个人独立掌握和手工复核程度尚未由本次自动执行证明；发布简历前应逐行理解并本人确认。
+'''
+    (ROOT/'reports/Interview_Addendum_V2_CN.md').write_text(interview,encoding='utf-8')
+    m=v['main'];old=v['old'];ref=v['strongest']
+    resume=f'''# Resume drafts - private owner review required
+
+Author: Qidian (Martin) Xing. Use only after personally reviewing and understanding the Codex-assisted implementation and results. Attribution to the prior team remains in the contribution statement. Historical evaluation is retrospective and previously inspected.
+
+## English
+
+- Benchmarked {summary['completed_screen_configurations']} real configurations for financial-distress ranking across temporal folds, retaining failed trials and five-seed comparisons; the development-selected model recorded {m.macro_AP:.3f} historical annual AP versus {ref.macro_AP:.3f} for the strongest same-cutoff baseline.
+- Compared legacy residual networks, tuned tree models and numerical representations through a Codex-assisted local workflow, auditing sampling updates, company generalization and paired uncertainty while preserving original team results and source attribution.
+
+## 中文
+
+- 比较{summary['completed_screen_configurations']}个真实配置，以时间折和五seed核验财务困境排序；开发期选定模型的历史年度AP为{m.macro_AP:.3f}，同截止年最强基准为{ref.macro_AP:.3f}，未将已暴露历史期称新holdout。
+- 在Codex辅助下对照旧Residual、调参树模型与数值表示，核查采样更新步数、公司泛化及配对区间，保留原团队成果与准确来源说明。
+
+No prospective PD, sole-author model-development, or unsupported improvement claim is made. Point difference against old L1 recipe: {m.macro_AP-old.macro_AP:+.3f} annual AP; strongest baseline: {v['strongest_name']}; paired intervals remain in the report.
+'''
+    (ROOT/'reports/Resume_Bullets_V2_EN_CN.md').write_text(resume,encoding='utf-8')
+
+def report():
+    if not (ART/'pdf_operation_started.json').exists():
+        state('verified_awaiting_pdf_authoring_marker',complete=False)
+        print('Numerical verification complete. PDF authoring marker required before report generation.');return
+    c=context();configuration_bridge();delta=delta_table(c);budget=export_ablations(c);matched=matched_numeric_controls(c);figures(c)
+    from .pdf_layout import render
+    (ROOT/'reports').mkdir(exist_ok=True)
+    for language,name in [('en','Research_Report_V2_EN'),('cn','PERFORMANCE_DELTA_CN')]:
+        document=pages(c,delta,budget,language)
+        document.insert(5,actual_changes_page(c,matched,language))
+        # Readability fixes do not modify scientific results or their identities.
+        for p in document:
+            for b in p['blocks']:
+                if b['type']=='paragraph' and language=='en':
+                    for old,new in [('width192','width 192'),('about302k','about 302k'),('versus36,801','versus 36,801'),('width64','width 64'),('used18','used 18'),('different16','different 16'),('seed42','seed 42'),('epoch31','epoch 31'),('epoch23','epoch 23'),('archived13','archived 13'),('receive2,000','receive 2,000'),('AP0.295332','AP 0.295332'),('through2014','through 2014'),('cutoff2012','cutoff 2012'),('uses2,000','uses 2,000'),('and2014','and 2014'),('MFE413','MFE 413')]:b['text']=b['text'].replace(old,new)
+        render(document,ROOT/f'reports/{name}.pdf',ROOT/f'reports/{name}.md',language)
+    write_summaries(c,matched);claims()
+    state('reports_generated_pending_visual_and_release_checks',complete=False,elapsed_hours=hours())
+
+if __name__=='__main__':report()

@@ -14,7 +14,7 @@ from sklearn.metrics import average_precision_score,roc_auc_score,log_loss
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier,ExtraTreesClassifier
 from scipy.special import expit,logit
-from .common import ROOT,ART,RESULT,dump,fit_event,digest,now,time_guard
+from .common import ROOT,ART,RESULT,dump,fit_event,digest,now,time_guard,hours
 from .preprocessing import NumericTransform
 from .networks import NumericNetwork,logits,probabilities
 from distress_ml.preprocessing import Preprocessor as V1Transform,resample_train
@@ -155,7 +155,14 @@ def train_tree(x,df,cfg,tag,stop=None,rounds=None):
         best=m.best_iteration+1 if stop is not None else pars['n_estimators'];history=m.evals_result() if stop is not None else {}
     elif fam in ['random_forest','extra_trees']:
         cls=RandomForestClassifier if fam=='random_forest' else ExtraTreesClassifier
-        m=cls(n_estimators=cfg.get('iterations',600),max_depth=cfg.get('depth',10),min_samples_leaf=cfg.get('leaf',5),max_features=cfg.get('max_features',.8),bootstrap=cfg.get('bootstrap',fam=='random_forest'),random_state=cfg['seed'],n_jobs=thread).fit(x,y,sample_weight=weights)
+        maximum=cfg.get('iterations',600);started=time.monotonic()
+        m=cls(n_estimators=min(25,maximum),warm_start=True,max_depth=cfg.get('depth',10),min_samples_leaf=cfg.get('leaf',5),max_features=cfg.get('max_features',.8),bootstrap=cfg.get('bootstrap',fam=='random_forest'),random_state=cfg['seed'],n_jobs=thread)
+        for count in range(25,maximum+25,25):
+            time_guard(7.25)
+            if time.monotonic()-started>cfg.get('per_fit_seconds',720):raise TimeoutError('Forest fit exceeded bounded compute; incomplete trial, not a smaller completed forest')
+            m.n_estimators=min(count,maximum);m.fit(x,y,sample_weight=weights)
+            dump(ART/f'logs/{tag.replace("/","__")}_forest_resource.json',dict(completed_trees=len(m.estimators_),requested_trees=maximum,seconds=time.monotonic()-started,at_utc=now(),guard='25-tree warm-start batches; same seeded tree sequence'))
+        m.warm_start=False
         best=len(m.estimators_);history={}
     elif fam=='logistic':
         m=LogisticRegression(C=cfg.get('C',1.),max_iter=1500,random_state=cfg['seed']).fit(x,y,sample_weight=weights);best=int(m.n_iter_.max());history={}

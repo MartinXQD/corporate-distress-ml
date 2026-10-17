@@ -54,7 +54,13 @@ def run_fold(cfg,year,stage='screen',candidate=None):
 def export():
     rows=[json.loads(p.read_text()) for p in (ART/'logs').glob('fold_*.json')]
     if rows:pd.DataFrame(rows).to_csv(RESULT/'development_by_year.csv',index=False)
-    c=database();pd.read_sql_query('SELECT * FROM trial_records',c).to_csv(RESULT/'trials.csv',index=False);c.close()
+    c=database();trials=pd.read_sql_query('SELECT * FROM trial_records',c);c.close()
+    counts={}
+    for r in rows:
+        if r['seed']==42:counts.setdefault(r['candidate'],set()).add(r['year'])
+    trials['completed_development_years']=trials.trial_id.map(lambda k:len(counts.get(k,set())))
+    trials['metric_identity']=trials.status.map(lambda s:'Complete registered trial' if s=='COMPLETE' else 'Partial/invalid/in-progress; not eligible as complete')
+    trials.to_csv(RESULT/'trials.csv',index=False)
 
 def execute(cfg,trial_id,stage,years):
     c=database();entry=c.execute('SELECT status FROM trial_records WHERE trial_id=?',(trial_id,)).fetchone()

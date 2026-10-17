@@ -16,13 +16,16 @@ from .search import base
 
 def reconstruct(df):
     assert (ART/'confirmation_opened.json').exists()
+    # Original preprocessing and DataLoader inputs were sorted by these keys.
+    # Preserve source row IDs, but reproduce that ordering for archive roles.
+    df=df.sort_values(['year','company_name'])
     output=[];train=df.year<=2011;val=df.year.between(2012,2014)
     for kind in ['legacy_fixed13_retrained','included_base_checkpoint_epoch31']:
         path=ART/f'models/V0_{kind}.joblib'
         name='LEGACY_FIXED13' if kind=='legacy_fixed13_retrained' else 'RAW18'
         cfg=base('legacy_residual',features=name,preprocess='std01',indicators=False,width=192,depth=4,dropout=.25,learning_rate=.001,weight_decay=.0002,batch_size=512,weight_alpha=1,max_epochs=100,patience=12,gradient_clip=None)
         if not path.exists():
-            f=features(df,name);pp=NumericTransform('std01',indicators=False).fit(f[train]);a=pp.transform(f[train]);b=pp.transform(f[val])
+            f=features(df,name).loc[df.index];pp=NumericTransform('std01',indicators=False).fit(f[train]);a=pp.transform(f[train]);b=pp.transform(f[val])
             if kind=='legacy_fixed13_retrained':
                 spec=importlib.util.spec_from_file_location('legacy_original_archive_training',SOURCE/'results/nn_team_handoff_clean_20260522/src/neural_network_training.py')
                 original=importlib.util.module_from_spec(spec);sys.modules[spec.name]=original;spec.loader.exec_module(original)
@@ -44,6 +47,7 @@ def reconstruct(df):
                 old=pd.read_csv(SOURCE/'data/processed/02_X_scaled_for_LR_SVM_ANN/X_train_base_scaled.csv')
                 ids=pd.read_csv(SOURCE/'data/processed/ids_train.csv')
                 assert np.array_equal(ids.company_name.to_numpy(),df.loc[train,'company_name'].to_numpy())
+                assert np.array_equal(ids.year.to_numpy(),df.loc[train,'year'].to_numpy())
                 np.testing.assert_allclose(a,old.to_numpy(),atol=5e-5,rtol=5e-6)
                 checkpoint=torch.load(ART/'audit/legacy_residual_base.pt',map_location='cpu',weights_only=True)
                 model=NumericNetwork(18,18,cfg)
