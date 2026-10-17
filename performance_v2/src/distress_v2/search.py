@@ -173,7 +173,7 @@ def search():
         sampler=joblib.load(sampler_path) if sampler_path.exists() else optuna.samplers.TPESampler(seed=42,n_startup_trials=8)
         studies[family]=optuna.create_study(study_name=family,storage='sqlite:///'+str(ART/'optuna.sqlite'),load_if_exists=True,direction='maximize',sampler=sampler)
         enqueue(studies[family],family)
-    dump(ROOT/'configs/resource_reserve.json',dict(search_soft_stop_hours=4.8,registered_search_maximum=5.9,reason='Reserve measured full-fold three-seed stability, five-seed final baselines, company stress, verification and reports inside the eight-hour wall clock. May end earlier only when all search targets complete.'))
+    dump(ROOT/'configs/resource_reserve.json',dict(search_soft_stop_hours=4.8,registered_search_maximum=5.9,reason='Reserve measured full-fold three-seed stability, five-seed final baselines, company stress, verification and reports inside the active eight-hour window. May end earlier when all targets complete or the best complete tree/neural pair needs the remaining training reserve.'))
     # Measured residual trial 000 took 19 minutes. Cost-based scheduling gives
     # the two high-priority boosting families three turns per cycle. It does
     # not change spaces, scoring, seeds, or promote based on historical data.
@@ -185,6 +185,20 @@ def search():
         underexplored=[f for f in list(TARGETS)[:8] if counts[f]<2]
         coverage_order=['num_mlp','tabm','legacy_residual','mlp','extra_trees','random_forest','catboost','xgboost']
         cycle=sorted(underexplored,key=lambda f:(counts[f],coverage_order.index(f)))+[f for f in schedule if f not in underexplored]
+        # Expensive neural fits must not consume the final registered seeds.
+        # Once basic coverage exists, finish the affordable high-priority
+        # boosting target before returning to the broader family rotation.
+        if not underexplored:
+            db=database();complete_table=pd.read_sql_query("SELECT * FROM trial_records WHERE status='COMPLETE' AND stage IN ('screen','baseline','refinement')",db);db.close()
+            from .budget import required_seconds,TREE
+            best_tree=complete_table[complete_table.family.isin(TREE)].sort_values('macro_AP',ascending=False).iloc[0].trial_id
+            best_nn=complete_table[complete_table.family.isin(NN)].sort_values('macro_AP',ascending=False).iloc[0].trial_id
+            needed=required_seconds(pd.read_csv(RESULT/'development_by_year.csv'),best_tree,best_nn)
+            reserve=dict(at_utc=now(),hours_elapsed=hours(),best_complete_tree=best_tree,best_complete_neural=best_nn,projected_required_seconds=needed,training_target_hours=7.15,safety_buffer_hours=.15,scoring_and_seeds_unchanged=True)
+            dump(ROOT/'configs/search_promotion_reserve.json',reserve)
+            if hours()+needed/3600+.15>=7.15:break
+            boosting=[f for f in ['catboost','xgboost'] if counts[f]<32]
+            if boosting:cycle=boosting
         with (ART/'logs/dispatch_cycles.jsonl').open('a') as stream:stream.write(json.dumps(dict(at_utc=now(),complete_counts=counts,cycle=cycle))+'\n')
         for family in cycle:
             target=TARGETS[family]

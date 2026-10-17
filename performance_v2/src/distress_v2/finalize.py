@@ -86,10 +86,15 @@ def select_shortlist():
             if r.trial_id in chosen or counts.get(r.family,0)>=2:continue
             chosen.append(r.trial_id);counts[r.family]=counts.get(r.family,0)+1
         # Reduce optional candidates when measured fold cost threatens final fits.
-        measured=dv();projection=sum(measured[measured.candidate==x].fit_seconds.mean()*12 for x in chosen)/3600
-        while len(chosen)>len(set(mandatory)) and projection>max(.5,6.45-hours()):
-            chosen.pop();projection=sum(measured[measured.candidate==x].fit_seconds.mean()*12 for x in chosen)/3600
-        dump(path,dict(candidates=chosen,selected_at_utc=now(),reason='Mandatory same-protocol strong legacy and LAGS baselines plus best screened tree/NN; up to two optional high-AP diverse candidates. Measured cost can remove optional candidates before stability.',estimated_remaining_stability_hours=projection,history_labels_unavailable=True))
+        measured=dv();mandatory_set=set(mandatory)
+        core_required=projection(best_tree,feasible_nn[0])
+        # Optional stability fits also consume the final-fit reserve. Include
+        # their potential final/ensemble cost before admitting extra models.
+        def total_forecast():return core_required+sum(25*mean_cost.get(x,60.) for x in chosen if x not in mandatory_set)
+        while len(chosen)>len(mandatory_set) and total_forecast()>available:
+            chosen.pop()
+        stability_hours=sum(mean_cost.get(x,60.)*12 for x in chosen)/3600
+        dump(path,dict(candidates=chosen,selected_at_utc=now(),reason='Mandatory same-protocol strong legacy and LAGS baselines plus best screened tree/NN; optional candidates require both stability and potential final-fit reserve. Measured cost can remove optional candidates before stability.',estimated_remaining_stability_hours=stability_hours,estimated_total_training_seconds=total_forecast(),history_labels_unavailable=True))
     for candidate in chosen:
         config=cfg(candidate)
         for seed in STABILITY_SEEDS:

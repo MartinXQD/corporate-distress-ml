@@ -1,0 +1,11 @@
+{
+  "at_utc": "2026-10-17T18:35:35.135416+00:00",
+  "reason": "Measured full TabM screening cost requires preserving complete registered-seed promotion, rather than spending the reserve on extra HPO.",
+  "basic_coverage_per_high_priority_family": 2,
+  "then_boosting_target_each": 32,
+  "broader_family_targets_unchanged": true,
+  "search_max_hours": 4.8,
+  "adaptive_reserve": "End HPO when the best complete tree/neural pair needs the remaining training reserve plus 0.15h; remove optional candidates before mandatory seeds",
+  "restarts_do_not_reset_clock": true,
+  "confirmation_historical_unopened": true
+}

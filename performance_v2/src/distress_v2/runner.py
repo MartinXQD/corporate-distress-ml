@@ -41,7 +41,10 @@ def main():
             from .reporting import report
             verify();report()
     except BaseException as exc:
-        state('interrupted_or_budget_limited',complete=False,training_running=False,running_pid=None,error=type(exc).__name__+': '+str(exc),elapsed_hours=hours(),resume_command='scripts/resume_performance_v2.sh --phase '+args.phase)
+        resume_phase=args.phase
+        if (ROOT/'configs/shortlist.json').exists():resume_phase='finalize'
+        if (ART/'historical_complete.json').exists():resume_phase='report'
+        state('interrupted_or_budget_limited',complete=False,training_running=False,running_pid=None,error=type(exc).__name__+': '+str(exc),elapsed_hours=hours(),resume_command='scripts/resume_performance_v2.sh --phase '+resume_phase)
         with (ART/'logs/runner_failures.log').open('a') as f:f.write(now()+'\n'+traceback.format_exc()+'\n')
         raise
 
