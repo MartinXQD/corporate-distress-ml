@@ -31,7 +31,10 @@ def delta_table(c):
         row=c['main'].loc['P2_seed_mean__'+key];config=json.loads((ROOT/f'configs/trial_{key}.json').read_text())
         short={'baseline_legacy_strong_inner_l1':'P2 old L1','baseline_v1_lags_xgb':'P2 lag XGB','baseline_v1_raw_catboost':'P2 Cat raw','baseline_v1_selected_rf':'P2 V1 RF','baseline_v1_selected_dl_corrected_steps':'P2 V1 DL','baseline_logistic':'P2 Logistic'}.get(key,'P2 overall' if key==selected['overall'] else ('P2 ML' if key==selected['ML'] else 'P2 DL'))
         component=c['historical_2015_2018'];cost=component[(component.candidate==key)&(component.channel=='P2')].fit_seconds.sum()
-        rows.append(dict(recipe=short,version='P2',fit_cutoff=2014,input=config['features']+'/'+config['preprocess'],selected='Yes' if key in [selected['overall'],selected['ML'],selected['DL']] else 'Fixed',seeds=int(row.seed_count),annual_AP=row.macro_AP,pooled_AP=row.AP,ROC=row.ROC_AUC,R5=row.recall5,seconds=cost,identity='New seed mean'))
+        processing=config['features']+'/'+config['preprocess']
+        for field,label in [('window','window'),('half_life','half-life'),('company_beta','company-beta')]:
+            if config.get(field):processing+=f'/{label}{config[field]:g}'
+        rows.append(dict(recipe=short,version='P2',fit_cutoff=2014,input=processing,selected='Yes' if key in [selected['overall'],selected['ML'],selected['DL']] else 'Fixed',seeds=int(row.seed_count),annual_AP=row.macro_AP,pooled_AP=row.AP,ROC=row.ROC_AUC,R5=row.recall5,seconds=cost,identity='New seed mean'))
     if selected['blend']['admitted']:
         r=c['main'].loc['P2_fixed_rank_blend'];rows.append(dict(recipe='P2 blend',version='P2',fit_cutoff=2014,input='annual ranks',selected='Yes',seeds=5,annual_AP=r.macro_AP,pooled_AP=r.AP,ROC=r.ROC_AUC,R5=r.recall5,seconds=np.nan,identity='Frozen blend'))
         for key,label in [('baseline_legacy_strong_inner_l1','Rank old L1'),('baseline_v1_lags_xgb','Rank lag XGB'),('baseline_v1_raw_catboost','Rank Cat raw'),('baseline_v1_selected_rf','Rank V1 RF')]:
@@ -272,7 +275,7 @@ The 2015-2018 historical labels were inspected in earlier versions. V2 is retros
 ## Evidence
 
 - [First comparison table](results/baseline_bridge.csv), [selection trace](results/selection_trace.csv), [2014 confirmation](results/confirmation_2014.csv), [historical results](results/historical_2015_2018.csv).
-- [All logical trials](results/trials.csv), [attempt history](results/trial_attempts.csv), [budget shortfalls](results/search_budget_summary.csv), [fold results](results/development_by_year.csv), [matched embedding controls](results/numeric_matched_controls.csv), [matched input controls](results/matched_input_controls.csv), [training-budget controls](results/training_budget_ablation.csv), [one-factor optimization controls](results/optimization_controls.csv).
+- [All logical trials](results/trials.csv), [attempt history](results/trial_attempts.csv), [budget shortfalls](results/search_budget_summary.csv), [fold results](results/development_by_year.csv), [matched embedding controls](results/numeric_matched_controls.csv), [matched input controls](results/matched_input_controls.csv), [training-budget controls](results/training_budget_ablation.csv), [one-factor optimization controls](results/optimization_controls.csv), [reconstructed ranking-pair accounting](results/ranking_pair_accounting.csv).
 - [Five-seed results](results/seeds.csv), [paired company intervals](results/paired_company_intervals.csv), [costs](results/costs.csv), [numerical verification](results/verification.json).
 - [English report](reports/Research_Report_V2_EN.pdf), [Chinese performance report](reports/PERFORMANCE_DELTA_CN.pdf), [Chinese interview addendum](reports/Interview_Addendum_V2_CN.md).
 - [Frozen protocol](V2_PROTOCOL.yaml), [execution corrections and deviations](PROTOCOL_EXECUTION_NOTES.md), [sources and installed versions](REFERENCES.md), [AI and contribution disclosure](CONTRIBUTIONS.md).
@@ -363,6 +366,12 @@ def report():
     from .search import export
     export()
     c=context();configuration_bridge();delta=delta_table(c);budget=export_ablations(c);matched=matched_numeric_controls(c);input_controls=matched_input_controls(c);optimizations=optimization_controls(c);figures(c)
+    marker_path=ART/'pdf_operation_started.json';marker=json.loads(marker_path.read_text())
+    preserved=ART/'continuations/window_01_expired_snapshot/pdf_operation_started.json'
+    if not preserved.exists():preserved.write_bytes(marker_path.read_bytes())
+    marker.setdefault('initial_scope',marker.get('scope'))
+    marker.update(scope='Same requested two PDF output paths, final regeneration after numerical verification',final_pair_authoring_started_at_utc=now(),same_output_operation_reused=True)
+    dump(marker_path,marker)
     stress=c['historical_2015_2018'][c['historical_2015_2018'].channel=='post_selection_company_stress'].copy()
     stress['role']=stress.name.str.rsplit('_',n=1).str[-1]
     stress.to_csv(RESULT/'company_stress.csv',index=False)
