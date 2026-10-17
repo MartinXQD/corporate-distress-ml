@@ -27,12 +27,14 @@ def run():
         original=json.loads(parent.config_json);config={**original,**change}
         if digest(config)==digest(original) or any(digest(p['config'])==digest(config) for p in plans):return
         plans.append(dict(round=round_number,parent=parent.trial_id,reason=reason,config=config,estimated_seconds=max(5.,parent.seconds)*(config.get('iterations',1)/json.loads(parent.config_json).get('iterations',1) if config['family'] in ['random_forest','extra_trees'] else 1.5)))
-    if json.loads(tree.config_json)['features']=='V1_S1':
-        # The incumbent's input is available to competing model families too.
-        # This is a development-only pipeline repair, not a causal feature claim.
-        for family in ['catboost','xgboost']:
+    tree_config=json.loads(tree.config_json)
+    if tree.family in ['catboost','xgboost','random_forest','extra_trees']:
+        # Transfer the observed incumbent input to competing boosting families;
+        # the same financial information is not reserved for one algorithm.
+        for family in [f for f in ['catboost','xgboost'] if f!=tree.family]:
             for depth in [3,5]:
-                c=base(family,features='V1_S1',preprocess='v1',clip=True,iterations=3000,depth=depth,learning_rate=.03,weight_alpha=0)
+                c=base(family,features=tree_config['features'],preprocess=tree_config['preprocess'],iterations=3000,depth=depth,learning_rate=.03,weight_alpha=0)
+                if 'clip' in tree_config:c['clip']=tree_config['clip']
                 if family=='catboost':c.update(l2_leaf_reg=3.,random_strength=.5,bootstrap_type='Bayesian',bagging_temperature=1.)
                 else:c.update(min_child_weight=4.,subsample=.9,colsample_bytree=.9,reg_lambda=3.,reg_alpha=0.)
                 plans.append(dict(round=1,parent=tree.trial_id,reason='Give the development-leading incumbent input/preprocessing to competing boosting families; multiple-factor pipeline comparison',config=c,estimated_seconds=90.))
