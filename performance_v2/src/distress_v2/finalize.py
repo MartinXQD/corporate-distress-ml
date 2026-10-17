@@ -200,6 +200,15 @@ def confirm_and_fit(selected):
                 time_guard(7.25)
                 p=fit(df[df.year<=2014],f[df.year<=2014],{**c,'seed':seed},name);save(p,path)
             inventory.append(dict(name=name,candidate=key,channel='P2',fit_cutoff=2014,seed=seed,path=str(path.relative_to(ROOT)),score_type='raw ranking score' if c['family']=='xgb_rank' else 'uncalibrated risk score'))
+    if selected['blend']['admitted']:
+        blend=selected['blend']['candidate'];parts=[]
+        for key in [blend['component_a'],blend['component_b']]:
+            frame=pd.read_csv(ART/f'predictions/confirmation_{key}.csv.gz',float_precision='round_trip').sort_values('row_id').reset_index(drop=True)
+            parts.append(frame)
+        assert np.array_equal(parts[0].row_id,parts[1].row_id)
+        out=parts[0].copy();out['score']=blend['weight_a']*annual_ranks(parts[0],parts[0].score.to_numpy())+blend['weight_b']*annual_ranks(parts[1],parts[1].score.to_numpy())
+        out.to_csv(ART/'predictions/confirmation_fixed_annual_rank_blend.csv.gz',index=False)
+        confirmation.append(dict(candidate='fixed_annual_rank_blend',channel='P2_frozen_confirmation',fit_cutoff=2013,seed=42,score_type='fixed annual percentile rank blend',**measures(out,out.score.to_numpy())))
     pd.DataFrame(confirmation).to_csv(RESULT/'confirmation_2014.csv',index=False)
     # Strict P1 fixed legacy transfer versus P2-selected cutoff transfer are distinct.
     transfer={'P1_fixed_legacy':baselines()['legacy_strong_inner_l1']}

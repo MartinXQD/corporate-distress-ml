@@ -199,6 +199,13 @@ def search():
             if hours()+needed/3600+.15>=7.15:break
             boosting=[f for f in ['catboost','xgboost'] if counts[f]<32]
             if boosting:cycle=boosting
+            elif not (ART/'refinement_complete.json').exists():
+                # Optimize the observed strong incumbents while their full
+                # stability/final fits are still affordable, then continue
+                # the broad rotation if a measured reserve remains.
+                from .refinement import run as refine
+                refine()
+                continue
         with (ART/'logs/dispatch_cycles.jsonl').open('a') as stream:stream.write(json.dumps(dict(at_utc=now(),complete_counts=counts,cycle=cycle))+'\n')
         for family in cycle:
             target=TARGETS[family]

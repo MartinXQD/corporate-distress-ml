@@ -65,6 +65,13 @@ def run():
         db=database();prior=db.execute('SELECT status,macro_AP FROM trial_records WHERE trial_id=?',(name,)).fetchone();db.close()
         if prior and prior[0]=='COMPLETE':
             records.append(dict(trial_id=name,round=p['round'],parent=p['parent'],status='COMPLETE',macro_AP=prior[1],reason=p['reason']+'; reused completed trial'));continue
+        db=database();current=pd.read_sql_query("SELECT * FROM trial_records WHERE status='COMPLETE' AND stage IN ('screen','baseline','refinement')",db);db.close()
+        from .budget import required_seconds,TREE
+        best_tree=current[current.family.isin(TREE)].sort_values('macro_AP',ascending=False).iloc[0].trial_id
+        best_nn=current[current.family.isin(NN)].sort_values('macro_AP',ascending=False).iloc[0].trial_id
+        required=required_seconds(pd.read_csv(RESULT/'development_by_year.csv'),best_tree,best_nn)
+        if hours()+required/3600+.15>=7.15:
+            records.append(dict(trial_id=name,round=p['round'],parent=p['parent'],status='NOT_STARTED_BUDGET',reason='Preserve full registered-seed promotion after measured incumbent cost changed'));continue
         if hours()+p['estimated_seconds']/3600>deadline:
             if prior and prior[0]=='RUNNING':
                 db=database();db.execute('UPDATE trial_records SET status=?,finished=?,error=? WHERE trial_id=?',('INCOMPLETE_BUDGET',now(),'Local refinement budget ended; interrupted partial folds retained',name));db.commit();db.close()

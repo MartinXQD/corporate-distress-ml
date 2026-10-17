@@ -23,6 +23,8 @@ def verify():
     assert (ART/'historical_complete.json').exists()
     frozen=json.loads((ROOT/'configs/artifact_freeze.json').read_text())
     assert all(sha(ROOT/p)==h for p,h in frozen['artifacts'].items())
+    assert sha(ROOT/'configs/selection_freeze.json')==frozen['selection_sha256']
+    assert json.loads((ROOT/'configs/final_inventory.json').read_text())==frozen['models']
     preservation=verify_protected()
     execution=json.loads((ROOT/'EXECUTION_STATE.json').read_text())
     import datetime as dt
@@ -68,8 +70,18 @@ def verify():
         np.testing.assert_allclose(q,d.raw_score.to_numpy(),atol=1e-6,rtol=1e-6)
         selected.append(dict(model=item['name'],neural=neural,max_reload_error=float(np.max(abs(q-d.raw_score.to_numpy())))))
     development_checks=verify_development(df)
+    confirmation_checks=0
+    for row in pd.read_csv(RESULT/'confirmation_2014.csv').itertuples():
+        d=pd.read_csv(ART/f'predictions/confirmation_{row.candidate}.csv.gz',float_precision='round_trip')
+        source=df.set_index('row_id').loc[d.row_id]
+        assert set(d.row_id)==set(df.loc[df.year==2014,'row_id'])
+        assert np.array_equal(source.y,d.y) and np.array_equal(source.company_name,d.company_name)
+        for key,value in independent(source,d.score.to_numpy()).items():
+            if key in ['AP','ROC_AUC','recall5']:assert np.isclose(value,getattr(row,key),atol=1e-9,rtol=1e-7)
+        confirmation_checks+=1
     result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),development_prediction_sets_verified=development_checks,frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=preservation['verified'],protected_files_read_denied=preservation['read_denied'],full_preservation_hash_check_complete=preservation['read_denied']==0,preservation_scope='All readable protected files compared against the initial hash manifest; any system-denied private originals remain explicitly unverified, not asserted unchanged',authorized_time_windows_verified=len(windows),recorded_fit_starts_verified=len(fit_ledger),fit_starts_outside_authorized_windows=0,same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
     uncertainty(df,hist,table)
+    result['confirmation_prediction_sets_verified']=confirmation_checks
     dump(RESULT/'verification.json',result)
     print(json.dumps(result,indent=2))
 
