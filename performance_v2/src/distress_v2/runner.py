@@ -3,13 +3,14 @@ import argparse
 import json
 import traceback
 import sys
+import os
 from .common import ROOT,ART,dump,state,hours,now
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--phase',choices=['all','search','finalize','report'],default='all');args=parser.parse_args()
     current=json.loads((ROOT/'EXECUTION_STATE.json').read_text())
     if current.get('complete'):print('This registered run is complete; preserve its freeze.');return
-    state('runner_started',active_command='scripts/run_performance_v2.sh -u -m distress_v2.runner --phase '+args.phase,error=None,elapsed_hours=hours())
+    state('runner_started',active_command='scripts/run_performance_v2.sh -u -m distress_v2.runner --phase '+args.phase,running_pid=os.getpid(),error=None,elapsed_hours=hours())
     try:
         if args.phase in ['all','search']:
             assert not (ART/'confirmation_opened.json').exists(),'Search cannot restart after confirmation opened'

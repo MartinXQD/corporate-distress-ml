@@ -43,6 +43,8 @@ def main():
     changed=git('diff','--name-only','b9e78c6454bfc7cbac6560bdfb047589dc8cd2fe','--cached').decode().splitlines()
     if any(not p.startswith('performance_v2/') for p in changed):issues.append(dict(reason='Release changes outside V2',paths=[p for p in changed if not p.startswith('performance_v2/')]))
     for commit in git('rev-list','b9e78c6454bfc7cbac6560bdfb047589dc8cd2fe..HEAD').decode().splitlines():
+        emails=git('show','-s','--format=%ae%n%ce',commit).decode().splitlines()
+        if not all(email.endswith('@users.noreply.github.com') for email in emails):issues.append(dict(commit=commit,reason='Non-noreply email in new public commit metadata; details kept private'))
         for rel in git('diff-tree','--no-commit-id','--name-only','-r',commit).decode().splitlines():
             p=Path(rel)
             if not rel.startswith('performance_v2/') or set(p.parts)&forbidden or p.suffix in suffixes or p.name in names:issues.append(dict(commit=commit,path=rel,reason='Excluded path in new branch history'))

@@ -15,8 +15,9 @@ def independent(df,q):
         ix=np.flatnonzero(df.year.to_numpy()==year)
         keys=np.array([tie_key(c,year) for c in df.iloc[ix].company_name])
         order=np.lexsort((keys,-q[ix]));n=int(np.ceil(.05*len(ix)))
-        annual.append(average_precision_score(y[ix],q[ix]));roc.append(roc_auc_score(y[ix],q[ix]));recall.append(y[ix][order[:n]].sum()/y[ix].sum())
-    return dict(AP=float(average_precision_score(y,q)),ROC_AUC=float(roc_auc_score(y,q)),macro_AP=float(np.mean(annual)),macro_ROC=float(np.mean(roc)),recall5=float(np.mean(recall)))
+        valid=len(np.unique(y[ix]))==2
+        annual.append(average_precision_score(y[ix],q[ix]) if valid else np.nan);roc.append(roc_auc_score(y[ix],q[ix]) if valid else np.nan);recall.append(y[ix][order[:n]].sum()/y[ix].sum() if y[ix].sum() else np.nan)
+    return dict(AP=float(average_precision_score(y,q)),ROC_AUC=float(roc_auc_score(y,q)) if len(np.unique(y))==2 else np.nan,macro_AP=float(np.mean(annual)),macro_ROC=float(np.mean(roc)),recall5=float(np.nanmean(recall)))
 
 def verify():
     assert (ART/'historical_complete.json').exists()
@@ -33,7 +34,7 @@ def verify():
         assert np.array_equal(sub.company_name.to_numpy(),d.company_id.to_numpy())
         assert np.array_equal(sub.year.to_numpy(),d.year.to_numpy())
         m=independent(sub,d.score.to_numpy())
-        for k,v in m.items():assert np.isclose(v,table.loc[item['name'],k],atol=1e-9,rtol=1e-7),(item['name'],k)
+        for k,v in m.items():assert np.isclose(v,table.loc[item['name'],k],atol=1e-9,rtol=1e-7,equal_nan=True),(item['name'],k)
         checked.append(item['name'])
         families[item['name']]=json.loads((ROOT/item['path']).with_suffix('.json').read_text())['config']['family']
     # Mean-seed and rank/blend rows use exactly the same stored row population.

@@ -37,7 +37,11 @@ def main():
     code,repository=api(f'/repos/{OWNER}/{SLUG}',token)
     assert code==200 and repository['owner']['login']==OWNER and repository['private'] is False
     head=git('rev-parse','HEAD');code,prior=api(f'/repos/{OWNER}/{SLUG}/git/ref/heads/{BRANCH}',token)
-    assert code==404 or (code==200 and prior['object']['sha']==head),'The remote branch already has unknown work; refusing overwrite'
+    known=False;receipt_path=ROOT/'artifacts/audit/publication_receipt_v2.json'
+    if code==200 and receipt_path.exists():
+        saved=json.loads(receipt_path.read_text());previous=saved.get('remote_commit_verified')
+        known=previous==prior['object']['sha'] and subprocess.run(['git','merge-base','--is-ancestor',previous,head],cwd=REPO).returncode==0
+    assert code==404 or (code==200 and (prior['object']['sha']==head or known)),'The remote branch already has unknown work; refusing overwrite'
     _,main_before=api(f'/repos/{OWNER}/{SLUG}/git/ref/heads/main',token)
     subprocess.run(['git','push','-u','origin',f'HEAD:refs/heads/{BRANCH}'],cwd=REPO,env=env,check=True,timeout=180)
     code,remote=api(f'/repos/{OWNER}/{SLUG}/git/ref/heads/{BRANCH}',token);assert code==200 and remote['object']['sha']==head
@@ -47,6 +51,6 @@ def main():
         expected=git('rev-parse','HEAD:'+record['path']);assert blobs.get(record['path'])==expected,record['path']
     _,main_after=api(f'/repos/{OWNER}/{SLUG}/git/ref/heads/main',token)
     receipt=dict(passed=True,repository=repository['html_url'],branch=BRANCH,branch_url=repository['html_url']+'/tree/'+BRANCH+'/performance_v2',authenticated_owner=OWNER,visibility='public',remote_commit_verified=head,all_index_blobs_verified=len(audit['files']),main_before=main_before['object']['sha'],main_after=main_after['object']['sha'],force_push=False,new_repository_created=False,verified_at_utc=datetime.datetime.now(datetime.timezone.utc).isoformat())
-    (ROOT/'artifacts/audit/publication_receipt_v2.json').write_text(json.dumps(receipt,indent=2));print(json.dumps(receipt,indent=2))
+    receipt_path.write_text(json.dumps(receipt,indent=2));print(json.dumps(receipt,indent=2))
 
 if __name__=='__main__':main()

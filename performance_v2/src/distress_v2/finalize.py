@@ -36,14 +36,50 @@ def select_shortlist():
         raise RuntimeError('Search finished. Resume the runner in a fresh process for the recorded V2 ROS baseline step correction before shortlist/confirmation; HPO step-refit configurations are unchanged.')
     from .refinement import run as refine
     refine()
+    from .boosting_tail import run as complete_boosting
+    complete_boosting()
     path=ROOT/'configs/shortlist.json'
     if path.exists():chosen=json.loads(path.read_text())['candidates']
     else:
         c=database();t=pd.read_sql_query("SELECT * FROM trial_records WHERE status='COMPLETE' AND stage IN ('screen','baseline','refinement')",c);c.close()
         assert len(t)>0
+        def functional_key(raw):
+            config=json.loads(raw)
+            if config.get('embedding','none')=='none':
+                for field in ['embedding','embedding_dim','bins']:config.pop(field,None)
+                if config['family']=='num_mlp':config['family']='legacy_residual' if config.get('backbone')=='residual' else 'mlp'
+            if config.get('embedding')=='periodic':config.pop('bins',None)
+            if config['family']=='legacy_residual':config.pop('backbone',None)
+            if config.get('backbone','mlp')=='mlp':config.pop('backbone',None)
+            if config['family']=='official_ft':config.pop('width',None)
+            return digest(config)
+        t['functional_key']=t.config_json.map(functional_key)
+        t['alias_control']=t.apply(lambda r:r.family=='num_mlp' and json.loads(r.config_json).get('embedding','none')=='none',axis=1)
+        ordered=t.sort_values(['alias_control','trial_id']);duplicates=ordered[ordered.duplicated('functional_key',keep='first')]
+        dump(ROOT/'configs/functional_duplicate_controls.json',dict(excluded_from_duplicate_stability_fits=duplicates.trial_id.tolist(),reason='Equivalent executable recipes, including matched no-embedding controls; all actual trials remain in the ledger. Prefer the original named backbone, not the better duplicate score.'))
+        t=ordered.drop_duplicates('functional_key',keep='first')
         neural=t.family.isin(NN);tree=t.family.isin(['catboost','xgboost','random_forest','extra_trees','xgb_rank'])
         mandatory=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf']
-        mandatory+=[t[tree].sort_values('macro_AP',ascending=False).iloc[0].trial_id,t[neural].sort_values('macro_AP',ascending=False).iloc[0].trial_id]
+        measured=dv();mean_cost=measured.groupby('candidate').fit_seconds.mean();latest_cost=measured[measured.year==2013].groupby('candidate').fit_seconds.mean()
+        available=max(0.,(7.15-hours())*3600);resource_decisions=[]
+        def projection(tree_id,nn_id):
+            stability=sum(12*mean_cost.get(k,60.) for k in set([*mandatory,tree_id,nn_id]))
+            final_fixed=sum(7*mean_cost.get(k,30.) for k in [*mandatory,'baseline_v1_selected_dl_corrected_steps'])
+            final_champions=sum(10*max(mean_cost.get(k,60.),latest_cost.get(k,60.)) for k in set([tree_id,nn_id]))
+            return float(stability+1.3*(final_fixed+final_champions)+360.)
+        fallback_nn='baseline_legacy_strong_inner_l1'
+        feasible_tree=[r.trial_id for r in t[tree].sort_values('macro_AP',ascending=False).itertuples() if projection(r.trial_id,fallback_nn)<=available]
+        if not feasible_tree:raise TimeoutError('Insufficient remaining budget for mandatory strong baselines, three-seed stability and five-seed final fits; no lucky-seed shortcut taken')
+        best_tree=feasible_tree[0];feasible_nn=[]
+        for r in t[neural].sort_values('macro_AP',ascending=False).itertuples():
+            seconds=projection(best_tree,r.trial_id);eligible=seconds<=available
+            resource_decisions.append(dict(candidate=r.trial_id,screen_AP=r.macro_AP,projected_required_seconds=seconds,remaining_training_seconds=available,eligible=eligible,reason='Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter'))
+            if eligible:feasible_nn.append(r.trial_id)
+        dump(ROOT/'configs/resource_feasibility_before_shortlist.json',dict(at_utc=now(),neural=resource_decisions,best_screened_neural=t[neural].sort_values('macro_AP',ascending=False).iloc[0].trial_id,selected_for_promotion=feasible_nn[0] if feasible_nn else None,rule='Omit an unaffordable candidate rather than replacing registered stability/final seeds with one favorable seed'))
+        if not feasible_nn:raise TimeoutError('No neural candidate can finish registered stability/final fits within remaining budget')
+        allowed_nn=set(feasible_nn);allowed_tree=set(feasible_tree)
+        t=t[(~t.family.isin(NN)|t.trial_id.isin(allowed_nn))&(~t.family.isin(['catboost','xgboost','random_forest','extra_trees','xgb_rank'])|t.trial_id.isin(allowed_tree)|t.trial_id.isin(mandatory))]
+        mandatory+=[best_tree,feasible_nn[0]]
         chosen=list(dict.fromkeys(mandatory));counts=t.set_index('trial_id').family.loc[chosen].value_counts().to_dict()
         for r in t.sort_values('macro_AP',ascending=False).itertuples():
             if len(chosen)>=8:break
@@ -125,7 +161,9 @@ def choose_blend(selected,summary):
         top_a=set();top_b=set()
         for year in YEARS:
             ix=np.flatnonzero(reference.year.to_numpy()==year);n=int(np.ceil(.05*len(ix)))
-            top_a.update(ix[np.argsort(-ranks[a][ix],kind='stable')[:n]]);top_b.update(ix[np.argsort(-ranks[b][ix],kind='stable')[:n]])
+            from distress_ml.splits import tie_key
+            keys=np.array([tie_key(company,year) for company in reference.iloc[ix].company_id])
+            top_a.update(ix[np.lexsort((keys,-ranks[a][ix]))[:n]]);top_b.update(ix[np.lexsort((keys,-ranks[b][ix]))[:n]])
         correlations.append(dict(a=a,b=b,annual_rank_correlation=float(np.corrcoef(ranks[a],ranks[b])[0,1]),top5_Jaccard=len(top_a&top_b)/len(top_a|top_b),positive_a_only=int(reference.iloc[list(top_a-top_b)].y_true.sum()),positive_b_only=int(reference.iloc[list(top_b-top_a)].y_true.sum())))
     pd.DataFrame(correlations).to_csv(RESULT/'ensemble_complementarity.csv',index=False)
     return dict(admitted=chosen,candidate=best,reference_macro_AP=base_macro,admission='At least +0.005 macro-year development AP, ROC/Top5 guardrails, finite two-model nonnegative grid; NN weight may be zero',score_type='annual percentile rank',reference_cohorts_fixed_for_bootstrap=True)
@@ -160,7 +198,8 @@ def confirm_and_fit(selected):
     pd.DataFrame(confirmation).to_csv(RESULT/'confirmation_2014.csv',index=False)
     # Strict P1 fixed legacy transfer versus P2-selected cutoff transfer are distinct.
     transfer={'P1_fixed_legacy':baselines()['legacy_strong_inner_l1']}
-    transfer.update({'P2_selected__fit_cutoff_2012_transfer__'+k:cfg(v) for k,v in [('overall',selected['overall']),('DL',selected['DL'])]})
+    transfer['P2_selected__fit_cutoff_2012_transfer__overall']=cfg(selected['overall'])
+    if selected['DL']!=selected['overall']:transfer['P2_selected__fit_cutoff_2012_transfer__DL']=cfg(selected['DL'])
     for key,c in transfer.items():
         f=features(df,c['features']);path=ART/f'models/{key}.joblib'
         if not path.exists():
@@ -187,7 +226,7 @@ def confirm_and_fit(selected):
         p=(ROOT/item['path']).with_suffix('.pt')
         if p.exists():hashes[str(p.relative_to(ROOT))]=sha(p)
     for p in (ROOT/'src').rglob('*.py'):
-        if p.name not in ['reporting.py','verify.py','inference.py']:hashes[str(p.relative_to(ROOT))]=sha(p)
+        if p.name not in ['reporting.py','pdf_layout.py','verify.py','inference.py']:hashes[str(p.relative_to(ROOT))]=sha(p)
     dump(ROOT/'configs/artifact_freeze.json',dict(frozen_at_utc=now(),selection_sha256=sha(ROOT/'configs/selection_freeze.json'),artifacts=hashes,models=inventory,historical_exposure='Previously inspected; diagnostics also rechecked saved V1 scores/labels',new_candidate_historical_scoring_not_started=True))
     state('final_artifacts_frozen_before_historical')
 

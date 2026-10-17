@@ -69,6 +69,8 @@ def export():
         if c.get('embedding','none')=='none':
             for field in ['embedding','embedding_dim','bins']:c.pop(field,None)
             if c['family']=='num_mlp':c['family']='legacy_residual' if c.get('backbone')=='residual' else 'mlp'
+        if c.get('embedding')=='periodic':c.pop('bins',None)
+        if c['family']=='legacy_residual':c.pop('backbone',None)
         if c.get('backbone','mlp')=='mlp':c.pop('backbone',None)
         if c['family']=='official_ft':c.pop('width',None)
         return digest(c)
@@ -181,7 +183,8 @@ def search():
         made=False
         counts={f:sum(t.state==optuna.trial.TrialState.COMPLETE for t in s.trials) for f,s in studies.items()}
         underexplored=[f for f in list(TARGETS)[:8] if counts[f]<2]
-        cycle=sorted(underexplored,key=lambda f:(counts[f],list(TARGETS).index(f)))+[f for f in schedule if f not in underexplored]
+        coverage_order=['num_mlp','tabm','legacy_residual','mlp','extra_trees','random_forest','catboost','xgboost']
+        cycle=sorted(underexplored,key=lambda f:(counts[f],coverage_order.index(f)))+[f for f in schedule if f not in underexplored]
         with (ART/'logs/dispatch_cycles.jsonl').open('a') as stream:stream.write(json.dumps(dict(at_utc=now(),complete_counts=counts,cycle=cycle))+'\n')
         for family in cycle:
             target=TARGETS[family]
