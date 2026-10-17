@@ -61,6 +61,10 @@ def execute(cfg,trial_id,stage,years):
     if entry and entry[0]=='COMPLETE':
         value=c.execute('SELECT macro_AP FROM trial_records WHERE trial_id=?',(trial_id,)).fetchone()[0]
         c.close();return 'COMPLETE',value
+    if entry:
+        cursor=c.execute('SELECT * FROM trial_records WHERE trial_id=?',(trial_id,));record=dict(zip([d[0] for d in cursor.description],cursor.fetchone()))
+        record['archived_at_utc']=now();record['reason']='Prior attempt preserved before bounded resume'
+        with (ART/'logs/trial_attempts.jsonl').open('a') as stream:stream.write(json.dumps(record)+'\n')
     c.execute('INSERT OR REPLACE INTO trial_records VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',(trial_id,cfg['family'],stage,'RUNNING',json.dumps(cfg,sort_keys=True),now(),None,None,None,None,None,None));c.commit();c.close()
     started=time.monotonic();rows=[];status='COMPLETE';error=None
     dump(ROOT/f'configs/trial_{trial_id}.json',cfg)

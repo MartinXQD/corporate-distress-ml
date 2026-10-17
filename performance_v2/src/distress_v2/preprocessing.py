@@ -9,9 +9,27 @@ class NumericTransform:
         self.columns=list(x);a=x.to_numpy(float)
         with warnings.catch_warnings():
             warnings.simplefilter('ignore');self.median=np.nan_to_num(np.nanmedian(a,axis=0))
-        self.numeric=np.array([not set(np.unique(v[np.isfinite(v)])).issubset({0.,1.}) for v in a.T])
-        self.missing=np.flatnonzero(np.isnan(a).any(axis=0)) if self.indicators else np.array([],int)
         z=np.where(np.isfinite(a),a,self.median)
+        variable=np.ptp(z,axis=0)>0
+        binary=np.all((a==0)|(a==1)|(~np.isfinite(a)),axis=0)
+        self.numeric=(~binary)&variable
+        kept_binary=[]
+        for j in np.flatnonzero(binary&variable):
+            if not any(np.array_equal(z[:,j],z[:,k]) for k in kept_binary):kept_binary.append(j)
+        self.binary=np.array(kept_binary,dtype=int)
+        missing=[]
+        for j in (np.flatnonzero(np.isnan(a).any(axis=0)) if self.indicators else []):
+            column=self.columns[j]
+            if column+'_invalid' in self.columns:continue
+            if column.startswith('lag') and '_' in column:
+                prefix=column.split('_',1)[0]
+                if 'observed_'+prefix in self.columns:continue
+            mask=(~np.isfinite(a[:,j])).astype(float)
+            if np.ptp(mask)==0:continue
+            if any(np.array_equal(mask,z[:,k]) for k in kept_binary):continue
+            if any(np.array_equal(mask,(~np.isfinite(a[:,k])).astype(float)) for k in missing):continue
+            missing.append(j)
+        self.missing=np.array(missing,dtype=int)
         q=.01 if self.kind=='std01' else .005
         self.low,self.high=np.quantile(z,[q,1-q],axis=0) if self.kind in ['std01','std005'] else (np.full(a.shape[1],-np.inf),np.full(a.shape[1],np.inf))
         self.low[~self.numeric]=-np.inf;self.high[~self.numeric]=np.inf
@@ -27,7 +45,7 @@ class NumericTransform:
             else:
                 self.center[self.numeric]=z[:,self.numeric].mean(axis=0);self.scale[self.numeric]=z[:,self.numeric].std(axis=0)
         self.scale=np.where(self.scale>0,self.scale,1.)
-        self.n_cont=int(self.numeric.sum());self.binary=np.flatnonzero(~self.numeric)
+        self.n_cont=int(self.numeric.sum())
         self.output_columns=[self.columns[i] for i in np.flatnonzero(self.numeric)]+[self.columns[i] for i in self.binary]+[self.columns[i]+'_missing' for i in self.missing]
         return self
     def transform(self,x):

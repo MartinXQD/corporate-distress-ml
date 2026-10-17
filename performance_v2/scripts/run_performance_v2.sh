@@ -10,6 +10,7 @@ export PYTHONPATH="$TASK_V2/src:$TASK_V1/src:$TASK_V2_SITE:$TASK_V1_SITE${PYTHON
 TASK_TORCH_LIB="$("$TASK_PYTHON" -c 'import importlib.util,pathlib; print(pathlib.Path(importlib.util.find_spec("torch").origin).parent/"lib")')"
 export DYLD_LIBRARY_PATH="$TASK_TORCH_LIB"
 export DISTRESS_OMP_READY=1
+export PYTHONDONTWRITEBYTECODE=1
 export OMP_NUM_THREADS="${V2_THREADS:-2}"
 export OPENBLAS_NUM_THREADS="$OMP_NUM_THREADS"
 export MKL_NUM_THREADS="$OMP_NUM_THREADS"
