@@ -193,7 +193,11 @@ def fit(df,x,cfg,tag):
             names,selector=selected_columns(x,df,cfg,tag+'/full_select');pp=make_preprocessor(cfg).fit(x[names]);a=pp.transform(x[names]);fitted_df=df
             if family in NN:
                 steps=stop_stats['best_steps']
-                if cfg.get('refit_rule')=='epochs':steps=stop_stats['best_epoch']*math.ceil(len(df)/cfg.get('batch_size',512))
+                if cfg.get('refit_rule')=='epochs':
+                    full_rows=len(df)
+                    if cfg.get('sampling_budget')=='epoch_equivalent' and cfg.get('sampling','none')!='none':
+                        full_rows=2*int(df.y.astype(int).value_counts().max())
+                    steps=stop_stats['best_epoch']*math.ceil(full_rows/cfg.get('batch_size',512))
                 model,final_stats=train_neural(a,df,cfg,tag+'/refit',getattr(pp,'n_cont',len(pp.columns)),fixed_steps=steps,schedule_horizon=stop_stats['schedule_horizon'])
             else:model,final_stats=train_tree(a,df,cfg,tag+'/refit',rounds=stop_stats['best_rounds'])
     else:

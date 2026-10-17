@@ -12,7 +12,8 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--model',required=True);parser.add_argument('--input',required=True);parser.add_argument('--output',required=True);args=parser.parse_args()
     model=Path(args.model).resolve();output=Path(args.output).resolve()
     assert output.is_relative_to(ART.resolve()) and not output.exists()
-    frozen=json.loads((ROOT/'configs/artifact_freeze.json').read_text())['artifacts'];rel=str(model.relative_to(ROOT))
+    freeze=json.loads((ROOT/'configs/artifact_freeze.json').read_text());frozen=freeze['artifacts'];rel=str(model.relative_to(ROOT))
+    assert any(i['path']==rel and i['channel']=='P2' for i in freeze['models']),'This CLI exposes P2 uncalibrated ranking only'
     assert rel in frozen and sha(model)==frozen[rel]
     names=pd.read_csv(args.input,nrows=0).columns
     df=pd.read_csv(args.input,usecols=[c for c in names if c not in ['y','y_true','status_label','bankrupt']]);df['row_id']=np.arange(len(df))

@@ -26,7 +26,7 @@ def baselines():
       'v1_lags_xgb':base('xgboost',features='V1_LAGS',preprocess='v1',clip=True,iterations=180,depth=3,learning_rate=.05,min_child_weight=1.,subsample=.9,colsample_bytree=.9,reg_lambda=1.,reg_alpha=0.),
       'v1_raw_catboost':base('catboost',features='V1_S0',preprocess='v1',clip=True,iterations=180,depth=5,learning_rate=.05),
       'v1_selected_rf':base('random_forest',features='V1_S1',preprocess='v1',clip=True,iterations=120,depth=16,leaf=3,max_features='sqrt'),
-      'v1_selected_dl':base('v1_residual',features='V1_S1',preprocess='v1',clip=True,width=64,depth=2,dropout=.15,learning_rate=.001,weight_decay=.0001,batch_size=1024,sampling='ros',sampling_budget='epoch_equivalent',refit_rule='epochs',max_epochs=25,patience=4),
+      'v1_selected_dl_corrected_steps':base('v1_residual',features='V1_S1',preprocess='v1',clip=True,width=64,depth=2,dropout=.15,learning_rate=.001,weight_decay=.0001,batch_size=1024,sampling='ros',sampling_budget='epoch_equivalent',refit_rule='epochs',refit_contract_revision=2,max_epochs=25,patience=4),
       'logistic':base('logistic',features='RAW17',preprocess='std005',C=1.)
     }
 
@@ -68,6 +68,13 @@ def execute(cfg,trial_id,stage,years):
     c.execute('INSERT OR REPLACE INTO trial_records VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',(trial_id,cfg['family'],stage,'RUNNING',json.dumps(cfg,sort_keys=True),now(),None,None,None,None,None,None));c.commit();c.close()
     started=time.monotonic();rows=[];status='COMPLETE';error=None
     dump(ROOT/f'configs/trial_{trial_id}.json',cfg)
+    # A bounded resume can reuse completed folds. Preserve curves from an
+    # interrupted, incomplete fit before repeating its deterministic fit.
+    if entry:
+        import shutil
+        backup=ART/'logs/interrupted_attempts'/f'{trial_id}_{time.time_ns()}'
+        for old in (ART/'logs').glob(trial_id+'__*'):
+            backup.mkdir(parents=True,exist_ok=True);shutil.copy2(old,backup/old.name)
     try:
         for year in years:
             time_guard(5.95 if stage in ['screen','baseline','bridge'] else 7.15)
@@ -144,10 +151,24 @@ def search():
         sampler=joblib.load(sampler_path) if sampler_path.exists() else optuna.samplers.TPESampler(seed=42,n_startup_trials=8)
         studies[family]=optuna.create_study(study_name=family,storage='sqlite:///'+str(ART/'optuna.sqlite'),load_if_exists=True,direction='maximize',sampler=sampler)
         enqueue(studies[family],family)
+    for family,study in studies.items():
+        for pending in study.get_trials(states=[optuna.trial.TrialState.RUNNING]):
+            cfg=pending.user_attrs.get('actual_config')
+            if cfg is None:
+                study.tell(pending.number,state=optuna.trial.TrialState.FAIL);continue
+            trial_id=f'{family}_{pending.number:03d}_{digest(cfg)[:8]}'
+            status,value=execute(cfg,trial_id,'screen',[2009,2011,2013])
+            study.tell(pending.number,value if status=='COMPLETE' else None,state=optuna.trial.TrialState.COMPLETE if status=='COMPLETE' else optuna.trial.TrialState.FAIL)
     dump(ROOT/'configs/resource_reserve.json',dict(search_soft_stop_hours=4.8,registered_search_maximum=5.9,reason='Reserve measured full-fold three-seed stability, five-seed final baselines, company stress, verification and reports inside the eight-hour wall clock. May end earlier only when all search targets complete.'))
+    # Measured residual trial 000 took 19 minutes. Cost-based scheduling gives
+    # the two high-priority boosting families three turns per cycle. It does
+    # not change spaces, scoring, seeds, or promote based on historical data.
+    schedule=[f for f in TARGETS for _ in range(3 if f in ['catboost','xgboost'] else 1)]
+    dump(ROOT/'configs/search_schedule_revision.json',dict(at_utc=now(),cycle=schedule,reason='Observed CPU cost; preserve broad tree search within the same wall-clock cap. No score-based family elimination.',registered_protocol_unchanged=True))
     while hours()<4.8:
         made=False
-        for family,target in TARGETS.items():
+        for family in schedule:
+            target=TARGETS[family]
             study=studies[family]
             completed=sum(t.state==optuna.trial.TrialState.COMPLETE for t in study.trials)
             attempts=sum(t.state!=optuna.trial.TrialState.WAITING for t in study.trials)

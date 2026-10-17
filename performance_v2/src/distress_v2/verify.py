@@ -56,14 +56,32 @@ def verify():
         d=pd.read_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',float_precision='round_trip')
         np.testing.assert_allclose(q,d.raw_score.to_numpy(),atol=1e-6,rtol=1e-6)
         selected.append(dict(model=item['name'],neural=neural,max_reload_error=float(np.max(abs(q-d.raw_score.to_numpy())))))
-    result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=len(original),same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
+    development_checks=verify_development(df)
+    result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),development_prediction_sets_verified=development_checks,frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=len(original),same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
     dump(RESULT/'verification.json',result)
     uncertainty(df,hist,table)
     print(json.dumps(result,indent=2))
 
+def verify_development(df):
+    """Recalculate every saved development fold, including invalidated evidence."""
+    indexed=df.set_index('row_id');count=0
+    for path in (ART/'logs').glob('fold_*.json'):
+        row=json.loads(path.read_text())
+        p=pd.read_csv(ROOT/row['prediction_path'],float_precision='round_trip')
+        assert p.row_id.is_unique
+        sub=indexed.loc[p.row_id]
+        assert set(sub.year)=={row['year']} and row['year']<=2013
+        np.testing.assert_array_equal(sub.y,p.y_true)
+        np.testing.assert_array_equal(sub.company_name,p.company_id)
+        m=independent(sub,p.score.to_numpy())
+        for metric in ['AP','ROC_AUC','recall5']:
+            assert np.isclose(m[metric],row[metric],atol=1e-9,rtol=1e-7),(path.name,metric)
+        count+=1
+    return count
+
 def uncertainty(df,hist,table):
     from distress_ml.evaluation import bootstrap_pairs
-    selected=json.loads((ROOT/'configs/selection_freeze.json').read_text());keys=list(dict.fromkeys([selected['overall'],selected['DL'],'baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb']))
+    selected=json.loads((ROOT/'configs/selection_freeze.json').read_text());benchmarks=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf'];keys=list(dict.fromkeys([selected['overall'],selected['DL'],*benchmarks]))
     predictions={}
     for key in keys:
         d=pd.read_csv(ART/f'predictions/P2_seed_mean__{key}_historical.csv.gz',float_precision='round_trip');predictions[key]=d.score.to_numpy()
@@ -76,8 +94,10 @@ def uncertainty(df,hist,table):
                 ix=np.flatnonzero(hist.year.to_numpy()==year);q[ix]=rankdata(q[ix],method='average')/len(ix)
             predictions[key]=q
     rows=[]
-    for reference in ['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb']:
+    for reference in benchmarks:
         t=bootstrap_pairs(hist,predictions,reference,repetitions=2000,seed=2026)
         t['score_convention']='annual percentile ranks, frozen cohorts' if selected['blend']['admitted'] else 'mean registered-seed uncalibrated scores'
         rows.append(t)
     pd.concat(rows).to_csv(RESULT/'paired_company_intervals.csv',index=False)
+
+if __name__=='__main__':verify()

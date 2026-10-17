@@ -20,7 +20,7 @@ def reconstruct(df):
     for kind in ['legacy_fixed13_retrained','included_base_checkpoint_epoch31']:
         path=ART/f'models/V0_{kind}.joblib'
         name='LEGACY_FIXED13' if kind=='legacy_fixed13_retrained' else 'RAW18'
-        cfg=base('legacy_residual',features=name,preprocess='std01',indicators=False,width=192,depth=4,dropout=.25,learning_rate=.001,weight_decay=.0002,batch_size=512,weight_alpha=1,max_epochs=100,patience=12)
+        cfg=base('legacy_residual',features=name,preprocess='std01',indicators=False,width=192,depth=4,dropout=.25,learning_rate=.001,weight_decay=.0002,batch_size=512,weight_alpha=1,max_epochs=100,patience=12,gradient_clip=None)
         if not path.exists():
             f=features(df,name);pp=NumericTransform('std01',indicators=False).fit(f[train]);a=pp.transform(f[train]);b=pp.transform(f[val])
             if kind=='legacy_fixed13_retrained':

@@ -32,17 +32,21 @@ def predictions(candidate,seeds=STABILITY_SEEDS):
     return result
 
 def select_shortlist():
+    if (ART/'baseline_steps_correction_required.json').exists() and not (ART/'baseline_steps_correction_applied.json').exists():
+        raise RuntimeError('Search finished. Resume the runner in a fresh process for the recorded V2 ROS baseline step correction before shortlist/confirmation; HPO step-refit configurations are unchanged.')
+    from .refinement import run as refine
+    refine()
     path=ROOT/'configs/shortlist.json'
     if path.exists():chosen=json.loads(path.read_text())['candidates']
     else:
-        c=database();t=pd.read_sql_query("SELECT * FROM trial_records WHERE status='COMPLETE' AND stage IN ('screen','baseline')",c);c.close()
+        c=database();t=pd.read_sql_query("SELECT * FROM trial_records WHERE status='COMPLETE' AND stage IN ('screen','baseline','refinement')",c);c.close()
         assert len(t)>0
         neural=t.family.isin(NN);tree=t.family.isin(['catboost','xgboost','random_forest','extra_trees','xgb_rank'])
-        mandatory=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb']
+        mandatory=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf']
         mandatory+=[t[tree].sort_values('macro_AP',ascending=False).iloc[0].trial_id,t[neural].sort_values('macro_AP',ascending=False).iloc[0].trial_id]
         chosen=list(dict.fromkeys(mandatory));counts=t.set_index('trial_id').family.loc[chosen].value_counts().to_dict()
         for r in t.sort_values('macro_AP',ascending=False).itertuples():
-            if len(chosen)>=6:break
+            if len(chosen)>=8:break
             if r.trial_id in chosen or counts.get(r.family,0)>=2:continue
             chosen.append(r.trial_id);counts[r.family]=counts.get(r.family,0)+1
         # Reduce optional candidates when measured fold cost threatens final fits.
@@ -60,7 +64,8 @@ def select_shortlist():
     counts=t.groupby('candidate').size();assert all(counts.get(k,0)==15 for k in chosen)
     summary=t.groupby('candidate').agg(family=('family','first'),features=('features','first'),macro_AP=('AP','mean'),macro_ROC=('ROC_AUC','mean'),recall5=('recall5','mean'),mean_fit_seconds=('fit_seconds','mean')).reset_index()
     recent=t[t.year.isin([2012,2013])].groupby('candidate').AP.mean();summary['recent_AP']=summary.candidate.map(recent)
-    incumbent=summary.set_index('candidate').loc['baseline_v1_lags_xgb']
+    benchmark_names=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf']
+    incumbent=summary[summary.candidate.isin(benchmark_names)].sort_values('macro_AP',ascending=False).iloc[0]
     summary['guardrail_pass']=(summary.macro_ROC>=incumbent.macro_ROC-.01)&(summary.recall5>=incumbent.recall5-.02)
     eligible=summary[summary.guardrail_pass]
     near=eligible[eligible.macro_AP>=eligible.macro_AP.max()-.005]
@@ -70,7 +75,7 @@ def select_shortlist():
     near_nn=neural[neural.macro_AP>=neural.macro_AP.max()-.005]
     dl=near_nn.sort_values(order,ascending=[False,False,True,True]).iloc[0].candidate
     summary.to_csv(RESULT/'selection_trace.csv',index=False)
-    selected=dict(overall=winner,DL=dl,shortlist=chosen,selection_years=YEARS,selection_seeds=STABILITY_SEEDS,near_tie=.005,guardrail_reference='baseline_v1_lags_xgb',chosen_at_utc=now(),history_exposed_before_version=True)
+    selected=dict(overall=winner,DL=dl,shortlist=chosen,selection_years=YEARS,selection_seeds=STABILITY_SEEDS,near_tie=.005,guardrail_reference=incumbent.candidate,chosen_at_utc=now(),history_exposed_before_version=True)
     selected['blend']=choose_blend(selected,summary)
     dump(ROOT/'configs/selection_freeze.json',selected);dump(RESULT/'selected_candidates.json',selected)
     state('selection_frozen_before_2014',overall=winner,DL=dl)
@@ -142,7 +147,7 @@ def confirm_and_fit(selected):
             p=fit(df[df.year<=2013],f[df.year<=2013],{**c,'seed':42},'confirm_'+key)
             q=p.predict(f[df.year==2014]);m=dict(candidate=key,channel='P2_frozen_confirmation',fit_cutoff=2013,seed=42,**measures(df[df.year==2014],q));confirmation.append(m);dump(done,m)
             out=df.loc[df.year==2014,['row_id','company_name','year','y']].copy();out['score']=q;out.to_csv(ART/f'predictions/confirmation_{key}.csv.gz',index=False)
-        seed_list=FINAL_SEEDS if key in [selected['overall'],selected['DL'],'baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost'] or (selected['blend']['admitted'] and key in [selected['blend']['candidate']['component_a'],selected['blend']['candidate']['component_b']]) else [42]
+        seed_list=FINAL_SEEDS if key!='baseline_logistic' else [42]
         for seed in seed_list:
             name=f'P2__{key}__seed{seed}';path=ART/f'models/{name}.joblib'
             if not path.exists():
@@ -178,8 +183,9 @@ def confirm_and_fit(selected):
     for item in inventory:
         p=(ROOT/item['path']).with_suffix('.pt')
         if p.exists():hashes[str(p.relative_to(ROOT))]=sha(p)
-    for p in (ROOT/'src').rglob('*.py'):hashes[str(p.relative_to(ROOT))]=sha(p)
-    dump(ROOT/'configs/artifact_freeze.json',dict(frozen_at_utc=now(),selection_sha256=sha(ROOT/'configs/selection_freeze.json'),artifacts=hashes,models=inventory,history_labels_not_opened_in_v2=True))
+    for p in (ROOT/'src').rglob('*.py'):
+        if p.name not in ['reporting.py','verify.py','inference.py']:hashes[str(p.relative_to(ROOT))]=sha(p)
+    dump(ROOT/'configs/artifact_freeze.json',dict(frozen_at_utc=now(),selection_sha256=sha(ROOT/'configs/selection_freeze.json'),artifacts=hashes,models=inventory,historical_exposure='Previously inspected; diagnostics also rechecked saved V1 scores/labels',new_candidate_historical_scoring_not_started=True))
     state('final_artifacts_frozen_before_historical')
 
 def logit_safe(x):

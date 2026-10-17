@@ -2,12 +2,14 @@
 import argparse
 import json
 import traceback
+import sys
 from .common import ROOT,ART,dump,state,hours,now
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--phase',choices=['all','search','finalize','report'],default='all');args=parser.parse_args()
     current=json.loads((ROOT/'EXECUTION_STATE.json').read_text())
     if current.get('complete'):print('This registered run is complete; preserve its freeze.');return
+    state('runner_started',active_command='scripts/run_performance_v2.sh -u -m distress_v2.runner --phase '+args.phase,error=None,elapsed_hours=hours())
     try:
         if args.phase in ['all','search']:
             assert not (ART/'confirmation_opened.json').exists(),'Search cannot restart after confirmation opened'
@@ -21,6 +23,11 @@ def main():
             if not (ROOT/'results/software_contracts.json').exists():contracts()
             equal_updates()
             for name,cfg in baselines().items():execute(cfg,'baseline_'+name,'baseline',[2009,2011,2013])
+            if (ART/'baseline_steps_correction_required.json').exists():
+                from .common import database
+                db=database();corrected=db.execute("SELECT status FROM trial_records WHERE trial_id='baseline_v1_selected_dl_corrected_steps'").fetchone();db.close()
+                assert corrected and corrected[0]=='COMPLETE','Corrected migrated baseline must finish before selection'
+                dump(ART/'baseline_steps_correction_applied.json',dict(at_utc=now(),corrected_trial='baseline_v1_selected_dl_corrected_steps',scope='Only V2 migrated V1 ROS epoch-equivalent refit; ordinary P2 step-refit search trials were unaffected'))
             search()
         if args.phase in ['all','finalize']:
             from .finalize import select_shortlist,confirm_and_fit,score_historical
