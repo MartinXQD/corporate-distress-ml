@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "checked_at_utc": "2026-10-17T05:49:19.872361+00:00",
+  "content_index_files": 123,
+  "content_index_bytes": 11914833,
+  "index_issues": [],
+  "prior_history_blobs_scanned": 85,
+  "prior_history_issues": [],
+  "scope": "Content index before this audit receipt and publication documentation; final private index audit is refreshed immediately before push.",
+  "excluded": "Original team materials, raw/processed data, full predictions, model files, environment, private cases, personal resume drafts, font files and credentials",
+  "github_identity": "MartinXQD verified by connector and HTTPS credential; rechecked at creation"
+}

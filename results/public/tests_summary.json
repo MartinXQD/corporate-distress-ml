@@ -1,0 +1,12 @@
+{
+  "tests": 28,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "passed": true,
+  "seconds": 3.715778112411499,
+  "synthetic_model_fit_calls": 11,
+  "synthetic_single_neural_updates": 3,
+  "scope": "Synthetic software contracts only; no research performance",
+  "command": "scripts/run.sh scripts/test_with_accounting.py"
+}

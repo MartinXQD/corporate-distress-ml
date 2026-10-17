@@ -46,7 +46,9 @@ def run():
     if readme.exists():
         for target in re.findall(r'\]\(([^)]+)\)',readme.read_text()):
             if target.startswith(('http:','https:','#')):continue
-            if not (ROOT/target.split('#')[0]).exists():issues.append(dict(path='README.md',reason='Broken relative link: '+target))
+            relative=target.split('#')[0]
+            if relative not in paths or not (ROOT/relative).exists():
+                issues.append(dict(path='README.md',reason='Relative link absent from public index: '+target))
     result=dict(passed=not issues,index_files=len(records),index_bytes=sum(x['bytes'] for x in records),issues=issues,files=records,git_root_verified=True,owner='MartinXQD (connector verified; recheck publishing credential before remote creation)')
     (ROOT/'artifacts/audit/release_index_audit.json').write_text(json.dumps(result,indent=2))
     print(json.dumps({k:v for k,v in result.items() if k!='files'},indent=2))

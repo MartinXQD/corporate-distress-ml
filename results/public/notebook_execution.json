@@ -1,0 +1,26 @@
+[
+  {
+    "notebook": "01_Data_and_Features.ipynb",
+    "executed": true,
+    "cells": 4,
+    "errors": 0
+  },
+  {
+    "notebook": "02_Validation_and_ML.ipynb",
+    "executed": true,
+    "cells": 4,
+    "errors": 0
+  },
+  {
+    "notebook": "03_PyTorch_and_Sequences.ipynb",
+    "executed": true,
+    "cells": 4,
+    "errors": 0
+  },
+  {
+    "notebook": "04_Results_and_Interpretation.ipynb",
+    "executed": true,
+    "cells": 5,
+    "errors": 0
+  }
+]

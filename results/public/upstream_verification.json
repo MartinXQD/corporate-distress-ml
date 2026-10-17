@@ -1,0 +1,96 @@
+{
+  "checked_at_utc": "2026-10-17T04:22:41.263157+00:00",
+  "repository": "https://github.com/sowide/bankruptcy_dataset",
+  "local_sha256": "cff2c899a97ecd629415cb22f59186000e74e1c0a78cfae036c0a53025419b5e",
+  "README.md": {
+    "sha256": "d1dbad3da754d05114fa9a938924964d1bfa4b30559cb73e56d0d4629abee1a2",
+    "bytes": 2173,
+    "url": "https://raw.githubusercontent.com/sowide/bankruptcy_dataset/main/README.md"
+  },
+  "LICENSE.md": {
+    "sha256": "f5b745ef98087f531e719ee8ca6a96809444573ecc7173c6fa68eaad39b3cc3f",
+    "bytes": 18658,
+    "url": "https://raw.githubusercontent.com/sowide/bankruptcy_dataset/main/LICENSE.md"
+  },
+  "american_bankruptcy_dataset.csv": {
+    "sha256": "d64ed85ae786d75113455ae238feb24015d19716c10ec1de3a90a52eddc7b04a",
+    "bytes": 12395824,
+    "url": "https://raw.githubusercontent.com/sowide/bankruptcy_dataset/main/american_bankruptcy_dataset.csv"
+  },
+  "upstream_shape": [
+    78682,
+    23
+  ],
+  "upstream_columns": [
+    "company_name",
+    "fyear",
+    "status_label",
+    "X1",
+    "X2",
+    "X3",
+    "X4",
+    "X5",
+    "X6",
+    "X7",
+    "X8",
+    "X9",
+    "X10",
+    "X11",
+    "X12",
+    "X13",
+    "X14",
+    "X15",
+    "X16",
+    "X17",
+    "X18",
+    "Division",
+    "MajorGroup"
+  ],
+  "upstream_companies": 8971,
+  "upstream_company_label_nunique_distribution": {
+    "1": 8971
+  },
+  "parsed_frame_equals_local": false,
+  "bytes_equal_local": false,
+  "normalized_common_columns_equal_local": false,
+  "normalization": "Rename fyear to year, then select the 21 local columns in local order; no row/label/value replacement.",
+  "common_values_mismatch_counts": {
+    "company_name": 0,
+    "status_label": 0,
+    "year": 0,
+    "X1": 63068,
+    "X2": 78682,
+    "X3": 78578,
+    "X4": 78681,
+    "X5": 78165,
+    "X6": 78662,
+    "X7": 78678,
+    "X8": 78682,
+    "X9": 78682,
+    "X10": 78682,
+    "X11": 78677,
+    "X12": 78681,
+    "X13": 78675,
+    "X14": 78682,
+    "X15": 78682,
+    "X16": 78682,
+    "X17": 78682,
+    "X18": 62948
+  },
+  "extra_upstream_columns": [
+    "Division",
+    "MajorGroup"
+  ],
+  "upstream_commit": "8bcd8db3b432b1fa6d65e26753b5c9fc6567438d",
+  "numeric_tolerance_audit": "results/public/upstream_numeric_comparison.csv",
+  "candidate_sha256_rechecked": "d64ed85ae786d75113455ae238feb24015d19716c10ec1de3a90a52eddc7b04a",
+  "key_values_aligned": {
+    "company_name": true,
+    "year": true,
+    "status_label": true
+  },
+  "year_dtype": {
+    "local": "int64",
+    "upstream": "float64"
+  }
+}

@@ -1,0 +1,4 @@
+relation,exact_rows,close_rows,rows,median_abs_residual,max_abs_residual
+sales_equals_revenue,78682,78682,78682,0.0,0.0
+gross_profit_sales_less_cogs,33998,78680,78682,6.661338147750939e-16,8.017
+ebit_ebitda_less_depreciation,50489,78679,78682,0.0,9.118

@@ -1,0 +1,24 @@
+{
+  "created_at_utc": "2026-10-17T05:20:53.892881+00:00",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "cpu_count": 10,
+  "memory_bytes": 25769803776,
+  "device": "cpu",
+  "MPS_available": false,
+  "CUDA_available": false,
+  "threads": 2,
+  "versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.7.2",
+    "torch": "2.14.1",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "imbalanced-learn": "0.14.0",
+    "reportlab": "5.0.1",
+    "pypdf": "6.21.0",
+    "nbformat": "5.10.4",
+    "nbclient": "0.10.2"
+  },
+  "python": "3.13.9"
+}

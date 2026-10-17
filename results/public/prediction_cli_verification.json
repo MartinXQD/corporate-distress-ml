@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "rows": 128,
+  "inference_label_independent": true,
+  "frozen_prediction_match": true,
+  "ml_full_historical_checkpoint_reproduced": true,
+  "model": "final_random_forest__S1__95d8315d2d_seed42",
+  "tolerance": 1e-06,
+  "fitting_performed": false,
+  "label_change_max_score_difference": 5.551115123125783e-17
+}

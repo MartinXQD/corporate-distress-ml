@@ -1,0 +1,78 @@
+{
+  "configurations": 41,
+  "development_fold_runs": 164,
+  "research_fit_calls": 542,
+  "software_fit_calls": 27,
+  "actual_total_fit_calls": 569,
+  "actual_fit_calls": 542,
+  "final_artifacts": 41,
+  "historical_primary_models": 24,
+  "workflow_seconds_to_report": 5456.409969,
+  "hardware": {
+    "created_at_utc": "2026-10-17T05:20:53.892881+00:00",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "cpu_count": 10,
+    "memory_bytes": 25769803776,
+    "device": "cpu",
+    "MPS_available": false,
+    "CUDA_available": false,
+    "threads": 2,
+    "versions": {
+      "numpy": "2.3.5",
+      "pandas": "2.2.3",
+      "scikit-learn": "1.7.2",
+      "torch": "2.14.1",
+      "xgboost": "3.4.1",
+      "catboost": "1.2.10",
+      "imbalanced-learn": "0.14.0",
+      "reportlab": "5.0.1",
+      "pypdf": "6.21.0",
+      "nbformat": "5.10.4",
+      "nbclient": "0.10.2"
+    },
+    "python": "3.13.9"
+  },
+  "selected_representatives": {
+    "ML": {
+      "label": "final_random_forest__S1__95d8315d2d_seed42",
+      "path": "artifacts/models/final_random_forest__S1__95d8315d2d_seed42.joblib",
+      "config_id": "random_forest__S1__95d8315d2d",
+      "family": "random_forest",
+      "feature_set": "S1",
+      "seed": 42,
+      "role": "primary",
+      "representative": [
+        "ML"
+      ]
+    },
+    "DL": {
+      "label": "final_residual_mlp__S1__aaac4276aa_seed42",
+      "path": "artifacts/models/final_residual_mlp__S1__aaac4276aa_seed42.joblib",
+      "config_id": "residual_mlp__S1__aaac4276aa",
+      "family": "residual_mlp",
+      "feature_set": "S1",
+      "seed": 42,
+      "role": "primary",
+      "representative": [
+        "DL"
+      ]
+    }
+  },
+  "bootstrap_repetitions": 2000,
+  "final_seeds": [
+    42,
+    137,
+    2026,
+    31415,
+    27182
+  ],
+  "source_files_preserved": 141,
+  "publication": "pending final Git-index audit and new-repository upload",
+  "failed_pilot_fit_calls": [
+    2
+  ],
+  "optional_sequences": "completed",
+  "paid_services": false,
+  "source_original_changes": 0,
+  "local_deliverables_complete": true
+}

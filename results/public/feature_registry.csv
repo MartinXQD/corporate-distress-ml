@@ -1,0 +1,133 @@
+feature,formula,source_columns,interpretation,group,time,invalid_rule,set
+X1,X1,X1,Current assets,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X1,sign(X1)*log1p(abs(X1)),X1,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X2,X2,X2,Cost of goods sold,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X2,sign(X2)*log1p(abs(X2)),X2,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X3,X3,X3,Depreciation and amortization,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X3,sign(X3)*log1p(abs(X3)),X3,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X4,X4,X4,EBITDA,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X4,sign(X4)*log1p(abs(X4)),X4,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X5,X5,X5,Inventory,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X5,sign(X5)*log1p(abs(X5)),X5,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X6,X6,X6,Net income,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X6,sign(X6)*log1p(abs(X6)),X6,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X7,X7,X7,Receivables,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X7,sign(X7)*log1p(abs(X7)),X7,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X8,X8,X8,Market value,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X8,sign(X8)*log1p(abs(X8)),X8,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X9,X9,X9,Net sales,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X9,sign(X9)*log1p(abs(X9)),X9,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X10,X10,X10,Total assets,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X10,sign(X10)*log1p(abs(X10)),X10,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X11,X11,X11,Long-term debt,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X11,sign(X11)*log1p(abs(X11)),X11,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X12,X12,X12,EBIT,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X12,sign(X12)*log1p(abs(X12)),X12,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X13,X13,X13,Gross profit,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X13,sign(X13)*log1p(abs(X13)),X13,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X14,X14,X14,Current liabilities,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X14,sign(X14)*log1p(abs(X14)),X14,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X15,X15,X15,Retained earnings,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X15,sign(X15)*log1p(abs(X15)),X15,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X16,X16,X16,Revenue (exact duplicate of net sales),raw_amounts,current fiscal year,Raw finite values; units and currency unverified,legacy18
+X17,X17,X17,Total liabilities,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X17,sign(X17)*log1p(abs(X17)),X17,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+X18,X18,X18,Operating expenses,raw_amounts,current fiscal year,Raw finite values; units and currency unverified,S0
+slog_X18,sign(X18)*log1p(abs(X18)),X18,Compress scale while preserving negative values,signed_log_amounts,current fiscal year,Finite raw input,S1
+working_capital_to_assets,(X1-X14)/X10,"X1-X14,X10",working capital to assets; current denominator,liquidity,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+working_capital_to_assets_invalid,isnan(working_capital_to_assets),"X1-X14,X10",Invalid ratio flag,liquidity,current fiscal year,Always finite binary,S1
+retained_earnings_to_assets,(X15)/X10,"X15,X10",retained earnings to assets; current denominator,profitability,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+retained_earnings_to_assets_invalid,isnan(retained_earnings_to_assets),"X15,X10",Invalid ratio flag,profitability,current fiscal year,Always finite binary,S1
+ebit_to_assets,(X12)/X10,"X12,X10",ebit to assets; current denominator,profitability,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+ebit_to_assets_invalid,isnan(ebit_to_assets),"X12,X10",Invalid ratio flag,profitability,current fiscal year,Always finite binary,S1
+ebitda_to_assets,(X4)/X10,"X4,X10",ebitda to assets; current denominator,profitability,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+ebitda_to_assets_invalid,isnan(ebitda_to_assets),"X4,X10",Invalid ratio flag,profitability,current fiscal year,Always finite binary,S1
+net_income_to_assets,(X6)/X10,"X6,X10",net income to assets; current denominator,profitability,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+net_income_to_assets_invalid,isnan(net_income_to_assets),"X6,X10",Invalid ratio flag,profitability,current fiscal year,Always finite binary,S1
+market_value_to_liabilities,(X8)/X17,"X8,X17",market value to liabilities; current denominator,market,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+market_value_to_liabilities_invalid,isnan(market_value_to_liabilities),"X8,X17",Invalid ratio flag,market,current fiscal year,Always finite binary,S1
+sales_to_assets,(X9)/X10,"X9,X10",sales to assets; current denominator,efficiency,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+sales_to_assets_invalid,isnan(sales_to_assets),"X9,X10",Invalid ratio flag,efficiency,current fiscal year,Always finite binary,S1
+liabilities_to_assets,(X17)/X10,"X17,X10",liabilities to assets; current denominator,leverage,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+liabilities_to_assets_invalid,isnan(liabilities_to_assets),"X17,X10",Invalid ratio flag,leverage,current fiscal year,Always finite binary,S1
+long_term_debt_to_assets,(X11)/X10,"X11,X10",long term debt to assets; current denominator,leverage,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+long_term_debt_to_assets_invalid,isnan(long_term_debt_to_assets),"X11,X10",Invalid ratio flag,leverage,current fiscal year,Always finite binary,S1
+current_ratio,(X1)/X14,"X1,X14",current ratio; current denominator,liquidity,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+current_ratio_invalid,isnan(current_ratio),"X1,X14",Invalid ratio flag,liquidity,current fiscal year,Always finite binary,S1
+gross_margin,(X13)/X9,"X13,X9",gross margin; current denominator,profitability,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+gross_margin_invalid,isnan(gross_margin),"X13,X9",Invalid ratio flag,profitability,current fiscal year,Always finite binary,S1
+operating_expense_to_sales,(X18)/X9,"X18,X9",operating expense to sales; current denominator,efficiency,current fiscal year,Nonpositive denominator -> NaN and explicit invalid indicator; positive tiny values remain for train-only clipping,S1
+operating_expense_to_sales_invalid,isnan(operating_expense_to_sales),"X18,X9",Invalid ratio flag,efficiency,current fiscal year,Always finite binary,S1
+working_capital,X1-X14,"X1,X14",Current assets less current liabilities,liquidity,current fiscal year,Finite,S1
+altman_z,1.2*WC/TA+1.4*RE/TA+3.3*EBIT/TA+0.6*MV/TL+Sales/TA,"X1,X14,X10,X15,X12,X8,X17,X9",Original public-manufacturer Z-score formula used descriptively across this unclassified universe,composite,current fiscal year,NaN if any component invalid; training median,S1
+delta1_net_income_to_assets,value(t)-value(t-1),net_income_to_assets,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+mean3_net_income_to_assets,"mean of available t,t-1,t-2",net_income_to_assets,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+std3_net_income_to_assets,"population std of available t,t-1,t-2",net_income_to_assets,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+delta1_liabilities_to_assets,value(t)-value(t-1),liabilities_to_assets,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+mean3_liabilities_to_assets,"mean of available t,t-1,t-2",liabilities_to_assets,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+std3_liabilities_to_assets,"population std of available t,t-1,t-2",liabilities_to_assets,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+delta1_current_ratio,value(t)-value(t-1),current_ratio,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+mean3_current_ratio,"mean of available t,t-1,t-2",current_ratio,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+std3_current_ratio,"population std of available t,t-1,t-2",current_ratio,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+delta1_sales_to_assets,value(t)-value(t-1),sales_to_assets,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+mean3_sales_to_assets,"mean of available t,t-1,t-2",sales_to_assets,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+std3_sales_to_assets,"population std of available t,t-1,t-2",sales_to_assets,Calendar-causal historical summary,dynamics,through target year only,Missing exact calendar lag -> NaN; retain target row,S2
+log_growth_X10,"log(X10_t)-log(X10_t-1), positive only","X10,X9,calendar history",Historical change or coverage,dynamics,through target year only,No backward fill,S2
+log_growth_X9,"log(X9_t)-log(X9_t-1), positive only","X10,X9,calendar history",Historical change or coverage,dynamics,through target year only,No backward fill,S2
+loss_count3,"sum(X6<0) over observed t,t-1,t-2",X6,Historical change or coverage,dynamics,through target year only,No backward fill,S2
+observed_years3,"count observed exact t,t-1,t-2","X10,X9,calendar history",Historical change or coverage,dynamics,through target year only,No backward fill,S2
+missing_tminus1,1 if exact t-1 absent else 0,"X10,X9,calendar history",Historical change or coverage,dynamics,through target year only,No backward fill,S2
+lag2_X1,X1(t-2),X1,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X2,X2(t-2),X2,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X3,X3(t-2),X3,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X4,X4(t-2),X4,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X5,X5(t-2),X5,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X6,X6(t-2),X6,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X7,X7(t-2),X7,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X8,X8(t-2),X8,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X9,X9(t-2),X9,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X10,X10(t-2),X10,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X11,X11(t-2),X11,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X12,X12(t-2),X12,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X13,X13(t-2),X13,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X14,X14(t-2),X14,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X15,X15(t-2),X15,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X17,X17(t-2),X17,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag2_X18,X18(t-2),X18,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-2,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+observed_lag2,1 if exact t-2 exists else 0,company/year alignment only,Calendar-slot observation mask,dynamics,t-2,Binary; current slot always observed,LAGS
+lag1_X1,X1(t-1),X1,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X2,X2(t-1),X2,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X3,X3(t-1),X3,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X4,X4(t-1),X4,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X5,X5(t-1),X5,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X6,X6(t-1),X6,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X7,X7(t-1),X7,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X8,X8(t-1),X8,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X9,X9(t-1),X9,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X10,X10(t-1),X10,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X11,X11(t-1),X11,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X12,X12(t-1),X12,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X13,X13(t-1),X13,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X14,X14(t-1),X14,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X15,X15(t-1),X15,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X17,X17(t-1),X17,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag1_X18,X18(t-1),X18,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-1,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+observed_lag1,1 if exact t-1 exists else 0,company/year alignment only,Calendar-slot observation mask,dynamics,t-1,Binary; current slot always observed,LAGS
+lag0_X1,X1(t-0),X1,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X2,X2(t-0),X2,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X3,X3(t-0),X3,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X4,X4(t-0),X4,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X5,X5(t-0),X5,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X6,X6(t-0),X6,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X7,X7(t-0),X7,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X8,X8(t-0),X8,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X9,X9(t-0),X9,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X10,X10(t-0),X10,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X11,X11(t-0),X11,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X12,X12(t-0),X12,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X13,X13(t-0),X13,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X14,X14(t-0),X14,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X15,X15(t-0),X15,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X17,X17(t-0),X17,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+lag0_X18,X18(t-0),X18,Exact calendar snapshot for flattened/sequence controls,raw_amounts,t-0,Absent slot -> NaN; observed mask retained; no target-row filtering,LAGS
+observed_lag0,1 if exact t-0 exists else 0,company/year alignment only,Calendar-slot observation mask,dynamics,t-0,Binary; current slot always observed,LAGS

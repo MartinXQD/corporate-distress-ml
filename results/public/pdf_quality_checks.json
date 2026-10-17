@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "checked_at_utc": "2026-10-17T05:47:24.381925+00:00",
+  "reports": [
+    {
+      "report": "Research_Report_EN",
+      "pages": 15,
+      "sha256": "b4f6289112aefd501ecf91d7cd8e9e2f0d415856679ed763ccaab0bb360c9889",
+      "all_pages_rendered": true,
+      "all_contact_sheets_visually_reviewed": true,
+      "machine_layout_flags": []
+    },
+    {
+      "report": "Project_Interview_Guide_CN",
+      "pages": 26,
+      "sha256": "d4ff5cf61913c6476b1709de31fe94e6849777900f06ccc3d6216d0855a7d7ba",
+      "all_pages_rendered": true,
+      "all_contact_sheets_visually_reviewed": true,
+      "machine_layout_flags": []
+    }
+  ],
+  "review": "All 41 rendered pages inspected through five contact sheets; enlarged inspection of English result/feature/CI tables and Chinese label/calibration/company/long-script pages. Legible embedded Chinese glyphs, consistent footers/page numbers, no clipping, overlap, orphan chapter headings or unintended blank pages observed.",
+  "visual_review_by": "Codex image inspection; owner review not asserted"
+}

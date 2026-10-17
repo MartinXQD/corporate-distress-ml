@@ -15,7 +15,8 @@ def main():
     freeze=verify_freeze();df=load_data('historical');hist=df[df.year>=2015]
     checks=[];t=pd.read_csv(PUBLIC/'historical_metrics.csv');t=t[t.score_type=='calibrated']
     for item in freeze['models']:
-        d=pd.read_csv(ART/f'predictions/{item["label"]}_historical.csv.gz')
+        # Exact float parsing preserves calibrated-score ties in the rank ensemble.
+        d=pd.read_csv(ART/f'predictions/{item["label"]}_historical.csv.gz',float_precision='round_trip')
         sub=d.rename(columns={'company_id':'company_name','y_true':'y'})
         if item['role']!='untuned_group_stress':
             assert set(sub.row_id)==set(hist.row_id)

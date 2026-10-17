@@ -1,0 +1,316 @@
+{
+  "status": "read_only_audit_completed_no_new_model_results",
+  "raw_files_sha256": {
+    "american_bankruptcy.csv": "cff2c899a97ecd629415cb22f59186000e74e1c0a78cfae036c0a53025419b5e",
+    "data/raw/american_bankruptcy.csv": "cff2c899a97ecd629415cb22f59186000e74e1c0a78cfae036c0a53025419b5e"
+  },
+  "rows": 78682,
+  "columns": 21,
+  "companies": 8971,
+  "year_min": 1999,
+  "year_max": 2018,
+  "missing_cells": 0,
+  "numeric_nonfinite_cells": 0,
+  "duplicate_company_year_rows": 0,
+  "duplicate_rows": 0,
+  "company_label_nunique_distribution": {
+    "1": 8971
+  },
+  "row_label_counts": {
+    "failed": 5220,
+    "alive": 73462
+  },
+  "company_label_counts": {
+    "failed": 609,
+    "alive": 8362
+  },
+  "exact_duplicate_feature_pairs": [
+    [
+      "X9",
+      "X16"
+    ]
+  ],
+  "negative_values_by_feature": {
+    "X1": 6,
+    "X2": 6,
+    "X3": 0,
+    "X4": 23012,
+    "X5": 0,
+    "X6": 34001,
+    "X7": 1,
+    "X8": 0,
+    "X9": 13,
+    "X10": 0,
+    "X11": 1,
+    "X12": 28498,
+    "X13": 6603,
+    "X14": 0,
+    "X15": 40277,
+    "X16": 13,
+    "X17": 0,
+    "X18": 3
+  },
+  "zero_values_by_feature": {
+    "X1": 0,
+    "X2": 306,
+    "X3": 633,
+    "X4": 3,
+    "X5": 19701,
+    "X6": 7,
+    "X7": 2205,
+    "X8": 0,
+    "X9": 0,
+    "X10": 0,
+    "X11": 20884,
+    "X12": 0,
+    "X13": 25,
+    "X14": 0,
+    "X15": 0,
+    "X16": 0,
+    "X17": 0,
+    "X18": 1
+  },
+  "sequence_audit": {
+    "firms_with_at_least_3_rows": 7310,
+    "firms_with_at_least_4_rows": 6554,
+    "firms_with_noncontiguous_year_coverage": 710
+  },
+  "by_year": [
+    {
+      "year": 1999,
+      "rows": 5308,
+      "companies": 5308,
+      "positive_rows": 380,
+      "positive_companies": 380,
+      "positive_row_fraction": 0.07159005275056518
+    },
+    {
+      "year": 2000,
+      "rows": 5226,
+      "companies": 5226,
+      "positive_rows": 404,
+      "positive_companies": 404,
+      "positive_row_fraction": 0.07730577879831611
+    },
+    {
+      "year": 2001,
+      "rows": 4897,
+      "companies": 4897,
+      "positive_rows": 414,
+      "positive_companies": 414,
+      "positive_row_fraction": 0.08454155605472738
+    },
+    {
+      "year": 2002,
+      "rows": 4651,
+      "companies": 4651,
+      "positive_rows": 414,
+      "positive_companies": 414,
+      "positive_row_fraction": 0.08901311545904107
+    },
+    {
+      "year": 2003,
+      "rows": 4417,
+      "companies": 4417,
+      "positive_rows": 415,
+      "positive_companies": 415,
+      "positive_row_fraction": 0.09395517319447588
+    },
+    {
+      "year": 2004,
+      "rows": 4348,
+      "companies": 4348,
+      "positive_rows": 404,
+      "positive_companies": 404,
+      "positive_row_fraction": 0.09291628334866606
+    },
+    {
+      "year": 2005,
+      "rows": 4205,
+      "companies": 4205,
+      "positive_rows": 379,
+      "positive_companies": 379,
+      "positive_row_fraction": 0.0901307966706302
+    },
+    {
+      "year": 2006,
+      "rows": 4128,
+      "companies": 4128,
+      "positive_rows": 366,
+      "positive_companies": 366,
+      "positive_row_fraction": 0.08866279069767442
+    },
+    {
+      "year": 2007,
+      "rows": 4009,
+      "companies": 4009,
+      "positive_rows": 336,
+      "positive_companies": 336,
+      "positive_row_fraction": 0.0838114242953355
+    },
+    {
+      "year": 2008,
+      "rows": 3857,
+      "companies": 3857,
+      "positive_rows": 284,
+      "positive_companies": 284,
+      "positive_row_fraction": 0.07363235675395385
+    },
+    {
+      "year": 2009,
+      "rows": 3743,
+      "companies": 3743,
+      "positive_rows": 234,
+      "positive_companies": 234,
+      "positive_row_fraction": 0.06251669783596046
+    },
+    {
+      "year": 2010,
+      "rows": 3625,
+      "companies": 3625,
+      "positive_rows": 218,
+      "positive_companies": 218,
+      "positive_row_fraction": 0.060137931034482756
+    },
+    {
+      "year": 2011,
+      "rows": 3513,
+      "companies": 3513,
+      "positive_rows": 194,
+      "positive_companies": 194,
+      "positive_row_fraction": 0.05522345573583831
+    },
+    {
+      "year": 2012,
+      "rows": 3485,
+      "companies": 3485,
+      "positive_rows": 182,
+      "positive_companies": 182,
+      "positive_row_fraction": 0.052223816355810616
+    },
+    {
+      "year": 2013,
+      "rows": 3484,
+      "companies": 3484,
+      "positive_rows": 167,
+      "positive_companies": 167,
+      "positive_row_fraction": 0.04793340987370838
+    },
+    {
+      "year": 2014,
+      "rows": 3504,
+      "companies": 3504,
+      "positive_rows": 142,
+      "positive_companies": 142,
+      "positive_row_fraction": 0.04052511415525114
+    },
+    {
+      "year": 2015,
+      "rows": 3354,
+      "companies": 3354,
+      "positive_rows": 111,
+      "positive_companies": 111,
+      "positive_row_fraction": 0.03309481216457961
+    },
+    {
+      "year": 2016,
+      "rows": 3191,
+      "companies": 3191,
+      "positive_rows": 83,
+      "positive_companies": 83,
+      "positive_row_fraction": 0.026010654967094954
+    },
+    {
+      "year": 2017,
+      "rows": 3014,
+      "companies": 3014,
+      "positive_rows": 57,
+      "positive_companies": 57,
+      "positive_row_fraction": 0.01891174518911745
+    },
+    {
+      "year": 2018,
+      "rows": 2723,
+      "companies": 2723,
+      "positive_rows": 36,
+      "positive_companies": 36,
+      "positive_row_fraction": 0.013220712449504223
+    }
+  ],
+  "label_timing_verified": false,
+  "units_verified": false,
+  "historical_period_previously_inspected": true,
+  "original_splits": {
+    "train_1999_2011": {
+      "rows": 55927,
+      "companies": 7719,
+      "positive_rows": 4442,
+      "positive_companies": 580,
+      "positive_row_fraction": 0.07942496468610867
+    },
+    "validation_2012_2014": {
+      "rows": 10473,
+      "companies": 4074,
+      "positive_rows": 491,
+      "positive_companies": 199,
+      "positive_row_fraction": 0.046882459658168625
+    },
+    "historical_test_2015_2018": {
+      "rows": 12282,
+      "companies": 3700,
+      "positive_rows": 287,
+      "positive_companies": 119,
+      "positive_row_fraction": 0.023367529718286924
+    }
+  },
+  "historical_test_company_novelty_by_training_cutoff": {
+    "2011": {
+      "seen": {
+        "rows": 9081,
+        "companies": 2611,
+        "positive_rows": 227,
+        "positive_companies": 94,
+        "positive_row_fraction": 0.02499724699922916
+      },
+      "unseen": {
+        "rows": 3201,
+        "companies": 1089,
+        "positive_rows": 60,
+        "positive_companies": 25,
+        "positive_row_fraction": 0.01874414245548266
+      }
+    },
+    "2012": {
+      "seen": {
+        "rows": 9644,
+        "companies": 2790,
+        "positive_rows": 247,
+        "positive_companies": 103,
+        "positive_row_fraction": 0.025611779344670262
+      },
+      "unseen": {
+        "rows": 2638,
+        "companies": 910,
+        "positive_rows": 40,
+        "positive_companies": 16,
+        "positive_row_fraction": 0.015163002274450341
+      }
+    },
+    "2014": {
+      "seen": {
+        "rows": 11070,
+        "companies": 3232,
+        "positive_rows": 277,
+        "positive_companies": 114,
+        "positive_row_fraction": 0.025022583559168924
+      },
+      "unseen": {
+        "rows": 1212,
+        "companies": 468,
+        "positive_rows": 10,
+        "positive_companies": 5,
+        "positive_row_fraction": 0.00825082508250825
+      }
+    }
+  }
+}

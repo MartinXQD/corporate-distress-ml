@@ -12,6 +12,17 @@ def core_comparison(c):
     d=c['development_summary'];d=d[d.stage=='core_recipe']
     return d.pivot(index='family',columns='feature_set',values='macro_year_AP').reset_index()
 
+def core_historical_comparison(c):
+    ids=c['development_summary'].query('stage == "core_recipe"').config_id
+    h=c['historical'][c['historical'].config_id.isin(ids)]
+    return h.pivot(index='family',columns='feature_set',values='AP').reset_index()
+
+def sequence_comparison(c):
+    d=c['development_summary']
+    selected=d[d.stage.isin(['sequence_control','sequence_extension'])|((d.stage=='core_recipe')&(d.feature_set=='S0')&d.family.isin(['xgboost','mlp']))]
+    h=c['historical'][['config_id','AP','ROC_AUC']]
+    return selected.merge(h,on='config_id',validate='one_to_one').sort_values(['family','feature_set'])
+
 def representative_rows(c):
     return pd.DataFrame([dict(representative=k,**v.to_dict()) for k,v in c['representative'].items()])
 
@@ -58,7 +69,13 @@ def measured_interpretation(c):
         conclusion_cn='整体高于零' if r.delta_lower>0 else ('整体低于零' if r.delta_upper<0 else '跨过零')
         intervals.append(f'{r.model} delta AP [{r.delta_lower:+.3f}, {r.delta_upper:+.3f}] {conclusion}')
         intervals_cn.append(f'{r.model} 的 AP 差区间 [{r.delta_lower:+.3f}, {r.delta_upper:+.3f}] {conclusion_cn}')
-    return dict(h1='Measured S1-minus-S0 development AP changes: '+h1+'.',h2='Measured S2-minus-S1 development AP changes: '+h2+'.',h4=f'The largest intervention delta was {DISPLAY[best.family]} / {best.recipe} ({best.delta_vs_S1:+.3f} AP). {DISPLAY[worst.family]} / {worst.recipe} {negative} ({worst.delta_vs_S1:+.3f}). These selected extrema are descriptive development observations, not unbiased final estimates.',h4_cn=f'受控干预中，开发增量最大的是 {DISPLAY[best.family]} / {best.recipe}（AP 差 {best.delta_vs_S1:+.3f}）；{DISPLAY[worst.family]} / {worst.recipe} {negative_cn}（{worst.delta_vs_S1:+.3f}）。这些极值来自开发表的描述，不是独立无偏估计。',ci='; '.join(intervals)+'. All interval statements are conditional on the fitted models and current clustered sample.',ci_cn='；'.join(intervals_cn)+'。结论只限于当前已拟合模型与公司聚类样本，不能推导未来业务或因果效果。')
+    hist=core_historical_comparison(c);hist=hist[~hist.family.isin(['dummy','altman'])]
+    gains=int((hist.S1>hist.S0).sum())
+    ml=c['representative']['ML'];dl=c['representative']['DL'];base=c['baseline']
+    transfer=f'Only {gains} of {len(hist)} learned fixed-recipe families have higher historical AP with S1 than S0. These are same-row point comparisons, not feature-specific significance tests. Development feature gains did not transfer uniformly.'
+    failure=f'The development-selected ML AP is {ml.AP:.3f}, versus {base.AP:.3f} for S0 Logistic; the selected DL AP is {dl.AP:.3f}. The DL pipeline does not reproduce its development advantage. The fixed ensemble also failed to improve on the selected tree in this historical period. This is a retained transfer failure, not a reason to choose a different historical winner or adjust weights.'
+    failure_cn=f'选定 RF 的历史 AP={ml.AP:.3f}，基准 Logistic={base.AP:.3f}；选定网络 AP={dl.AP:.3f}。ROS 的开发优势没有迁移，固定集成也未超过选定树。必须保留这一泛化失败，不能改选历史分数最好的一行或重调权重。'
+    return dict(h1='Measured S1-minus-S0 development AP changes: '+h1+'.',h1_transfer=transfer,history_failure=failure,history_failure_cn=failure_cn,h2='Measured S2-minus-S1 development AP changes: '+h2+'.',h4=f'The largest intervention delta was {DISPLAY[best.family]} / {best.recipe} ({best.delta_vs_S1:+.3f} AP). {DISPLAY[worst.family]} / {worst.recipe} {negative} ({worst.delta_vs_S1:+.3f}). These selected extrema are descriptive development observations, not unbiased final estimates.',h4_cn=f'受控干预中，开发增量最大的是 {DISPLAY[best.family]} / {best.recipe}（AP 差 {best.delta_vs_S1:+.3f}）；{DISPLAY[worst.family]} / {worst.recipe} {negative_cn}（{worst.delta_vs_S1:+.3f}）。这些极值来自开发表的描述，不是独立无偏估计。',ci='; '.join(intervals)+'. All interval statements are conditional on the fitted models and current clustered sample.',ci_cn='；'.join(intervals_cn)+'。结论只限于当前已拟合模型与公司聚类样本，不能推导未来业务或因果效果。')
 
 def english_pages(c):
     ml=c['representative']['ML'];dl=c['representative']['DL'];base=c['baseline'];r=representative_rows(c)
@@ -108,13 +125,12 @@ def english_pages(c):
         p('MLP uses two dense blocks. Residual MLP adds normalized skip blocks. FT-Transformer learns a weight and bias token for each numeric feature, adds a CLS token and applies two small attention layers. It is an independent educational implementation inspired by the tabular-model paper, not a reproduction of the paper benchmark. Attention acts across features; it does not create a time series.'),
         p('PyTorch training uses AdamW, dropout, weight decay, shuffled deterministic DataLoaders, BCEWithLogitsLoss, finite-gradient checks and gradient clipping. Sigmoid is applied for probabilities after logits. The networks use train mode for updates and eval/inference mode for scoring; round-trip checkpoint tests verify prediction consistency.'),
         p('All measured runs use local CPU, two threads and one neural experiment process. A first XGBoost pilot crashed because two OpenMP runtimes were loaded; sharing the PyTorch runtime resolved the conflict. Exact KD-tree neighbors avoid a separate SMOTE dispatcher crash. Failed diagnostics remain logged. No paid service or system-Python modification was used.')),
-      page('6. Development comparison and bounded search',
+      page('6. Development and frozen feature transfer',
         table(core,['family','S0','S1'],['Family','S0 macro-year AP','S1 macro-year AP']),
         p(interpretation['h1']),
-        fig('development_features','Bars compare the fixed recipes on the same records and seven development scoring years. Higher AP is better, but these are development-selected observations.'),
-        p('The first stage runs every required family on S0 and S1 with seed 42. The best S1 ML and DL family each receive only two pre-registered capacity/regularization candidates. The second stage is deliberately small; it is not an exhaustive architecture search or an equal-compute claim for all model families.'),
-        p(f'The final ML representative is {DISPLAY[ml.family]} on {ml.feature_set}; the DL representative is {DISPLAY[dl.family]} on {dl.feature_set}. Their configurations were chosen from complete development runs before historical evaluation, using macro-year AP and registered tie rules. The complete candidate table includes weak and failed-to-improve alternatives.'),
-        p('A fixed equal-rank ML+DL candidate is assessed on matched OOF predictions only. It is admitted to the historical inventory only if its development macro AP exceeds both constituents; no historical metric controls that decision.')),
+        table(core_historical_comparison(c).query('family not in ["dummy", "altman"]'),['family','S0','S1'],['Frozen historical AP','S0','S1']),
+        p(interpretation['h1_transfer']),
+        p('The first table selects by seven development years. The second is frozen, previously inspected 2015-2018 evidence and never enters selection. Only the best S1 ML and DL core families received two extra pre-registered candidates each; all weak alternatives remain reported.')),
       page('7. Controlled feature and imbalance ablations',
         table(ablation_wide(c),['recipe','xgboost','residual_mlp'],['Changed factor','XGBoost AP','Residual MLP AP']),
         p(interpretation['h2']+' '+interpretation['h4']),
@@ -124,13 +140,17 @@ def english_pages(c):
         p('A negative AP delta is retained as a failed improvement, not removed. Clipping, selecting variables, resampling and adding architecture are empirical choices with costs; none is assumed to improve every model or year.')),
       page('8. Frozen historical ranking',
         table(main,['pipeline','feature_set','AP','ROC_AUC','macro_recall_top5'],['Pipeline','Set','AP','ROC-AUC','Annual R@5%']),
-        fig('ranking_curves','The PR and ROC curves use identical historical rows for the S0 Logistic baseline and development-selected representatives. AP is sklearn average_precision_score, not trapezoidal PR area.'),
         p(f'The evaluation contains {int(base.rows):,} records and {int(base.positive_rows)} positive rows, from {int(base.positive_companies)} positive companies. Its prevalence is {base.prevalence:.4f}. Pooled AP and macro-year AP answer different weighting questions; both are saved. Use same-row paired differences, not an AP ratio across years with different prevalence.'),
+        p(interpretation['history_failure']),
         p('Core S1 rows provide a controlled family comparison. Representative rows describe optimized pipelines, including their information set. Extra tuned configurations from the same family remain identifiable by config_id in the machine tables. Old team scores follow different roles and are not used as an improvement denominator.')),
+      page('8.2. Ranking and review-budget curves',
+        fig('ranking_curves','The PR and ROC curves use identical historical rows for the S0 Logistic baseline and development-selected representatives. AP is sklearn average_precision_score, not trapezoidal PR area.'),
+        fig('screening_calibration','Left: mean annual recall under fixed review capacities. Right: calibrated reliability bins, whose counts and positive counts remain essential to interpretation.'),
+        p('PR curves describe precision-recall tradeoffs over the frozen score ordering. ROC curves describe ranking across both classes. The annual review curve instead fixes capacity at 1%, 5% or 10%; it does not find a favorable historical threshold.'),
+        p('The reliability plot compares mean score with observed failed-label fraction, using saved natural-prevalence predictions. Sparse bins can be unstable. These score probabilities remain tied to the retrospective label, not an event-defined annual PD.')),
       page('9. Screening and probability quality',
-        fig('screening_calibration','Left: average recall under fixed annual review capacities. Right: reliability bins. Sparse high-score bins require their counts and positive counts; a line alone is not evidence of calibration.'),
         table(r,['representative','precision','recall','F1','alert_fraction','Brier'],['Rep.','Precision','Recall','F1','Alert share','Brier']),
-        table(calibration_comparison(c).query('period == "2015-2018"'),['representative','raw_Brier','cal_Brier','raw_logloss','cal_logloss'],['Historical','Raw Brier','Platt Brier','Raw log loss','Platt log loss']),
+        table(calibration_comparison(c),['representative','period','raw_Brier','cal_Brier','raw_logloss','cal_logloss'],['Rep.','Period','Raw Brier','Platt Brier','Raw log loss','Platt log loss']),
         p('Annual Top 1%, 5% and 10% use score-only ordering, ceil(budget*n) and a deterministic company/year hash for ties. The capacity is fixed before looking at outcomes. Lift divides selected precision by the same year\'s positive fraction. It is a risk-screening statistic, not a realized financial return.'),
         p('One fixed threshold maximizes F1 on 2014 calibrated predictions. Historical precision, recall, F1 and confusion counts use that frozen threshold. A large change in the historical alarm fraction is possible under distribution shift; threshold metrics must be interpreted alongside review budgets.'),
         p('Platt calibration fits only on natural-prevalence 2013 data, without refitting the base model afterward. Uncalibrated scores, 2014 probability quality, historical Brier/log loss and reliability-bin counts are preserved. Brier and log loss assess probability prediction quality, not pure calibration error. A calibrated failed-label probability is still not an annual default PD.')),
@@ -149,7 +169,7 @@ def english_pages(c):
         p('The five registered seeds are all retained. Their mean and range describe stochastic training variation on the same evaluation population, not five independent tests. Seed 42 is the preselected main run; no best historical seed is substituted. Seed averaging is not represented as a single model or as independent data replication.'),
         p('Company bootstrap does not fully represent shared macroeconomic shocks, upstream data revisions, point-in-time label availability or future-regime uncertainty. Rank-ensemble intervals also hold the original annual rank-reference cohorts fixed; they do not rebuild ranks for a new universe. Four historical years provide descriptive temporal evidence rather than broad coverage of economic states.')),
       page('12. Annual trajectories and finite ensemble',
-        table(seq,['family','feature_set','macro_year_AP','mean_fit_seconds'],['Optional family','History set','Development AP','Mean fit seconds']),
+        table(sequence_comparison(c),['family','feature_set','macro_year_AP','AP','ROC_AUC'],['Controlled family','Set','Dev AP','Historical AP','Hist ROC']),
         table(pd.DataFrame(list(c['ensemble_choice']['macro_year_AP'].items()),columns=['candidate','AP']),['candidate','AP'],['Fixed-rank OOF candidate','Development AP']),
         p('The GRU receives [batch, 3 calendar slots, feature] rather than treating financial columns as time. A shared snapshot preprocessor is fitted only on current training-role records. For missing calendar slots, numerical inputs are zeroed and an observed flag is zero; target-year rows remain present. The recurrent output at the target year feeds a logit head.'),
         p('Snapshot S0 tree/MLP, flattened three-year tree/MLP and GRU are evaluated on identical target rows. This separates the availability of historical inputs from a recurrent architecture. The flattened controls may learn lag-specific transforms; the GRU shares feature scaling over time. They compare practical pipelines on the same information, not perfectly identical parameterizations.'),
@@ -281,7 +301,7 @@ def chinese_pages(c):
       page('15. GRU：真正的年度轨迹对照',
         p('GRU 通过门控制旧状态保留多少、新输入写入多少，用于压缩年度轨迹。本项目 tensor 为 [batch, 3, features]，按 t-2、t-1、t 排列。缺失年度的数值部分归零，另附 observed flag；目标年度始终保留。'),
         p('共享 snapshot preprocessor 只在当次训练角色拟合，三个年度槽使用同一组尺度。若 t-1 不存在，不会将 t-2 前移填补。padding/mask 是覆盖描述，不是合成一份真实财务报表。'),
-        table(sequence,['family','feature_set','macro_year_AP','mean_fit_seconds'],['模型','信息集','开发 AP','平均训练秒']),
+        table(sequence_comparison(c),['family','feature_set','macro_year_AP','AP','ROC_AUC'],['模型','信息集','开发 AP','历史 AP','历史 ROC']),
         p('对照包含当年 S0 tree/MLP，以及同三年窗口的 flattened tree/MLP。若历史 flattened 模型已获得同等增益，就不能把提升全部归功于循环结构。所有对照在相同 target row_id 上评价；历史不足公司没有被静默删除。'),
         p('本轮固定三年窗口，没有根据历史测试反复试 2/3/4 年；也没有把普通 SMOTE 用在序列张量上。序列模型仍然预测最终状态标签，不自动获得未来一年事件含义。'),
         code('configs/sequence_extension.yaml\nsequences.py: sequence_tensor, fit_sequence_pipeline\nfeatures.py: build_features(..., "LAGS")')),
@@ -310,6 +330,7 @@ def chinese_pages(c):
       page('19. 真实结果：哪些变化有效，哪些无效',
         table(core,['family','S0','S1'],['固定配方','S0 开发 AP','S1 开发 AP']),
         p(interpretation['h4_cn']),
+        p(interpretation['history_failure_cn']),
         p(f'历史期主报告采用开发选出的 ML/DL 配置：{DISPLAY[ml.family]} 的 AP={ml.AP:.3f}、ROC={ml.ROC_AUC:.3f}；{DISPLAY[dl.family]} 的 AP={dl.AP:.3f}、ROC={dl.ROC_AUC:.3f}。同协议 S0 Logistic 为 AP={base.AP:.3f}。不要从这几行中事后挑一个测试最大值倒填为开发选择。'),
         p('H1 看 S1-S0：金融结构与稳健变换是否提供增量。H2 看 S2-S1 与 flattened controls：历史信息是否有用。H3 先看 S1 同信息集，再看优化 pipeline。H4 保留 no selection、无加权、ROS、SMOTE 的完整对照。H5 结合陌生公司与 hash 留组，而不是只看总体 AP。'),
         p('失败实验也有研究价值：没有提升的筛选或采样说明该干预在当前信息集/优化设置下未获支持，而不是方法永远无效。先解释变化因素和成本，再谈是否值得保留。完整 ablation 表的负差异不能删除。'),

@@ -134,7 +134,7 @@ def claims(c):
     for table_name in ['historical_metrics','historical_yearly','historical_seen_unseen','development_summary','paired_company_bootstrap','seen_unseen_company_bootstrap','group_stress_metrics']:
         t=c[table_name]
         for i,r in t.iterrows():
-            for metric in ['AP','ROC_AUC','macro_year_AP','macro_recall_top5','Brier','delta_lower','delta_upper']:
+            for metric in ['AP','ROC_AUC','macro_year_AP','macro_recall_top5','Brier','log_loss','precision','recall','F1','TP','FP','FN','TN','alert_fraction','prevalence','rows','companies','positive_rows','positive_companies','features','parameters','epochs','fit_seconds','inference_seconds','score_years','worst_year_AP','mean_fit_seconds','mean_features','lower','upper','delta_mean','delta_lower','delta_upper','valid_draws','invalid_draws']:
                 if metric in r and pd.notna(r[metric]):
                     rows.append(dict(claim_id=f'{table_name}:{i}:{metric}',metric=metric,value=float(r[metric]),metric_file=f'results/public/{table_name}.csv',csv_data_row=i+1,row_selection=json.dumps({k:str(r[k]) for k in ['label','config_id','year','seed','score_type','novelty','seen_cutoff','model','metric','group_fold'] if k in r},sort_keys=True),protocol_id=c['freeze']['protocol_id'],run_id=r.get('label',r.get('config_id',r.get('model','development'))),qualification='Development-selected, previously inspected historical evaluation; company-constant labels; no one-year event horizon. CI conditional on fitted models.'))
     for filename in ['controlled_ablation_summary','seed_results','pre_evaluation_metrics','reliability_bins','group_permutation_importance','confusion_cell_profiles','feature_selection_stability','split_audit','accounting_relationships','financial_field_audit','ensemble_development']:
@@ -147,6 +147,9 @@ def claims(c):
                     rows.append(dict(claim_id=f'{filename}:{i}:{metric}',metric=metric,value=float(r[metric]),metric_file=f'results/public/{filename}.csv',csv_data_row=i+1,row_selection=json.dumps({k:str(r[k]) for k in ['label','config_id','family','recipe','year','seed','role','score_type','representative','cell','group','selector','feature'] if k in r},sort_keys=True),protocol_id=c['freeze']['protocol_id'],run_id=r.get('label',r.get('config_id','aggregate_or_audit')),qualification='Descriptive audit/aggregate; see table role. Historical period previously inspected; no causal or event-horizon claim.'))
     for metric in ['rows','companies','missing_cells','duplicate_company_year_rows']:
         rows.append(dict(claim_id='data_audit:'+metric,metric=metric,value=c['audit'][metric],metric_file='results/public/data_audit.json',csv_data_row='',row_selection=metric,protocol_id=c['freeze']['protocol_id'],run_id='structural_audit',qualification='Read-only audit, not model performance'))
+    for group in ['row_label_counts','company_label_counts','sequence_audit']:
+        for metric,value in c['audit'][group].items():
+            rows.append(dict(claim_id=f'data_audit:{group}:{metric}',metric=metric,value=value,metric_file='results/public/data_audit.json',csv_data_row='',row_selection=group+'.'+metric,protocol_id=c['freeze']['protocol_id'],run_id='structural_audit',qualification='Read-only audit, not model performance'))
     pd.DataFrame(rows).to_csv(ROOT/'results/CLAIMS.csv',index=False)
 
 def render_document(pages,pdf_path,source_path,language='en'):
@@ -234,6 +237,13 @@ def write_summaries(c):
     bullets=f'''# Draft resume bullets - owner review required\n\nThese drafts describe AI-assisted work completed under the owner's direction. Confirm comprehension and personal contribution before use. This file is local only.\n\n## English\n\n- Trained reproducible ML and PyTorch benchmarks on {c['audit']['rows']:,} firm-years, applying expanding-year validation, separate calibration and threshold roles, and company-disjoint stress tests for retrospective failed-company classification.\n- Evaluated development-selected {DISPLAY[ml['family']]} and {DISPLAY[dl['family']]} pipelines, recording historical AP of {ml['AP']:.3f} and {dl['AP']:.3f}; assessed annual screening budgets, five-seed variability, and paired company-bootstrap uncertainty.\n\n## 中文\n\n- 在 {c['audit']['rows']:,} 条公司年度记录上训练可复现的 ML 与 PyTorch 基准，执行逐年扩展验证、独立校准与阈值选择及公司不重叠压力测试；任务限定为回溯式失败公司识别。\n- 评估由开发期选定的 {DISPLAY[ml['family']]} 与 {DISPLAY[dl['family']]}，历史评估 AP 分别为 {ml['AP']:.3f} 与 {dl['AP']:.3f}，并报告年度审查预算、五种子波动及公司聚类 bootstrap 区间。\n\n## Evidence\n\nSee results/public/historical_metrics.csv (calibrated, seed 42), seed_results.csv, paired_company_bootstrap.csv and results/CLAIMS.csv. Previously inspected 2015-2018 is not a new untouched external test. No improvement over the original team's different protocol is claimed. Opening verbs avoid the prohibited list; wording remains subject to owner review.\n'''
     seed_n=len(c['freeze']['final_seeds'])
     bullets=bullets.replace('five-seed',f'{seed_n}-seed').replace('五种子',f'{seed_n}种子')
+    bullets=bullets.replace(
+        f"Evaluated development-selected {DISPLAY[ml['family']]} and {DISPLAY[dl['family']]} pipelines, recording historical AP of {ml['AP']:.3f} and {dl['AP']:.3f}; assessed annual screening budgets, {seed_n}-seed variability, and paired company-bootstrap uncertainty.",
+        f"Evaluated development-selected Random Forest screening at historical AP {ml['AP']:.3f} versus {base['AP']:.3f} for same-protocol Logistic, reporting inconclusive paired company-bootstrap intervals and weaker transfer of the selected network and ensemble."
+    ).replace(
+        f"评估由开发期选定的 {DISPLAY[ml['family']]} 与 {DISPLAY[dl['family']]}，历史评估 AP 分别为 {ml['AP']:.3f} 与 {dl['AP']:.3f}，并报告年度审查预算、{seed_n}种子波动及公司聚类 bootstrap 区间。",
+        f"评估开发期选定的 Random Forest：历史 AP 为 {ml['AP']:.3f}，同协议 Logistic 为 {base['AP']:.3f}；配对公司 bootstrap 区间未支持确定提升，并记录选定网络与集成的泛化失败。"
+    )
     (ROOT/'reports/Resume_Bullets_EN_CN.md').write_text(bullets)
     status_path=ROOT/'EXPERIMENT_STATUS.md'
     status_text=status_path.read_text().replace('Five pre-registered seeds',f'{seed_n} pre-registered seeds')
