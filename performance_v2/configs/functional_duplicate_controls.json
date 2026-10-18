@@ -1,0 +1,6 @@
+{
+  "excluded_from_duplicate_stability_fits": [
+    "num_mlp_000_ed456950"
+  ],
+  "reason": "Equivalent executable recipes, including matched no-embedding controls; all actual trials remain in the ledger. Prefer the original named backbone, not the better duplicate score."
+}

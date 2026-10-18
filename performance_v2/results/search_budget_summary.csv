@@ -1,0 +1,11 @@
+family,target_complete,actual_complete,failed_attempts,waiting_enqueued,completed_target_shortfall,family_closed_for_performance
+catboost,36,36,0,0,0,False
+xgboost,36,36,0,0,0,False
+random_forest,12,6,2,0,6,False
+extra_trees,12,6,0,0,6,False
+legacy_residual,18,6,1,0,12,False
+mlp,18,6,0,0,12,False
+num_mlp,14,6,0,0,8,False
+tabm,14,6,0,0,8,False
+official_ft,8,0,0,6,8,False
+xgb_rank,6,0,0,6,6,False

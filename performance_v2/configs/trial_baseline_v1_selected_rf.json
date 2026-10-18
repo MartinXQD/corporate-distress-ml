@@ -1,0 +1,18 @@
+{
+  "family": "random_forest",
+  "features": "V1_S1",
+  "preprocess": "v1",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "none",
+  "refit_rule": "steps",
+  "max_epochs": 200,
+  "patience": 25,
+  "per_fit_seconds": 720,
+  "clip": true,
+  "iterations": 120,
+  "depth": 16,
+  "leaf": 3,
+  "max_features": "sqrt"
+}

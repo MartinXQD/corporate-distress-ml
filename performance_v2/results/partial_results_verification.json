@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": "Saved development predictions only; not final historical validation",
+  "complete_experiment": false,
+  "verified_development_prediction_sets": 118,
+  "protected_files_unchanged": 1345,
+  "protected_files_read_denied": 0,
+  "model_fit_calls_after_registered_deadline": 0,
+  "checked_at_utc": "2026-10-17T17:56:25.271716+00:00"
+}

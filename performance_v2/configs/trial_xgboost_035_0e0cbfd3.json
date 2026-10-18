@@ -1,0 +1,21 @@
+{
+  "family": "xgboost",
+  "features": "LEGACY33",
+  "preprocess": "native",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "none",
+  "refit_rule": "steps",
+  "max_epochs": 200,
+  "patience": 25,
+  "per_fit_seconds": 720,
+  "iterations": 1500,
+  "depth": 7,
+  "learning_rate": 0.10147583119871122,
+  "min_child_weight": 1.4714453749360787,
+  "subsample": 0.6915625899692004,
+  "colsample_bytree": 0.7143017937243147,
+  "reg_lambda": 9.33159457809179,
+  "reg_alpha": 9.033687092768852e-06
+}

@@ -1,0 +1,166 @@
+"""Independent saved-prediction arithmetic and frozen-pipeline reload checks."""
+import json
+import numpy as np
+import pandas as pd
+from sklearn.metrics import average_precision_score,roc_auc_score
+from scipy.stats import rankdata
+from .common import ROOT,SOURCE,ART,RESULT,dump,sha,now
+from .data import load,features
+from .training import load as load_model,NN
+from distress_ml.splits import groups,tie_key
+
+def independent(df,q):
+    y=df.y.to_numpy(int);annual=[];roc=[];recall=[]
+    for year in sorted(df.year.unique()):
+        ix=np.flatnonzero(df.year.to_numpy()==year)
+        keys=np.array([tie_key(c,year) for c in df.iloc[ix].company_name])
+        order=np.lexsort((keys,-q[ix]));n=int(np.ceil(.05*len(ix)))
+        valid=len(np.unique(y[ix]))==2
+        annual.append(average_precision_score(y[ix],q[ix]) if valid else np.nan);roc.append(roc_auc_score(y[ix],q[ix]) if valid else np.nan);recall.append(y[ix][order[:n]].sum()/y[ix].sum() if y[ix].sum() else np.nan)
+    return dict(AP=float(average_precision_score(y,q)) if len(np.unique(y))==2 else np.nan,ROC_AUC=float(roc_auc_score(y,q)) if len(np.unique(y))==2 else np.nan,macro_AP=float(np.mean(annual)),macro_ROC=float(np.mean(roc)),recall5=float(np.nanmean(recall)))
+
+def verify():
+    assert (ART/'historical_complete.json').exists()
+    frozen=json.loads((ROOT/'configs/artifact_freeze.json').read_text())
+    assert all(sha(ROOT/p)==h for p,h in frozen['artifacts'].items())
+    assert sha(ROOT/'configs/selection_freeze.json')==frozen['selection_sha256']
+    assert json.loads((ROOT/'configs/final_inventory.json').read_text())==frozen['models']
+    preservation=verify_protected()
+    execution=json.loads((ROOT/'EXECUTION_STATE.json').read_text())
+    import datetime as dt
+    windows={'original':dict(started_at_utc=execution['started_at_utc'],deadline_utc=execution['deadline_utc'])}
+    if execution.get('active_window_registration'):
+        path=ROOT/execution['active_window_registration']
+        assert sha(path)==execution['active_window_registration_sha256']
+        windows[execution['active_window_registration']]=json.loads(path.read_text())
+    fit_ledger=[json.loads(line) for line in (ART/'logs/fits.jsonl').read_text().splitlines()]
+    for event in fit_ledger:
+        window=windows[event.get('window','original')]
+        assert dt.datetime.fromisoformat(window['started_at_utc'])<=dt.datetime.fromisoformat(event['at_utc'])<=dt.datetime.fromisoformat(window['deadline_utc']),'A recorded fit started outside its authorized window'
+    df=load('historical');hist=df[df.year>=2015];table=pd.read_csv(RESULT/'historical_2015_2018.csv',float_precision='round_trip').set_index('name');checked=[];families={}
+    populations=json.loads((ART/'audit/final_training_company_sets.json').read_text())['populations'];population_checks=0;all_pipeline_reloads=[]
+    for item in frozen['models']:
+        metadata=json.loads((ROOT/item['path']).with_suffix('.json').read_text())
+        if item['channel']=='P2':
+            registered=populations[item['candidate']]
+            assert metadata['company_hash']==registered['company_hash'] and metadata['row_hash']==registered['row_hash']
+            assert metadata['fit_rows']==registered['natural_rows']
+            configured=json.loads((ROOT/f'configs/trial_{item["candidate"]}.json').read_text())
+            assert {k:v for k,v in configured.items() if k!='seed'}=={k:v for k,v in metadata['config'].items() if k!='seed'}
+            population_checks+=1
+        d=pd.read_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',float_precision='round_trip')
+        expected=hist if item['channel']!='post_selection_company_stress' else hist[groups(hist)==item['group_fold']]
+        assert set(d.row_id)==set(expected.row_id)
+        sub=df.set_index('row_id').loc[d.row_id]
+        assert np.array_equal(sub.y.to_numpy(),d.y_true.to_numpy())
+        assert np.array_equal(sub.company_name.to_numpy(),d.company_id.to_numpy())
+        assert np.array_equal(sub.year.to_numpy(),d.year.to_numpy())
+        pipeline=load_model(ROOT/item['path'])
+        source_rows=df.set_index('row_id',drop=False).loc[d.row_id]
+        matrix=features(df,pipeline.cfg['features']).loc[source_rows.index]
+        actual=pipeline.predict(matrix)
+        np.testing.assert_allclose(actual,d.raw_score,atol=1e-6,rtol=1e-6)
+        all_pipeline_reloads.append(dict(model=item['name'],rows=len(actual),maximum_error=float(np.max(abs(actual-d.raw_score.to_numpy())))))
+        m=independent(sub,d.score.to_numpy())
+        for k,v in m.items():assert np.isclose(v,table.loc[item['name'],k],atol=1e-9,rtol=1e-7,equal_nan=True),(item['name'],k)
+        checked.append(item['name'])
+        families[item['name']]=json.loads((ROOT/item['path']).with_suffix('.json').read_text())['config']['family']
+    # Mean-seed and rank/blend rows use exactly the same stored row population.
+    for name,row in table.iterrows():
+        if row.channel not in ['P2_seed_ensemble','P2_annual_rank_seed_ensemble']:continue
+        if name=='P2_fixed_rank_blend':path=ART/'predictions/P2_fixed_rank_blend_historical.csv.gz'
+        else:path=ART/f'predictions/P2_seed_mean__{row.candidate}_historical.csv.gz'
+        d=pd.read_csv(path,float_precision='round_trip');q=d.score.to_numpy()
+        assert np.array_equal(hist.row_id,d.row_id)
+        if row.channel=='P2_annual_rank_seed_ensemble' and name!='P2_fixed_rank_blend':
+            for year in sorted(d.year.unique()):
+                ix=np.flatnonzero(d.year.to_numpy()==year);q[ix]=rankdata(q[ix],method='average')/len(ix)
+        for key,value in independent(hist,q).items():assert np.isclose(value,row[key],atol=1e-9,rtol=1e-7),(name,key)
+    selected=[]
+    for neural in [False,True]:
+        items=[m for m in frozen['models'] if (families[m['name']] in NN)==neural and m['channel']=='P2']
+        item=min(items,key=lambda x:sha(ROOT/x['path']))
+        p=load_model(ROOT/item['path']);q=p.predict(features(df,p.cfg['features'])[df.year>=2015])
+        d=pd.read_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',float_precision='round_trip')
+        np.testing.assert_allclose(q,d.raw_score.to_numpy(),atol=1e-6,rtol=1e-6)
+        selected.append(dict(model=item['name'],neural=neural,max_reload_error=float(np.max(abs(q-d.raw_score.to_numpy())))))
+    archive_reloads=[]
+    for item in frozen['models']:
+        if item['channel']!='V0_archive_role':continue
+        p=load_model(ROOT/item['path'])
+        matrix=features(df,p.cfg['features']).loc[hist.index]
+        q=p.predict(matrix)
+        d=pd.read_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',float_precision='round_trip')
+        np.testing.assert_array_equal(hist.row_id,d.row_id)
+        np.testing.assert_allclose(q,d.raw_score,atol=1e-6,rtol=1e-6)
+        archive_reloads.append(dict(model=item['name'],source_order_verified=True,max_reload_error=float(np.max(abs(q-d.raw_score.to_numpy())))))
+    development_checks=verify_development(df)
+    confirmation_checks=0
+    for row in pd.read_csv(RESULT/'confirmation_2014.csv').itertuples():
+        d=pd.read_csv(ART/f'predictions/confirmation_{row.candidate}.csv.gz',float_precision='round_trip')
+        source=df.set_index('row_id').loc[d.row_id]
+        assert set(d.row_id)==set(df.loc[df.year==2014,'row_id'])
+        assert np.array_equal(source.y,d.y) and np.array_equal(source.company_name,d.company_name)
+        for key,value in independent(source,d.score.to_numpy()).items():
+            if key in ['AP','ROC_AUC','recall5']:assert np.isclose(value,getattr(row,key),atol=1e-9,rtol=1e-7)
+        confirmation_checks+=1
+    result=dict(passed=True,checked_at_utc=now(),saved_prediction_sets_verified=len(checked),development_prediction_sets_verified=development_checks,frozen_hashes_verified=len(frozen['artifacts']),protected_files_unchanged=preservation['verified'],protected_files_read_denied=preservation['read_denied'],full_preservation_hash_check_complete=preservation['read_denied']==0,preservation_scope='All readable protected files compared against the initial hash manifest; any system-denied private originals remain explicitly unverified, not asserted unchanged',authorized_time_windows_verified=len(windows),recorded_fit_starts_verified=len(fit_ledger),fit_starts_outside_authorized_windows=0,same_source_row_alignment=True,primary_metrics_independently_recomputed=True,reloaded_models=selected,tolerance=1e-6)
+    uncertainty(df,hist,table)
+    result['confirmation_prediction_sets_verified']=confirmation_checks
+    result['final_training_population_models_verified']=population_checks
+    result['archive_pipeline_row_order_reloads']=archive_reloads
+    result['all_frozen_pipelines_reloaded_in_source_row_order']=len(all_pipeline_reloads)
+    dump(RESULT/'pipeline_row_alignment_reloads.json',dict(passed=True,models=all_pipeline_reloads,tolerance=1e-6,fit_calls_added=0))
+    dump(RESULT/'verification.json',result)
+    print(json.dumps(result,indent=2))
+
+def verify_protected():
+    original=json.loads((ART/'audit/protected_sources.json').read_text());changed=[];denied=[];verified=0
+    for path,expected in original.items():
+        try:
+            if sha(SOURCE/path)!=expected:changed.append(path)
+            else:verified+=1
+        except PermissionError:denied.append(path)
+        except FileNotFoundError:changed.append(path)
+    dump(ART/'audit/preservation_current.json',dict(at_utc=now(),verified=verified,read_denied=denied,changed_or_missing=changed,complete=not denied and not changed))
+    assert not changed,'A readable protected V0/V1 file changed or is missing; see local audit'
+    return dict(verified=verified,read_denied=len(denied))
+
+def verify_development(df):
+    """Recalculate every saved development fold, including invalidated evidence."""
+    indexed=df.set_index('row_id');count=0
+    for path in (ART/'logs').glob('fold_*.json'):
+        row=json.loads(path.read_text())
+        p=pd.read_csv(ROOT/row['prediction_path'],float_precision='round_trip')
+        assert p.row_id.is_unique
+        sub=indexed.loc[p.row_id]
+        assert set(sub.year)=={row['year']} and row['year']<=2013
+        np.testing.assert_array_equal(sub.y,p.y_true)
+        np.testing.assert_array_equal(sub.company_name,p.company_id)
+        m=independent(sub,p.score.to_numpy())
+        for metric in ['AP','ROC_AUC','recall5']:
+            assert np.isclose(m[metric],row[metric],atol=1e-9,rtol=1e-7),(path.name,metric)
+        count+=1
+    return count
+
+def uncertainty(df,hist,table):
+    from .uncertainty import bootstrap,contract
+    dump(RESULT/'bootstrap_software_contract.json',contract())
+    selected=json.loads((ROOT/'configs/selection_freeze.json').read_text());benchmarks=['baseline_legacy_strong_inner_l1','baseline_v1_lags_xgb','baseline_v1_raw_catboost','baseline_v1_selected_rf'];keys=list(dict.fromkeys([selected['overall'],selected['DL'],*benchmarks]))
+    predictions={}
+    for key in keys:
+        d=pd.read_csv(ART/f'predictions/P2_seed_mean__{key}_historical.csv.gz',float_precision='round_trip');predictions[key]=d.score.to_numpy()
+    if selected['blend']['admitted']:
+        d=pd.read_csv(ART/'predictions/P2_fixed_rank_blend_historical.csv.gz',float_precision='round_trip');predictions['fixed_annual_rank_blend']=d.score.to_numpy()
+        # All pooled AP blend comparisons use the same annual-rank convention.
+        for key in keys:
+            q=predictions[key].copy()
+            for year in sorted(hist.year.unique()):
+                ix=np.flatnonzero(hist.year.to_numpy()==year);q[ix]=rankdata(q[ix],method='average')/len(ix)
+            predictions[key]=q
+    t,arrays=bootstrap(hist,predictions,benchmarks,repetitions=2000,seed=2026)
+    t['score_convention']='annual percentile ranks, frozen cohorts' if selected['blend']['admitted'] else 'mean registered-seed uncalibrated scores'
+    t.to_csv(RESULT/'paired_company_intervals.csv',index=False)
+    np.savez_compressed(ART/'audit/paired_bootstrap_draws.npz',**arrays)
+
+if __name__=='__main__':verify()

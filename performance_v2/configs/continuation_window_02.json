@@ -1,0 +1,16 @@
+{
+  "window_id": "continuation_02",
+  "explicit_user_authorization": true,
+  "authorization": "The owner explicitly instructed continuing the task to completion after the original budget expired; a new separately bounded local eight-hour window was announced.",
+  "started_at_utc": "2026-10-17T18:06:30+00:00",
+  "deadline_utc": "2026-10-18T02:06:30+00:00",
+  "maximum_hours": 8,
+  "original_started_at_utc": "2026-10-17T06:53:18+00:00",
+  "original_deadline_utc": "2026-10-17T14:53:18+00:00",
+  "protocol_sha256": "8575b5bfc4b7346af431c9b0845d4303a3b56df75548c25e97b494e46a1de135",
+  "statistical_protocol_unchanged": true,
+  "confirmation_and_historical_unopened": true,
+  "reuse_completed_development_folds": true,
+  "paid_services": false,
+  "original_window_snapshot": "artifacts/continuations/window_01_expired_snapshot"
+}

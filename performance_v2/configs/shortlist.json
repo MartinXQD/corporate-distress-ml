@@ -1,0 +1,16 @@
+{
+  "candidates": [
+    "baseline_legacy_strong_inner_l1",
+    "baseline_v1_lags_xgb",
+    "baseline_v1_raw_catboost",
+    "baseline_v1_selected_rf",
+    "refine_r3_15_a028aa7a",
+    "refine_r3_21_bbf84fb1",
+    "refine_r3_22_c5b19fbc"
+  ],
+  "selected_at_utc": "2026-10-17T23:22:43.527961+00:00",
+  "reason": "Mandatory same-protocol strong legacy and LAGS baselines plus best screened tree/NN; optional candidates require both stability and potential final-fit reserve. Measured cost can remove optional candidates before stability.",
+  "estimated_remaining_stability_hours": 0.6891267788410833,
+  "estimated_total_training_seconds": 6058.691991543241,
+  "history_labels_unavailable": true
+}

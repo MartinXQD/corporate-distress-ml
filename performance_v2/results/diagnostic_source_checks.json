@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "metric_definitions_agree": true,
+  "v1_representatives_reloaded": true,
+  "legacy_parameter_counts_verified": true,
+  "legacy_checkpoint_present": true,
+  "legacy_checkpoint_epoch": 31,
+  "checkpoint_matches_reported_epoch23_run": false,
+  "versions": {
+    "tabm": "0.0.3",
+    "rtdl-num-embeddings": "0.0.12",
+    "rtdl-revisiting-models": "0.0.2",
+    "optuna": "5.0.0",
+    "torch": "2.14.1",
+    "catboost": "1.2.10",
+    "xgboost": "3.4.1",
+    "numpy": "2.3.5",
+    "scikit-learn": "1.7.2"
+  },
+  "at_utc": "2026-10-17T06:59:43.863304+00:00",
+  "bridge_evidence_source_hashes_match": {
+    "src/neural_network_models.py": true,
+    "src/neural_network_training.py": true,
+    "outputs/neural_networks/neural_network_comparison.csv": true
+  },
+  "legacy_FT_parameters": 68113,
+  "V1_core_FT_parameters": 6081,
+  "V1_core_FT_epochs": 10
+}

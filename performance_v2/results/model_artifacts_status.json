@@ -1,0 +1,18 @@
+{
+  "status": "DELIVERED_LOCALLY_VERIFIED",
+  "new_final_pipelines": 47,
+  "pipeline_sidecars": 47,
+  "neural_state_files": 22,
+  "channels": {
+    "P2": 36,
+    "P1": 1,
+    "P2_selected__fit_cutoff_2012_transfer": 2,
+    "V0_archive_role": 2,
+    "post_selection_company_stress": 6
+  },
+  "local_only": true,
+  "public_git_excludes_serialized_models": true,
+  "inventory": "configs/final_inventory.json",
+  "full_pipeline_source_order_reloads": 47,
+  "checked_at_utc": "2026-10-18T00:39:10.959374+00:00"
+}

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "checked_at_utc": "2026-10-17T20:34:19.699105+00:00",
+  "verified_role_runs": 12,
+  "source": "Replay of the unchanged NumPy sampling sequence using saved executed steps, seed and exact training rows; exposure counters match",
+  "direct_pair_logging": false,
+  "independent_observations_not_claimed": true,
+  "model_training_performed": false
+}

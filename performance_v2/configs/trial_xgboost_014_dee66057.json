@@ -1,0 +1,21 @@
+{
+  "family": "xgboost",
+  "features": "LAGS_RAW3",
+  "preprocess": "native",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "none",
+  "refit_rule": "steps",
+  "max_epochs": 200,
+  "patience": 25,
+  "per_fit_seconds": 720,
+  "iterations": 1500,
+  "depth": 7,
+  "learning_rate": 0.14892999329489678,
+  "min_child_weight": 1.6912111795012665,
+  "subsample": 0.6332534281509997,
+  "colsample_bytree": 0.9861317136927821,
+  "reg_lambda": 0.22440070066706128,
+  "reg_alpha": 0.005147040184078837
+}

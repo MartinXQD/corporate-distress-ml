@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "checked_at_utc": "2026-10-18T00:28:06.257318+00:00",
+  "saved_prediction_sets_verified": 47,
+  "development_prediction_sets_verified": 541,
+  "frozen_hashes_verified": 136,
+  "protected_files_unchanged": 1344,
+  "protected_files_read_denied": 1,
+  "full_preservation_hash_check_complete": false,
+  "preservation_scope": "All readable protected files compared against the initial hash manifest; any system-denied private originals remain explicitly unverified, not asserted unchanged",
+  "authorized_time_windows_verified": 2,
+  "recorded_fit_starts_verified": 1312,
+  "fit_starts_outside_authorized_windows": 0,
+  "same_source_row_alignment": true,
+  "primary_metrics_independently_recomputed": true,
+  "reloaded_models": [
+    {
+      "model": "P2__baseline_v1_raw_catboost__seed2718",
+      "neural": false,
+      "max_reload_error": 0.0
+    },
+    {
+      "model": "P2__refine_r3_21_bbf84fb1__seed31415",
+      "neural": true,
+      "max_reload_error": 2.9541015633682832e-08
+    }
+  ],
+  "tolerance": 1e-06,
+  "confirmation_prediction_sets_verified": 9,
+  "final_training_population_models_verified": 36,
+  "archive_pipeline_row_order_reloads": [
+    {
+      "model": "V0_legacy_fixed13_retrained",
+      "source_order_verified": true,
+      "max_reload_error": 2.976150514921727e-08
+    },
+    {
+      "model": "V0_included_base_checkpoint_epoch31",
+      "source_order_verified": true,
+      "max_reload_error": 2.9796600298226394e-08
+    }
+  ],
+  "all_frozen_pipelines_reloaded_in_source_row_order": 47
+}

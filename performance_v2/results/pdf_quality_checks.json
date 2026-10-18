@@ -1,0 +1,134 @@
+{
+  "passed": true,
+  "scope": "Final verified report rendering and bounds; manual inspection additionally required",
+  "reports_are_final": true,
+  "source_verification_sha256": "6c01024ae7742bb5d0dfbe174bf648c661e6cdb70020a8bac997302008624c5e",
+  "manual_visual_review": "passed_all_15_pages",
+  "files": [
+    {
+      "file": "reports/Research_Report_V2_EN.pdf",
+      "sha256": "443397abeff9d18f36fc3da1571a32183a6e4fdb5f7a3f5402a007e571889475",
+      "pages": [
+        {
+          "page": 1,
+          "width": 841.8900146484375,
+          "height": 595.280029296875,
+          "text_characters": 2112,
+          "outside_blocks": []
+        },
+        {
+          "page": 2,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 2142,
+          "outside_blocks": []
+        },
+        {
+          "page": 3,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 1042,
+          "outside_blocks": []
+        },
+        {
+          "page": 4,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 781,
+          "outside_blocks": []
+        },
+        {
+          "page": 5,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 1394,
+          "outside_blocks": []
+        },
+        {
+          "page": 6,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 2561,
+          "outside_blocks": []
+        },
+        {
+          "page": 7,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 2338,
+          "outside_blocks": []
+        }
+      ],
+      "page_count": 7
+    },
+    {
+      "file": "reports/PERFORMANCE_DELTA_CN.pdf",
+      "sha256": "86db106c0c906cce438332073eb2267f2ce839bf8af14bdf7a68071625251b3d",
+      "pages": [
+        {
+          "page": 1,
+          "width": 841.8900146484375,
+          "height": 595.280029296875,
+          "text_characters": 1646,
+          "outside_blocks": []
+        },
+        {
+          "page": 2,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 1145,
+          "outside_blocks": []
+        },
+        {
+          "page": 3,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 584,
+          "outside_blocks": []
+        },
+        {
+          "page": 4,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 441,
+          "outside_blocks": []
+        },
+        {
+          "page": 5,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 711,
+          "outside_blocks": []
+        },
+        {
+          "page": 6,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 1537,
+          "outside_blocks": []
+        },
+        {
+          "page": 7,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 993,
+          "outside_blocks": []
+        },
+        {
+          "page": 8,
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "text_characters": 597,
+          "outside_blocks": []
+        }
+      ],
+      "page_count": 8
+    }
+  ],
+  "manual_reviewed_at_utc": "2026-10-18T00:39:10.959374+00:00",
+  "reviewed_pages": {
+    "Research_Report_V2_EN.pdf": 7,
+    "PERFORMANCE_DELTA_CN.pdf": 8
+  },
+  "manual_review_scope": "Every final rendered page inspected for text, tables, figures, fonts, clipping and page breaks"
+}

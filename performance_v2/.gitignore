@@ -1,0 +1,10 @@
+.venv/
+artifacts/
+__pycache__/
+.pytest_cache/
+*.sqlite*
+*.pt
+*.joblib
+reports/Resume_Bullets_V2_EN_CN.md
+EXECUTION_STATE.json
+NEXT_ACTIONS.md

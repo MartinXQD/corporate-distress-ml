@@ -1,0 +1,13 @@
+candidate,score_year,role,lambda_value,optimizer_updates,natural_rows,positive_exposures,negative_exposures,pair_draws,effective_annual_queries,minimum_query_year,maximum_query_year,source,pair_draws_are_independent,model_training_performed
+refine_r3_25_d8a6c4d7,2009,stop,0.05,12393,41189,537336,5764581,537334,9,1999,2007,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_25_d8a6c4d7,2009,refit,0.05,10368,45046,447250,4859996,447244,10,1999,2008,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_25_d8a6c4d7,2011,stop,0.05,11520,48789,483600,5371080,483596,11,1999,2009,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_25_d8a6c4d7,2011,refit,0.05,9120,52414,376114,4264990,376114,12,1999,2010,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_25_d8a6c4d7,2013,stop,0.05,17050,55927,688510,7980175,688510,13,1999,2011,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_25_d8a6c4d7,2013,refit,0.05,14300,59412,565173,6696403,565130,14,1999,2012,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_26_c261a4b9,2009,stop,0.2,13041,41189,565432,6065997,565428,9,1999,2007,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_26_c261a4b9,2009,refit,0.2,11016,45046,475205,5163737,475199,10,1999,2008,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_26_c261a4b9,2011,stop,0.2,11520,48789,483600,5371080,483596,11,1999,2009,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_26_c261a4b9,2011,refit,0.2,9120,52414,376114,4264990,376114,12,1999,2010,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_26_c261a4b9,2013,stop,0.2,15730,55927,635206,7362355,635206,13,1999,2011,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False
+refine_r3_26_c261a4b9,2013,refit,0.2,12980,59412,513029,6078611,512988,14,1999,2012,"Deterministic sampling-sequence replay, matched to saved actual update/exposure counters and training-row hash",False,False

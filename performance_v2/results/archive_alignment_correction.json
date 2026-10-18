@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "corrected_at_utc": "2026-10-18T00:24:42.745588+00:00",
+  "model": "V0_legacy_fixed13_retrained",
+  "cause": "Archive feature cache retained year/company order while score rows retained source order",
+  "evidence": "Original misaligned scores reproduced by the exact year/company permutation; corrected scores use frozen pipeline and source-row order",
+  "old_metrics": {
+    "AP": 0.02469626919481316,
+    "ROC_AUC": 0.5346342044376795,
+    "recall5": 0.04265199727311332,
+    "rows": 12282,
+    "prevalence": 0.023367529718286924,
+    "positive_companies": 119,
+    "macro_AP": 0.02481351339191347,
+    "macro_ROC": 0.5359022801172844,
+    "single_class_years": 0
+  },
+  "corrected_metrics": {
+    "AP": 0.2249621880383545,
+    "ROC_AUC": 0.8468426885185901,
+    "recall5": 0.48414330627393404,
+    "rows": 12282,
+    "prevalence": 0.023367529718286924,
+    "positive_companies": 119,
+    "macro_AP": 0.23535904280061143,
+    "macro_ROC": 0.8612880213718933,
+    "single_class_years": 0
+  },
+  "fits_added": 0,
+  "selection_and_all_frozen_artifacts_unchanged": true,
+  "other_historical_model_rows_unchanged": true,
+  "scope": "Archive-only inference alignment correction within the completed frozen batch; no reselection, refit, new historical search or metric-definition change"
+}

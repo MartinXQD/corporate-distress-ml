@@ -1,0 +1,23 @@
+{
+  "at_utc": "2026-10-17T23:22:42.302543+00:00",
+  "deadline_hours": 5.9,
+  "registered_search_maximum_hours": 5.9,
+  "training_completion_target_hours": 7.15,
+  "projected_stability_seconds": 1810.0216261639725,
+  "projected_final_seconds": 1744.459816752086,
+  "minimum_delivery_reserve_hours": 0.55,
+  "safety_buffer_hours": 0.1,
+  "promotion_feasibility": {
+    "remaining_training_seconds": 6767.742106000004,
+    "projected_required_seconds": 4117.6172926815125,
+    "best_screened_neural": "refine_r3_21_bbf84fb1",
+    "promotion_neural": "refine_r3_21_bbf84fb1",
+    "screened_best_is_affordable": true,
+    "reason": "Cost forecast only; no 2014/historical scores; preserve all required seeds"
+  },
+  "reason": "Finish registered boosting targets when measured cost permits; no new feature space, scoring years, seeds, or historical selection",
+  "family_targets": {
+    "catboost": 36,
+    "xgboost": 36
+  }
+}

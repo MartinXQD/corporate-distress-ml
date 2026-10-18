@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "weighted_metric_fixtures": 25,
+  "tied_and_zero_weight_scores": true,
+  "paired_bootstrap_draws_compared": 40,
+  "rare_class_fixed_year_draws": 128,
+  "annual_single_class_draws_excluded_without_changing_years": true,
+  "reference": "Preserved V1 bootstrap on complete-class fixtures and sklearn metrics; sparse-year correction explicitly verified",
+  "absolute_tolerance": 1e-12,
+  "performance_evidence": false
+}

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "fresh_kernel": true,
+  "code_cells": 5,
+  "outputs_contain_only_aggregates": true,
+  "fit_calls_added": 0,
+  "sha256": "f2daee005895aa55345ce9a2a0795a83dc7c353d3b39ceed5bfceeeb65da43e0",
+  "source_verification_sha256": "6c01024ae7742bb5d0dfbe174bf648c661e6cdb70020a8bac997302008624c5e",
+  "file": "notebooks/Performance_V2_Results.ipynb"
+}

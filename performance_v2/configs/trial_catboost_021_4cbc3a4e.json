@@ -1,0 +1,20 @@
+{
+  "family": "catboost",
+  "features": "LAGS_SLOG3",
+  "preprocess": "native",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "none",
+  "refit_rule": "steps",
+  "max_epochs": 200,
+  "patience": 25,
+  "per_fit_seconds": 720,
+  "iterations": 1500,
+  "depth": 7,
+  "learning_rate": 0.023837654293162855,
+  "l2_leaf_reg": 3.53527492201012,
+  "random_strength": 0.174522525281836,
+  "bootstrap_type": "Bayesian",
+  "bagging_temperature": 1.232205310624002
+}

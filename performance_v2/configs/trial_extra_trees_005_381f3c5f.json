@@ -1,0 +1,18 @@
+{
+  "family": "extra_trees",
+  "features": "LEGACY33",
+  "preprocess": "none",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "none",
+  "refit_rule": "steps",
+  "max_epochs": 200,
+  "patience": 25,
+  "per_fit_seconds": 720,
+  "iterations": 300,
+  "depth": 16,
+  "leaf": 40,
+  "max_features": 0.8,
+  "bootstrap": false
+}

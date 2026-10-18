@@ -1,0 +1,296 @@
+{
+  "at_utc": "2026-10-17T23:22:43.514761+00:00",
+  "neural": [
+    {
+      "candidate": "refine_r3_21_bbf84fb1",
+      "screen_AP": 0.49268646883179557,
+      "projected_required_seconds": 4117.6172926815125,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r3_22_c5b19fbc",
+      "screen_AP": 0.4584078613170733,
+      "projected_required_seconds": 4146.394012046141,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r3_19_a9cf81da",
+      "screen_AP": 0.4343045605740125,
+      "projected_required_seconds": 3278.0729383995226,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "legacy_residual_005_20356a29",
+      "screen_AP": 0.40483520938893497,
+      "projected_required_seconds": 11501.71146352456,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": false,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r3_20_5a53a97b",
+      "screen_AP": 0.39485372874591723,
+      "projected_required_seconds": 3696.965990482914,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r3_23_900ac963",
+      "screen_AP": 0.3839175681228562,
+      "projected_required_seconds": 3880.513683191003,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "mlp_000_d4daf458",
+      "screen_AP": 0.38191854653338564,
+      "projected_required_seconds": 4810.844896813513,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "legacy_residual_002_cc7f8bee",
+      "screen_AP": 0.37210958167177194,
+      "projected_required_seconds": 10074.117273045827,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": false,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r3_25_d8a6c4d7",
+      "screen_AP": 0.37194140737494036,
+      "projected_required_seconds": 4147.520628042526,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "tabm_005_6a648199",
+      "screen_AP": 0.36976702111447385,
+      "projected_required_seconds": 28088.869692592627,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": false,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "legacy_residual_000_ed2c13d5",
+      "screen_AP": 0.36976260966838953,
+      "projected_required_seconds": 13490.233613642231,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": false,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r2_11_0a498b1e",
+      "screen_AP": 0.36409387636935464,
+      "projected_required_seconds": 4218.824848385535,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "mlp_002_1e2a4889",
+      "screen_AP": 0.36379217556843263,
+      "projected_required_seconds": 3910.893361316128,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r3_24_db14c17c",
+      "screen_AP": 0.36068331907238055,
+      "projected_required_seconds": 4121.828865606694,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "mlp_004_67762d82",
+      "screen_AP": 0.35895543838162774,
+      "projected_required_seconds": 4296.269667024702,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r3_26_c261a4b9",
+      "screen_AP": 0.35875980284363057,
+      "projected_required_seconds": 4014.5755628826228,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r2_10_dd8b4817",
+      "screen_AP": 0.3573440580917964,
+      "projected_required_seconds": 3626.5194373579843,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "num_mlp_001_2e324aa9",
+      "screen_AP": 0.3567896769116507,
+      "projected_required_seconds": 3692.3505394492604,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "num_mlp_003_35291bb8",
+      "screen_AP": 0.35620434851037674,
+      "projected_required_seconds": 4765.109344658032,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "num_mlp_005_b5b232c3",
+      "screen_AP": 0.35270055236677006,
+      "projected_required_seconds": 4684.137756770368,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "tabm_001_db7a6be5",
+      "screen_AP": 0.3513082030938899,
+      "projected_required_seconds": 21567.295915648145,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": false,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "mlp_005_f67bcbd0",
+      "screen_AP": 0.3499583707588581,
+      "projected_required_seconds": 4190.041605428509,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "num_mlp_002_e33add9b",
+      "screen_AP": 0.32356710871781574,
+      "projected_required_seconds": 3869.4059672147923,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "tabm_000_5c0bfd4d",
+      "screen_AP": 0.3227253366969473,
+      "projected_required_seconds": 22111.952424971714,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": false,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "legacy_residual_004_b7ffc591",
+      "screen_AP": 0.3189751303153566,
+      "projected_required_seconds": 8725.742331971393,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": false,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "mlp_001_123223a9",
+      "screen_AP": 0.318530781112547,
+      "projected_required_seconds": 3725.0731843420435,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "mlp_003_91660c59",
+      "screen_AP": 0.3132377919668817,
+      "projected_required_seconds": 4027.6653800995045,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "tabm_003_1c17403c",
+      "screen_AP": 0.30118997112550844,
+      "projected_required_seconds": 19882.629863523303,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": false,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "legacy_residual_003_7c6aba88",
+      "screen_AP": 0.2820891601785479,
+      "projected_required_seconds": 6170.714800907791,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "legacy_residual_006_ef6527bd",
+      "screen_AP": 0.27580462094446423,
+      "projected_required_seconds": 3495.455930074344,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "refine_r2_12_67034d77",
+      "screen_AP": 0.2691501591788344,
+      "projected_required_seconds": 3418.9521561077054,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "baseline_v1_selected_dl_corrected_steps",
+      "screen_AP": 0.25171801452442094,
+      "projected_required_seconds": 2920.913945217711,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "tabm_002_c9bcffa5",
+      "screen_AP": 0.23135400360634642,
+      "projected_required_seconds": 5804.932198132745,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "num_mlp_004_9a8ceae0",
+      "screen_AP": 0.22886339546006063,
+      "projected_required_seconds": 3598.2397866744404,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "tabm_004_01248867",
+      "screen_AP": 0.2273050525886741,
+      "projected_required_seconds": 5384.467274174625,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    },
+    {
+      "candidate": "baseline_legacy_strong_inner_l1",
+      "screen_AP": 0.22468154216132044,
+      "projected_required_seconds": 3361.451569364743,
+      "remaining_training_seconds": 6766.4872110000015,
+      "eligible": true,
+      "reason": "Three-seed/five-year stability, five final seeds, strong same-cutoff baselines, company stress and delivery reserve; not a historical-score filter"
+    }
+  ],
+  "best_screened_neural": "refine_r3_21_bbf84fb1",
+  "selected_for_promotion": "refine_r3_21_bbf84fb1",
+  "rule": "Omit an unaffordable candidate rather than replacing registered stability/final seeds with one favorable seed"
+}

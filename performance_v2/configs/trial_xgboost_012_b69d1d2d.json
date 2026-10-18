@@ -1,0 +1,21 @@
+{
+  "family": "xgboost",
+  "features": "SLOG17",
+  "preprocess": "native",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "none",
+  "refit_rule": "steps",
+  "max_epochs": 200,
+  "patience": 25,
+  "per_fit_seconds": 720,
+  "iterations": 1500,
+  "depth": 8,
+  "learning_rate": 0.08745332215708852,
+  "min_child_weight": 3.155930789601266,
+  "subsample": 0.7989304645633365,
+  "colsample_bytree": 0.6442872616076114,
+  "reg_lambda": 14.676268210818202,
+  "reg_alpha": 0.034180837499055816
+}

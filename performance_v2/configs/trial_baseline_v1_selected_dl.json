@@ -1,0 +1,21 @@
+{
+  "family": "v1_residual",
+  "features": "V1_S1",
+  "preprocess": "v1",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "ros",
+  "refit_rule": "epochs",
+  "max_epochs": 25,
+  "patience": 4,
+  "per_fit_seconds": 720,
+  "clip": true,
+  "width": 64,
+  "depth": 2,
+  "dropout": 0.15,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "batch_size": 1024,
+  "sampling_budget": "epoch_equivalent"
+}

@@ -1,0 +1,21 @@
+{
+  "family": "legacy_residual",
+  "features": "RAW18",
+  "preprocess": "std01",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "sampling": "ros",
+  "refit_rule": "steps",
+  "max_epochs": 100,
+  "patience": 12,
+  "per_fit_seconds": 720,
+  "indicators": false,
+  "width": 192,
+  "depth": 4,
+  "dropout": 0.25,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0002,
+  "batch_size": 512,
+  "sampling_budget": "epoch_equivalent"
+}
