@@ -65,10 +65,10 @@
   "all_conditional_intervals_positive": true,
   "historical_exposure": "Previously inspected across versions; not a new holdout",
   "paid_services": false,
-  "publication": "pending exact release audit and authenticated branch push",
+  "publication": "PUBLISHED_VERIFIED_NEW_BRANCH",
   "scientific_evaluation_complete": true,
-  "delivery_complete": false,
-  "status": "LOCAL_DELIVERY_COMPLETE_PUBLICATION_PENDING",
+  "delivery_complete": true,
+  "status": "COMPLETE_LOCAL_AND_PUBLISHED",
   "active_window_hours_to_report": 6.373146425000001,
   "original_window_started_at_utc": "2026-10-17T06:53:18+00:00",
   "original_window_deadline_utc": "2026-10-17T14:53:18+00:00",
@@ -94,5 +94,12 @@
   "pdf_pages": 15,
   "executed_notebook": true,
   "all_frozen_pipeline_reloads": 47,
-  "archive_alignment_correction": true
+  "archive_alignment_correction": true,
+  "public_branch_url": "https://github.com/MartinXQD/corporate-distress-ml/tree/research/performance-v2/performance_v2",
+  "authenticated_publisher": "MartinXQD",
+  "published_scientific_commit": "e7f6fb51238730bb5e055572b752e2ff0c84b102",
+  "main_unchanged": true,
+  "public_data_and_models_uploaded": false,
+  "final_delivery_checked_at_utc": "2026-10-18T00:48:15.169763+00:00",
+  "active_window_hours_to_delivery": 6.695880489722223
 }

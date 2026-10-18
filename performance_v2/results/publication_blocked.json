@@ -1,10 +1,14 @@
 {
   "blocked": false,
-  "status": "LOCAL_GATES_PASSED_AWAITING_FINAL_INDEX_AUDIT_AND_AUTHENTICATED_PUSH",
-  "training_and_scientific_results_complete": true,
-  "missing_steps": [
-    "Audit exact public Git index",
-    "Authenticate matching GitHub owner and push only the authorized new branch"
-  ],
-  "raw_private_data_will_not_be_pushed": true
+  "status": "PUBLISHED_VERIFIED_NEW_BRANCH",
+  "branch_url": "https://github.com/MartinXQD/corporate-distress-ml/tree/research/performance-v2/performance_v2",
+  "authenticated_owner": "MartinXQD",
+  "scientific_commit": "e7f6fb51238730bb5e055572b752e2ff0c84b102",
+  "main_unchanged": true,
+  "private_data_uploaded": false,
+  "serialized_models_uploaded": false,
+  "new_repository_created": false,
+  "force_push": false,
+  "verified_at_utc": "2026-10-18T00:47:38.697700+00:00",
+  "missing_steps": []
 }

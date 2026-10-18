@@ -38,3 +38,5 @@ The two archive-only inference rows required an explicit cached-feature order co
 The inherited V1 paths and historical lock are unchanged. The V2 bridge used a source snapshot before the compact-mask implementation; its purpose is a controlled mechanism diagnostic, explicitly distinct from P2 HPO. One migrated V1 ROS trial was invalidated for an epoch-refit step error and replaced before selection; it is retained in the ledger and does not explain original V1 performance.
 
 The final preservation check confirmed 1344 readable protected files against their initial hashes. 1 private original file(s) could not be read under current system permissions, including an escalated read-only attempt; no current hash-equality claim is made for those files. Exact local exceptions remain in the private audit directory and are not published.
+
+Publication is complete on the [verified public branch](https://github.com/MartinXQD/corporate-distress-ml/tree/research/performance-v2/performance_v2). [Publication checks](PUBLICATION.md) record identity, remote content and preserved main history.

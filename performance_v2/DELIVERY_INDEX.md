@@ -42,3 +42,5 @@ The first eight-hour registration expired partial. A separate explicitly authori
 1,344 protected V0/V1 files matched the original manifest. macOS denied access to one private original image even for the read-only escalated check; that file's current equality is unverified, with exact details retained privately. No private originals are published.
 
 Company novelty is sparse: 468 naturally unseen firms include only five failed firms, and single-class annual metrics remain NA. Company-group stress uses parameters selected on broader companies; it is post-selection stress, with mean pooled AP about 0.143 for ML and 0.138 for DL. It does not support a claim of robust prospective unseen-company performance. Company-constant retrospective labels and missing event/publication dates preclude verified annual PD or early-warning claims.
+
+Publication is complete on the [verified public branch](https://github.com/MartinXQD/corporate-distress-ml/tree/research/performance-v2/performance_v2). [Publication checks](PUBLICATION.md) record identity, remote content and preserved main history.
