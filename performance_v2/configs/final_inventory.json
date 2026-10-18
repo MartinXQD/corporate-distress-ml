@@ -1,0 +1,431 @@
+[
+  {
+    "name": "P2__refine_r3_15_a028aa7a__seed42",
+    "candidate": "refine_r3_15_a028aa7a",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "path": "artifacts/models/P2__refine_r3_15_a028aa7a__seed42.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__refine_r3_15_a028aa7a__seed2026",
+    "candidate": "refine_r3_15_a028aa7a",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2026,
+    "path": "artifacts/models/P2__refine_r3_15_a028aa7a__seed2026.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__refine_r3_15_a028aa7a__seed31415",
+    "candidate": "refine_r3_15_a028aa7a",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 31415,
+    "path": "artifacts/models/P2__refine_r3_15_a028aa7a__seed31415.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__refine_r3_15_a028aa7a__seed7",
+    "candidate": "refine_r3_15_a028aa7a",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 7,
+    "path": "artifacts/models/P2__refine_r3_15_a028aa7a__seed7.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__refine_r3_15_a028aa7a__seed2718",
+    "candidate": "refine_r3_15_a028aa7a",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2718,
+    "path": "artifacts/models/P2__refine_r3_15_a028aa7a__seed2718.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__refine_r3_21_bbf84fb1__seed42",
+    "candidate": "refine_r3_21_bbf84fb1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "path": "artifacts/models/P2__refine_r3_21_bbf84fb1__seed42.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__refine_r3_21_bbf84fb1__seed2026",
+    "candidate": "refine_r3_21_bbf84fb1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2026,
+    "path": "artifacts/models/P2__refine_r3_21_bbf84fb1__seed2026.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__refine_r3_21_bbf84fb1__seed31415",
+    "candidate": "refine_r3_21_bbf84fb1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 31415,
+    "path": "artifacts/models/P2__refine_r3_21_bbf84fb1__seed31415.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__refine_r3_21_bbf84fb1__seed7",
+    "candidate": "refine_r3_21_bbf84fb1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 7,
+    "path": "artifacts/models/P2__refine_r3_21_bbf84fb1__seed7.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__refine_r3_21_bbf84fb1__seed2718",
+    "candidate": "refine_r3_21_bbf84fb1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2718,
+    "path": "artifacts/models/P2__refine_r3_21_bbf84fb1__seed2718.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_legacy_strong_inner_l1__seed42",
+    "candidate": "baseline_legacy_strong_inner_l1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "path": "artifacts/models/P2__baseline_legacy_strong_inner_l1__seed42.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_legacy_strong_inner_l1__seed2026",
+    "candidate": "baseline_legacy_strong_inner_l1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2026,
+    "path": "artifacts/models/P2__baseline_legacy_strong_inner_l1__seed2026.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_legacy_strong_inner_l1__seed31415",
+    "candidate": "baseline_legacy_strong_inner_l1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 31415,
+    "path": "artifacts/models/P2__baseline_legacy_strong_inner_l1__seed31415.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_legacy_strong_inner_l1__seed7",
+    "candidate": "baseline_legacy_strong_inner_l1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 7,
+    "path": "artifacts/models/P2__baseline_legacy_strong_inner_l1__seed7.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_legacy_strong_inner_l1__seed2718",
+    "candidate": "baseline_legacy_strong_inner_l1",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2718,
+    "path": "artifacts/models/P2__baseline_legacy_strong_inner_l1__seed2718.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_lags_xgb__seed42",
+    "candidate": "baseline_v1_lags_xgb",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "path": "artifacts/models/P2__baseline_v1_lags_xgb__seed42.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_lags_xgb__seed2026",
+    "candidate": "baseline_v1_lags_xgb",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2026,
+    "path": "artifacts/models/P2__baseline_v1_lags_xgb__seed2026.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_lags_xgb__seed31415",
+    "candidate": "baseline_v1_lags_xgb",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 31415,
+    "path": "artifacts/models/P2__baseline_v1_lags_xgb__seed31415.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_lags_xgb__seed7",
+    "candidate": "baseline_v1_lags_xgb",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 7,
+    "path": "artifacts/models/P2__baseline_v1_lags_xgb__seed7.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_lags_xgb__seed2718",
+    "candidate": "baseline_v1_lags_xgb",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2718,
+    "path": "artifacts/models/P2__baseline_v1_lags_xgb__seed2718.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_raw_catboost__seed42",
+    "candidate": "baseline_v1_raw_catboost",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "path": "artifacts/models/P2__baseline_v1_raw_catboost__seed42.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_raw_catboost__seed2026",
+    "candidate": "baseline_v1_raw_catboost",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2026,
+    "path": "artifacts/models/P2__baseline_v1_raw_catboost__seed2026.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_raw_catboost__seed31415",
+    "candidate": "baseline_v1_raw_catboost",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 31415,
+    "path": "artifacts/models/P2__baseline_v1_raw_catboost__seed31415.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_raw_catboost__seed7",
+    "candidate": "baseline_v1_raw_catboost",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 7,
+    "path": "artifacts/models/P2__baseline_v1_raw_catboost__seed7.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_raw_catboost__seed2718",
+    "candidate": "baseline_v1_raw_catboost",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2718,
+    "path": "artifacts/models/P2__baseline_v1_raw_catboost__seed2718.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_rf__seed42",
+    "candidate": "baseline_v1_selected_rf",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "path": "artifacts/models/P2__baseline_v1_selected_rf__seed42.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_rf__seed2026",
+    "candidate": "baseline_v1_selected_rf",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2026,
+    "path": "artifacts/models/P2__baseline_v1_selected_rf__seed2026.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_rf__seed31415",
+    "candidate": "baseline_v1_selected_rf",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 31415,
+    "path": "artifacts/models/P2__baseline_v1_selected_rf__seed31415.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_rf__seed7",
+    "candidate": "baseline_v1_selected_rf",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 7,
+    "path": "artifacts/models/P2__baseline_v1_selected_rf__seed7.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_rf__seed2718",
+    "candidate": "baseline_v1_selected_rf",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2718,
+    "path": "artifacts/models/P2__baseline_v1_selected_rf__seed2718.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_dl_corrected_steps__seed42",
+    "candidate": "baseline_v1_selected_dl_corrected_steps",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "path": "artifacts/models/P2__baseline_v1_selected_dl_corrected_steps__seed42.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_dl_corrected_steps__seed2026",
+    "candidate": "baseline_v1_selected_dl_corrected_steps",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2026,
+    "path": "artifacts/models/P2__baseline_v1_selected_dl_corrected_steps__seed2026.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_dl_corrected_steps__seed31415",
+    "candidate": "baseline_v1_selected_dl_corrected_steps",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 31415,
+    "path": "artifacts/models/P2__baseline_v1_selected_dl_corrected_steps__seed31415.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_dl_corrected_steps__seed7",
+    "candidate": "baseline_v1_selected_dl_corrected_steps",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 7,
+    "path": "artifacts/models/P2__baseline_v1_selected_dl_corrected_steps__seed7.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_v1_selected_dl_corrected_steps__seed2718",
+    "candidate": "baseline_v1_selected_dl_corrected_steps",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 2718,
+    "path": "artifacts/models/P2__baseline_v1_selected_dl_corrected_steps__seed2718.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P2__baseline_logistic__seed42",
+    "candidate": "baseline_logistic",
+    "channel": "P2",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "path": "artifacts/models/P2__baseline_logistic__seed42.joblib",
+    "score_type": "uncalibrated risk score"
+  },
+  {
+    "name": "P1_fixed_legacy",
+    "candidate": "P1_fixed_legacy",
+    "channel": "P1",
+    "fit_cutoff": 2012,
+    "seed": 42,
+    "path": "artifacts/models/P1_fixed_legacy.joblib",
+    "score_type": "separate P1 calibrated score"
+  },
+  {
+    "name": "P2_selected__fit_cutoff_2012_transfer__overall",
+    "candidate": "P2_selected__fit_cutoff_2012_transfer__overall",
+    "channel": "P2_selected__fit_cutoff_2012_transfer",
+    "fit_cutoff": 2012,
+    "seed": 42,
+    "path": "artifacts/models/P2_selected__fit_cutoff_2012_transfer__overall.joblib",
+    "score_type": "uncalibrated ranking score"
+  },
+  {
+    "name": "P2_selected__fit_cutoff_2012_transfer__DL",
+    "candidate": "P2_selected__fit_cutoff_2012_transfer__DL",
+    "channel": "P2_selected__fit_cutoff_2012_transfer",
+    "fit_cutoff": 2012,
+    "seed": 42,
+    "path": "artifacts/models/P2_selected__fit_cutoff_2012_transfer__DL.joblib",
+    "score_type": "uncalibrated ranking score"
+  },
+  {
+    "name": "V0_legacy_fixed13_retrained",
+    "candidate": "legacy_fixed13_retrained",
+    "channel": "V0_archive_role",
+    "fit_cutoff": 2011,
+    "seed": 42,
+    "path": "artifacts/models/V0_legacy_fixed13_retrained.joblib",
+    "score_type": "uncalibrated legacy risk score; separate archived selection roles"
+  },
+  {
+    "name": "V0_included_base_checkpoint_epoch31",
+    "candidate": "included_base_checkpoint_epoch31",
+    "channel": "V0_archive_role",
+    "fit_cutoff": 2011,
+    "seed": 42,
+    "path": "artifacts/models/V0_included_base_checkpoint_epoch31.joblib",
+    "score_type": "uncalibrated legacy risk score; separate archived selection roles"
+  },
+  {
+    "name": "post_selection_group0_ML",
+    "candidate": "refine_r3_15_a028aa7a",
+    "channel": "post_selection_company_stress",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "group_fold": 0,
+    "path": "artifacts/models/post_selection_group0_ML.joblib",
+    "score_type": "ranking score; selected hyperparameters use broader companies"
+  },
+  {
+    "name": "post_selection_group1_ML",
+    "candidate": "refine_r3_15_a028aa7a",
+    "channel": "post_selection_company_stress",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "group_fold": 1,
+    "path": "artifacts/models/post_selection_group1_ML.joblib",
+    "score_type": "ranking score; selected hyperparameters use broader companies"
+  },
+  {
+    "name": "post_selection_group2_ML",
+    "candidate": "refine_r3_15_a028aa7a",
+    "channel": "post_selection_company_stress",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "group_fold": 2,
+    "path": "artifacts/models/post_selection_group2_ML.joblib",
+    "score_type": "ranking score; selected hyperparameters use broader companies"
+  },
+  {
+    "name": "post_selection_group0_DL",
+    "candidate": "refine_r3_21_bbf84fb1",
+    "channel": "post_selection_company_stress",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "group_fold": 0,
+    "path": "artifacts/models/post_selection_group0_DL.joblib",
+    "score_type": "ranking score; selected hyperparameters use broader companies"
+  },
+  {
+    "name": "post_selection_group1_DL",
+    "candidate": "refine_r3_21_bbf84fb1",
+    "channel": "post_selection_company_stress",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "group_fold": 1,
+    "path": "artifacts/models/post_selection_group1_DL.joblib",
+    "score_type": "ranking score; selected hyperparameters use broader companies"
+  },
+  {
+    "name": "post_selection_group2_DL",
+    "candidate": "refine_r3_21_bbf84fb1",
+    "channel": "post_selection_company_stress",
+    "fit_cutoff": 2014,
+    "seed": 42,
+    "group_fold": 2,
+    "path": "artifacts/models/post_selection_group2_DL.joblib",
+    "score_type": "ranking score; selected hyperparameters use broader companies"
+  }
+]

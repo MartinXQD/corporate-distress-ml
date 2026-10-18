@@ -1,0 +1,242 @@
+{
+  "passed": true,
+  "models": [
+    {
+      "model": "P2__refine_r3_15_a028aa7a__seed42",
+      "rows": 12282,
+      "maximum_error": 2.8925323469763953e-08
+    },
+    {
+      "model": "P2__refine_r3_15_a028aa7a__seed2026",
+      "rows": 12282,
+      "maximum_error": 2.848892211027021e-08
+    },
+    {
+      "model": "P2__refine_r3_15_a028aa7a__seed31415",
+      "rows": 12282,
+      "maximum_error": 2.963104250852666e-08
+    },
+    {
+      "model": "P2__refine_r3_15_a028aa7a__seed7",
+      "rows": 12282,
+      "maximum_error": 2.9658508315932863e-08
+    },
+    {
+      "model": "P2__refine_r3_15_a028aa7a__seed2718",
+      "rows": 12282,
+      "maximum_error": 2.8740692159523462e-08
+    },
+    {
+      "model": "P2__refine_r3_21_bbf84fb1__seed42",
+      "rows": 12282,
+      "maximum_error": 2.9609680152198337e-08
+    },
+    {
+      "model": "P2__refine_r3_21_bbf84fb1__seed2026",
+      "rows": 12282,
+      "maximum_error": 2.957305911266417e-08
+    },
+    {
+      "model": "P2__refine_r3_21_bbf84fb1__seed31415",
+      "rows": 12282,
+      "maximum_error": 2.9541015633682832e-08
+    },
+    {
+      "model": "P2__refine_r3_21_bbf84fb1__seed7",
+      "rows": 12282,
+      "maximum_error": 2.980117796980153e-08
+    },
+    {
+      "model": "P2__refine_r3_21_bbf84fb1__seed2718",
+      "rows": 12282,
+      "maximum_error": 2.9721832328633013e-08
+    },
+    {
+      "model": "P2__baseline_legacy_strong_inner_l1__seed42",
+      "rows": 12282,
+      "maximum_error": 2.9793548628198607e-08
+    },
+    {
+      "model": "P2__baseline_legacy_strong_inner_l1__seed2026",
+      "rows": 12282,
+      "maximum_error": 2.9800415024539006e-08
+    },
+    {
+      "model": "P2__baseline_legacy_strong_inner_l1__seed31415",
+      "rows": 12282,
+      "maximum_error": 2.9796600298226394e-08
+    },
+    {
+      "model": "P2__baseline_legacy_strong_inner_l1__seed7",
+      "rows": 12282,
+      "maximum_error": 2.9799652079276484e-08
+    },
+    {
+      "model": "P2__baseline_legacy_strong_inner_l1__seed2718",
+      "rows": 12282,
+      "maximum_error": 2.9800415024539006e-08
+    },
+    {
+      "model": "P2__baseline_v1_lags_xgb__seed42",
+      "rows": 12282,
+      "maximum_error": 2.4646759078095215e-08
+    },
+    {
+      "model": "P2__baseline_v1_lags_xgb__seed2026",
+      "rows": 12282,
+      "maximum_error": 2.866287229785769e-08
+    },
+    {
+      "model": "P2__baseline_v1_lags_xgb__seed31415",
+      "rows": 12282,
+      "maximum_error": 2.9579162563742045e-08
+    },
+    {
+      "model": "P2__baseline_v1_lags_xgb__seed7",
+      "rows": 12282,
+      "maximum_error": 2.8562164300360848e-08
+    },
+    {
+      "model": "P2__baseline_v1_lags_xgb__seed2718",
+      "rows": 12282,
+      "maximum_error": 2.7557373050157707e-08
+    },
+    {
+      "model": "P2__baseline_v1_raw_catboost__seed42",
+      "rows": 12282,
+      "maximum_error": 0.0
+    },
+    {
+      "model": "P2__baseline_v1_raw_catboost__seed2026",
+      "rows": 12282,
+      "maximum_error": 0.0
+    },
+    {
+      "model": "P2__baseline_v1_raw_catboost__seed31415",
+      "rows": 12282,
+      "maximum_error": 0.0
+    },
+    {
+      "model": "P2__baseline_v1_raw_catboost__seed7",
+      "rows": 12282,
+      "maximum_error": 0.0
+    },
+    {
+      "model": "P2__baseline_v1_raw_catboost__seed2718",
+      "rows": 12282,
+      "maximum_error": 0.0
+    },
+    {
+      "model": "P2__baseline_v1_selected_rf__seed42",
+      "rows": 12282,
+      "maximum_error": 1.1102230246251565e-16
+    },
+    {
+      "model": "P2__baseline_v1_selected_rf__seed2026",
+      "rows": 12282,
+      "maximum_error": 1.1102230246251565e-16
+    },
+    {
+      "model": "P2__baseline_v1_selected_rf__seed31415",
+      "rows": 12282,
+      "maximum_error": 1.1102230246251565e-16
+    },
+    {
+      "model": "P2__baseline_v1_selected_rf__seed7",
+      "rows": 12282,
+      "maximum_error": 1.1102230246251565e-16
+    },
+    {
+      "model": "P2__baseline_v1_selected_rf__seed2718",
+      "rows": 12282,
+      "maximum_error": 1.1102230246251565e-16
+    },
+    {
+      "model": "P2__baseline_v1_selected_dl_corrected_steps__seed42",
+      "rows": 12282,
+      "maximum_error": 2.978820801136095e-08
+    },
+    {
+      "model": "P2__baseline_v1_selected_dl_corrected_steps__seed2026",
+      "rows": 12282,
+      "maximum_error": 2.9799652079276484e-08
+    },
+    {
+      "model": "P2__baseline_v1_selected_dl_corrected_steps__seed31415",
+      "rows": 12282,
+      "maximum_error": 2.978134150399825e-08
+    },
+    {
+      "model": "P2__baseline_v1_selected_dl_corrected_steps__seed7",
+      "rows": 12282,
+      "maximum_error": 2.9788970956623473e-08
+    },
+    {
+      "model": "P2__baseline_v1_selected_dl_corrected_steps__seed2718",
+      "rows": 12282,
+      "maximum_error": 2.980117796980153e-08
+    },
+    {
+      "model": "P2__baseline_logistic__seed42",
+      "rows": 12282,
+      "maximum_error": 0.0
+    },
+    {
+      "model": "P1_fixed_legacy",
+      "rows": 12282,
+      "maximum_error": 2.9776000998182894e-08
+    },
+    {
+      "model": "P2_selected__fit_cutoff_2012_transfer__overall",
+      "rows": 12282,
+      "maximum_error": 2.9097747766826387e-08
+    },
+    {
+      "model": "P2_selected__fit_cutoff_2012_transfer__DL",
+      "rows": 12282,
+      "maximum_error": 2.9528045675242254e-08
+    },
+    {
+      "model": "V0_legacy_fixed13_retrained",
+      "rows": 12282,
+      "maximum_error": 2.976150514921727e-08
+    },
+    {
+      "model": "V0_included_base_checkpoint_epoch31",
+      "rows": 12282,
+      "maximum_error": 2.9796600298226394e-08
+    },
+    {
+      "model": "post_selection_group0_ML",
+      "rows": 4085,
+      "maximum_error": 2.8949737496120065e-08
+    },
+    {
+      "model": "post_selection_group1_ML",
+      "rows": 3989,
+      "maximum_error": 2.7385711698357795e-08
+    },
+    {
+      "model": "post_selection_group2_ML",
+      "rows": 4208,
+      "maximum_error": 2.7770996058329445e-08
+    },
+    {
+      "model": "post_selection_group0_DL",
+      "rows": 4085,
+      "maximum_error": 2.9710388149695177e-08
+    },
+    {
+      "model": "post_selection_group1_DL",
+      "rows": 3989,
+      "maximum_error": 2.9595184303232713e-08
+    },
+    {
+      "model": "post_selection_group2_DL",
+      "rows": 4208,
+      "maximum_error": 2.880325322696109e-08
+    }
+  ],
+  "tolerance": 1e-06,
+  "fit_calls_added": 0
+}

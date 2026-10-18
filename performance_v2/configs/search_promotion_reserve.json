@@ -1,0 +1,10 @@
+{
+  "at_utc": "2026-10-17T22:23:24.632188+00:00",
+  "hours_elapsed": 4.281842312777778,
+  "best_complete_tree": "refine_r3_15_a028aa7a",
+  "best_complete_neural": "refine_r3_21_bbf84fb1",
+  "projected_required_seconds": 4117.6172926815125,
+  "training_target_hours": 7.15,
+  "safety_buffer_hours": 0.15,
+  "scoring_and_seeds_unchanged": true
+}

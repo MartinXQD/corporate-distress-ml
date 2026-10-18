@@ -1,25 +1,10 @@
 {
-  "pushed": false,
-  "reason": "Final experiments and independent final-result verification incomplete",
-  "identity_live_recheck": {
-    "checked_at_utc": "2026-10-17T18:03:25.329342+00:00",
-    "read_only": true,
-    "pushed": false,
-    "credential_available": true,
-    "expected_login": "MartinXQD",
-    "http_status": 200,
-    "authenticated_login": "MartinXQD",
-    "owner_matches": true
-  },
-  "private_data_uploaded": false,
-  "missing": [
-    "Full numerical-embedding and paired TabM performance search",
-    "Target CatBoost/XGBoost and other family search coverage",
-    "Five-year, three-seed shortlist stability and final selection",
-    "One frozen 2014 confirmation batch",
-    "Same-cutoff 2014 final fits with five registered seeds",
-    "New frozen 2015-2018 historical batch and paired company intervals",
-    "New company-generalization stress tests and saved final model pipelines",
-    "Final publication checks and authenticated GitHub branch push"
-  ]
+  "blocked": false,
+  "status": "LOCAL_GATES_PASSED_AWAITING_FINAL_INDEX_AUDIT_AND_AUTHENTICATED_PUSH",
+  "training_and_scientific_results_complete": true,
+  "missing_steps": [
+    "Audit exact public Git index",
+    "Authenticate matching GitHub owner and push only the authorized new branch"
+  ],
+  "raw_private_data_will_not_be_pushed": true
 }

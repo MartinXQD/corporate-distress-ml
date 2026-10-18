@@ -25,6 +25,13 @@ def main():
     dest.mkdir()
     for folder in ['src','scripts']:
         shutil.copytree(ROOT/folder,dest/folder,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+    # New replications receive the diagnosed inference-only order correction
+    # before their first fit/freeze. This run's frozen source is preserved.
+    scoring=dest/'src/distress_v2/finalize.py'
+    original=scoring.read_text()
+    needle="p=load_model(ROOT/item['path']);f=features(df,p.cfg['features']);mask=hist.copy()"
+    assert needle in original
+    scoring.write_text(original.replace(needle,"p=load_model(ROOT/item['path']);f=features(df,p.cfg['features']).loc[df.index];mask=hist.copy()"))
     for filename in ['.gitignore','requirements_v2.txt','REFERENCES.md','CONTRIBUTIONS.md','PROTOCOL_EXECUTION_NOTES.md']:
         shutil.copy2(ROOT/filename,dest/filename)
     for folder in ['configs','results','reports','artifacts/audit','artifacts/logs','artifacts/models','artifacts/predictions','artifacts/cache']:(dest/folder).mkdir(parents=True,exist_ok=True)

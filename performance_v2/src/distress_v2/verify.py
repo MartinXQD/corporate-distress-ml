@@ -38,7 +38,7 @@ def verify():
         window=windows[event.get('window','original')]
         assert dt.datetime.fromisoformat(window['started_at_utc'])<=dt.datetime.fromisoformat(event['at_utc'])<=dt.datetime.fromisoformat(window['deadline_utc']),'A recorded fit started outside its authorized window'
     df=load('historical');hist=df[df.year>=2015];table=pd.read_csv(RESULT/'historical_2015_2018.csv',float_precision='round_trip').set_index('name');checked=[];families={}
-    populations=json.loads((ART/'audit/final_training_company_sets.json').read_text())['populations'];population_checks=0
+    populations=json.loads((ART/'audit/final_training_company_sets.json').read_text())['populations'];population_checks=0;all_pipeline_reloads=[]
     for item in frozen['models']:
         metadata=json.loads((ROOT/item['path']).with_suffix('.json').read_text())
         if item['channel']=='P2':
@@ -55,6 +55,12 @@ def verify():
         assert np.array_equal(sub.y.to_numpy(),d.y_true.to_numpy())
         assert np.array_equal(sub.company_name.to_numpy(),d.company_id.to_numpy())
         assert np.array_equal(sub.year.to_numpy(),d.year.to_numpy())
+        pipeline=load_model(ROOT/item['path'])
+        source_rows=df.set_index('row_id',drop=False).loc[d.row_id]
+        matrix=features(df,pipeline.cfg['features']).loc[source_rows.index]
+        actual=pipeline.predict(matrix)
+        np.testing.assert_allclose(actual,d.raw_score,atol=1e-6,rtol=1e-6)
+        all_pipeline_reloads.append(dict(model=item['name'],rows=len(actual),maximum_error=float(np.max(abs(actual-d.raw_score.to_numpy())))))
         m=independent(sub,d.score.to_numpy())
         for k,v in m.items():assert np.isclose(v,table.loc[item['name'],k],atol=1e-9,rtol=1e-7,equal_nan=True),(item['name'],k)
         checked.append(item['name'])
@@ -78,6 +84,16 @@ def verify():
         d=pd.read_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',float_precision='round_trip')
         np.testing.assert_allclose(q,d.raw_score.to_numpy(),atol=1e-6,rtol=1e-6)
         selected.append(dict(model=item['name'],neural=neural,max_reload_error=float(np.max(abs(q-d.raw_score.to_numpy())))))
+    archive_reloads=[]
+    for item in frozen['models']:
+        if item['channel']!='V0_archive_role':continue
+        p=load_model(ROOT/item['path'])
+        matrix=features(df,p.cfg['features']).loc[hist.index]
+        q=p.predict(matrix)
+        d=pd.read_csv(ART/f'predictions/{item["name"]}_historical.csv.gz',float_precision='round_trip')
+        np.testing.assert_array_equal(hist.row_id,d.row_id)
+        np.testing.assert_allclose(q,d.raw_score,atol=1e-6,rtol=1e-6)
+        archive_reloads.append(dict(model=item['name'],source_order_verified=True,max_reload_error=float(np.max(abs(q-d.raw_score.to_numpy())))))
     development_checks=verify_development(df)
     confirmation_checks=0
     for row in pd.read_csv(RESULT/'confirmation_2014.csv').itertuples():
@@ -92,6 +108,9 @@ def verify():
     uncertainty(df,hist,table)
     result['confirmation_prediction_sets_verified']=confirmation_checks
     result['final_training_population_models_verified']=population_checks
+    result['archive_pipeline_row_order_reloads']=archive_reloads
+    result['all_frozen_pipelines_reloaded_in_source_row_order']=len(all_pipeline_reloads)
+    dump(RESULT/'pipeline_row_alignment_reloads.json',dict(passed=True,models=all_pipeline_reloads,tolerance=1e-6,fit_calls_added=0))
     dump(RESULT/'verification.json',result)
     print(json.dumps(result,indent=2))
 

@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "checked_at_utc": "2026-10-17T19:29:14.891540+00:00",
+  "scope": "Six saved development prediction sets; seed42 screening only, no final performance claim",
+  "confirmation_unopened": true,
+  "historical_unopened": true,
+  "records": [
+    {
+      "candidate": "xgboost_018_1ff25fdd",
+      "macro_AP": 0.43925533181374243,
+      "years": [
+        {
+          "year": 2009,
+          "AP": 0.38529687825010145,
+          "ROC_AUC": 0.8608937213952887,
+          "recall5": 0.3333333333333333
+        },
+        {
+          "year": 2011,
+          "AP": 0.4402541042829546,
+          "ROC_AUC": 0.8710967469396756,
+          "recall5": 0.422680412371134
+        },
+        {
+          "year": 2013,
+          "AP": 0.49221501290817116,
+          "ROC_AUC": 0.8975952225786595,
+          "recall5": 0.47904191616766467
+        }
+      ]
+    },
+    {
+      "candidate": "baseline_v1_selected_rf",
+      "macro_AP": 0.4181402504516607,
+      "years": [
+        {
+          "year": 2009,
+          "AP": 0.36632727983531704,
+          "ROC_AUC": 0.855496123521202,
+          "recall5": 0.3247863247863248
+        },
+        {
+          "year": 2011,
+          "AP": 0.4243076814046258,
+          "ROC_AUC": 0.8633950730408799,
+          "recall5": 0.3917525773195876
+        },
+        {
+          "year": 2013,
+          "AP": 0.46378579011503934,
+          "ROC_AUC": 0.8943421568078795,
+          "recall5": 0.47305389221556887
+        }
+      ]
+    }
+  ]
+}

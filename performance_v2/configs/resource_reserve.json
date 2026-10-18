@@ -1,5 +1,5 @@
 {
   "search_soft_stop_hours": 4.8,
   "registered_search_maximum": 5.9,
-  "reason": "Reserve measured full-fold three-seed stability, five-seed final baselines, company stress, verification and reports inside the eight-hour wall clock. May end earlier only when all search targets complete."
+  "reason": "Reserve measured full-fold three-seed stability, five-seed final baselines, company stress, verification and reports inside the active eight-hour window. May end earlier when all targets complete or the best complete tree/neural pair needs the remaining training reserve."
 }

@@ -1,0 +1,9 @@
+candidate,channel,fit_cutoff,start_year,natural_rows,companies,positive_companies,identity
+refine_r3_15_a028aa7a,P2,2014,1999,66400,8503,604,Registered natural final fitting population; completion verified separately
+refine_r3_21_bbf84fb1,P2,2014,1999,66400,8503,604,Registered natural final fitting population; completion verified separately
+baseline_legacy_strong_inner_l1,P2,2014,1999,66400,8503,604,Registered natural final fitting population; completion verified separately
+baseline_v1_lags_xgb,P2,2014,1999,66400,8503,604,Registered natural final fitting population; completion verified separately
+baseline_v1_raw_catboost,P2,2014,1999,66400,8503,604,Registered natural final fitting population; completion verified separately
+baseline_v1_selected_rf,P2,2014,1999,66400,8503,604,Registered natural final fitting population; completion verified separately
+baseline_v1_selected_dl_corrected_steps,P2,2014,1999,66400,8503,604,Registered natural final fitting population; completion verified separately
+baseline_logistic,P2,2014,1999,66400,8503,604,Registered natural final fitting population; completion verified separately

@@ -3,5 +3,6 @@
   "deadline_hours": 5.75,
   "full_mlp_pair": "Original queued RAW17/std01 PLE configuration; same 200-epoch ceiling as the no-embedding control",
   "tabm_pair": "Same RAW17/std01, width128/depth2/k16, 20-epoch ceiling for both no-embedding and PLE; limited-budget mechanism control, not a full 200-epoch tuning claim",
-  "selection_information": "Only completed development years through2013; no confirmation/history"
+  "selection_information": "Only completed development years through2013; no confirmation/history",
+  "execution_qualification": "The proposed 20-epoch controls were not run in the expired original window. The continuation instead completed full 200-epoch-ceiling matched MLP/TabM trials; see trial_num_mlp_001_2e324aa9.json and trial_tabm_001_db7a6be5.json."
 }

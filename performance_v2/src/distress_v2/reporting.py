@@ -187,8 +187,8 @@ def page(title,*blocks):return dict(title=title,subtitle=None,blocks=list(blocks
 
 def pages(c,delta,budget,language):
     cn=language=='cn';v=verdict(c);selected=c['selected'];cohort=c['cohort']
-    overview=delta[delta.version.isin(['V0','V1','P2'])&~delta.recipe.isin(['V1 lag XGB','V1 Cat raw','P2 Cat raw','P2 Logistic'])].copy()
-    overview['input']=overview.input.replace({'INNER_L1/std01':'L1/01','V1_LAGS/v1':'Lag3/V1','V1_S1/v1':'S1/V1','fixed13/std01':'13/01','RAW18/std01':'18/01'})
+    overview=delta[delta.version.isin(['V0','V1','P2'])&~delta.recipe.isin(['V1 lag XGB','V1 Cat raw','P2 Logistic'])].copy()
+    overview['input']=overview.input.replace({'INNER_L1/std01':'L1/01','V1_LAGS/v1':'Lag3/V1','V1_S1/v1':'S1/V1','V1_S0/v1':'RAW/V1','fixed13/std01':'13/01','RAW18/std01':'18/01'})
     overview['input']=overview.input.str.replace('RATIO_CORE','Ratio',regex=False).str.replace('SLOG_RATIO','LogR',regex=False).str.replace('LAGS_RAW3','Lag3',regex=False).str.replace('LAGS_SLOG3','Log3',regex=False).str.replace('DYNAMIC_COMPACT','Dyn',regex=False).str.replace('quantile','QT',regex=False).str.replace('std005','005',regex=False).str.replace('std01','01',regex=False)
     overview['selected']=overview.selected.replace({'Yes':'Y','No':'N','Fixed':'Pre'});overview['minutes']=overview.seconds/60;overview['identity']=overview.identity.replace({'Archive only':'Archive','Saved V1':'V1','New seed mean':'Mean score','Frozen blend':'Rank blend'})
     columns=['recipe','fit_cutoff','input','selected','seeds','annual_AP','pooled_AP','ROC','R5','minutes','identity']
@@ -312,6 +312,8 @@ The final preservation check confirmed {preservation['protected_files_unchanged'
 
 开发期 overall={selected['overall']}，DL={selected['DL']}。先按五年×三seed选定，再打开2014确认与已暴露历史期。没有事后把历史最高行补成winner。
 
+DL代表的历史年度AP为{c['main'].loc['P2_seed_mean__'+selected['DL']].macro_AP:.3f}，高于冻结融合的{v['main'].macro_AP:.3f}；因此不能说集成在历史期提高了最佳NN的AP。旧固定13列按原角色真实重训的pooled AP为{c['main'].loc['V0_legacy_fixed13_retrained'].AP:.3f}，没有精确重现旧档案0.295。原包epoch31 checkpoint复算为{c['main'].loc['V0_included_base_checkpoint_epoch31'].AP:.3f}，不能冒充epoch23档案。
+
 ## 旧版为什么可能更好？
 
 配置确实不同：旧网络192×4约30万参数，V1选定网络64×2、36,801参数；输入、截尾、权重、采样、停止与重拟合角色也变了。旧AP实现与sklearn对真实分数和ties样例一致。不能仅凭小网络、epoch少或某个历史分数下降就诊断欠拟合。桥接实验固定2012和seed42逐项对照，其结果只支持该环境；全流程改动不能当单项因果效应。
@@ -323,6 +325,8 @@ The final preservation check confirmed {preservation['protected_files_unchanged'
 ## 哪些改动有新证据？
 
 成对数值embedding结果见 numeric_matched_controls.csv；不同输入的桥接见 feature_preprocess_ablation.csv；相同树参数的三年输入对照见 matched_input_controls.csv；预算见 training_budget_ablation.csv。最终选定配方与一次2014确认写在两份PDF。只对已完成成对控制讨论机制；随机搜索不同参数的两行只能比较整条配方。
+
+实际单因素证据：三年开发、seed42下，XGBoost增加3年半衰期权重后年度AP由0.458到0.548，MLP由0.382到0.493；评分群体和自然类别比例均未改变。这支持时间权重在当前开发环境有用，不能单独证明未来宏观漂移机制。相同树配方下，RAW17/精简比率/三年历史分别为0.400/0.322/0.392，不能声称增加比率或历史必有增益。RAW17的MLP加入PLE反而由0.382到0.357；TabM有真实官方模块和6个完成配置，但没有成为入围者，不能拿架构新颖代替成绩。
 
 ## 为什么主指标用年度AP？
 
@@ -348,8 +352,8 @@ Author: Qidian (Martin) Xing. Use only after personally reviewing and understand
 
 ## English
 
-- Benchmarked {summary['unique_effective_screen_recipes']} financial-distress configurations with temporal folds and five-seed checks; a development-selected recipe achieved {m.macro_AP:.3f} historical annual AP against {ref.macro_AP:.3f} for the strongest same-cutoff baseline on previously inspected data.
-- Compared legacy residual networks, tuned tree models and numerical representations through a Codex-assisted local workflow, auditing sampling updates, company generalization and paired uncertainty while preserving original team results and source attribution.
+- Benchmarked {summary['unique_effective_screen_recipes']} financial-distress recipes with temporal validation and five-seed checks; the frozen blend reached {m.macro_AP:.3f} historical annual AP versus {ref.macro_AP:.3f} for the strongest same-cutoff baseline.
+- Compared legacy neural networks, tuned boosting and TabM through a Codex-assisted local study, checking sampling updates, company generalization and paired uncertainty while preserving team attribution.
 
 ## 中文
 
@@ -392,6 +396,13 @@ def report():
             evidence=f"In the fixed 2012 control, reducing RAW18 capacity from 192 x 4 to 64 x 2 changes AP from {control['bridge_legacy192_raw18']:.3f} to {control['bridge_legacy64_raw18']:.3f}; this does not support bigger-is-always-better. Removing only the duplicate raw column gives {control['bridge_legacy192_raw17']:.3f}; removing full class weighting gives {control['bridge_legacy192_unweighted']:.3f}. These are local mechanism sensitivities, not a causal decomposition of the historical version gap."
             population=f"The common pre-2015 population leaves {int(novelty.companies)} naturally unseen companies, including {int(novelty.positive_companies)} failed firms. Actual rolling-window fitting sets were registered separately before final fitting. The table reports mean/range of pooled AP over three company groups, not confidence intervals; hyperparameters were selected on broader companies."
         document[1]['blocks'].append(block(evidence))
+        archive=c['main'].loc['V0_legacy_fixed13_retrained'];included=c['main'].loc['V0_included_base_checkpoint_epoch31']
+        archive_text=(f'旧角色实跑：固定13列原训练循环重训的 pooled AP={archive.AP:.3f}；原包epoch31 checkpoint重载为{included.AP:.3f}。前者未复现档案0.295，后者不是档案epoch23。已纠正这两条档案复算的缓存行序错误，并对全部47个冻结流水线逐行重载核验；没有新增训练或改变选择。' if language=='cn' else f'Actual archive-role results: original-loop fixed-13 retraining has pooled AP {archive.AP:.3f}; the included epoch31 checkpoint gives {included.AP:.3f}. The former does not reproduce archived 0.295; the latter is not the archived epoch23 artifact. An archive-cache row permutation was corrected for these two rows, then every frozen pipeline was reloaded in source-row order, without new fitting or selection changes.')
+        document[1]['blocks'].append(block(archive_text))
+        dl=c['main'].loc['P2_seed_mean__'+c['selected']['DL']]
+        if c['selected']['blend']['admitted']:
+            blend=c['main'].loc['P2_fixed_rank_blend']
+            document[5]['blocks'].append(block((f'历史期DL代表年度AP={dl.macro_AP:.3f}，高于开发期冻结融合的{blend.macro_AP:.3f}；融合未在该期改善DL的AP。保留预先选择，不按历史最高行替换主结果。' if language=='cn' else f'The DL representative has historical annual AP {dl.macro_AP:.3f}, above the development-frozen blend at {blend.macro_AP:.3f}. Fusion did not improve historical DL AP. The frozen choice is retained rather than replacing it with the highest historical row.')))
         for p in document:
             if p['title'].startswith('6.'):
                 p['blocks'].append(tab(stress_summary,['role','groups','AP_mean','AP_min','AP_max','recall5'],['Role','Groups','AP mean','Min','Max','R@5']))

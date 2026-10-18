@@ -1,0 +1,20 @@
+{
+  "batch_size": 512,
+  "depth": 2,
+  "dropout": 0.15,
+  "family": "mlp",
+  "features": "RAW17",
+  "learning_rate": 0.0005,
+  "max_epochs": 200,
+  "patience": 25,
+  "per_fit_seconds": 720,
+  "preprocess": "std01",
+  "refit_rule": "steps",
+  "sampling": "none",
+  "schedule": "fixed",
+  "seed": 42,
+  "threads": 4,
+  "weight_alpha": 0,
+  "weight_decay": 0.0002,
+  "width": 128
+}
