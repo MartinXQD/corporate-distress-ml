@@ -3,6 +3,8 @@ on: [push, pull_request]
 jobs:
   unit:
     runs-on: ubuntu-latest
+    env:
+      DISTRESS_PYTHON: python
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
