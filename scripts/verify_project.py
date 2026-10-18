@@ -10,6 +10,17 @@ import urllib.parse
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def exact_path_exists(path):
+    """Match path spelling even on case-insensitive macOS filesystems."""
+    relative = path.relative_to(ROOT)
+    parent = ROOT
+    for part in relative.parts:
+        if part not in {item.name for item in parent.iterdir()}:
+            return False
+        parent = parent / part
+    return parent.exists()
+
+
 def verify():
     checks = []
     def require(condition, description):
@@ -19,6 +30,7 @@ def verify():
 
     manifest = json.loads((ROOT / "docs/research_origin/aggregate_manifest.json").read_text())
     for item in manifest["files"]:
+        require(exact_path_exists(ROOT / item["path"]), "exact source path spelling: " + item["path"])
         require(hashlib.sha256((ROOT / item["path"]).read_bytes()).hexdigest() == item["sha256"],
                 "immutable source: " + item["path"])
     registration = json.loads((ROOT / "configs/protocol_registration.json").read_text())
@@ -58,7 +70,7 @@ def verify():
                 continue
             target = urllib.parse.unquote(target.split("#")[0].split("?")[0].strip("<>"))
             destination = (path.parent / target).resolve()
-            require(destination.is_relative_to(ROOT) and destination.exists(),
+            require(destination.is_relative_to(ROOT) and exact_path_exists(destination),
                     "local link: " + str(path.relative_to(ROOT)) + " -> " + target)
             links.append(str(path.relative_to(ROOT)) + ":" + target)
     notebooks = []
