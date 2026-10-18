@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "fresh_execution": true,
+  "private_artifacts_present": false,
+  "research_training_triggered": false,
+  "notebooks": [
+    {
+      "path": "notebooks/01_Data_and_Features.ipynb",
+      "code_cells": 4,
+      "sha256": "8c71ebd2483d02db8774fad5c9e9c84c4b17aec3d9dfb72671c737269a41723b"
+    },
+    {
+      "path": "notebooks/02_Model_Comparison.ipynb",
+      "code_cells": 5,
+      "sha256": "241bbec0293f55992c112bfe26ff694126c97fe643cfd2bbee15a9602846d16d"
+    }
+  ]
+}

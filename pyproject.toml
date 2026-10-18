@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "corporate-distress-ml"
-version = "1.0.0"
-description = "Independent retrospective failed-company classification benchmark"
+version = "1.1.0"
+description = "Corporate financial distress classification with temporal validation and rank blending"
 requires-python = ">=3.11"
 authors = [{name = "Qidian (Martin) Xing"}]
 dependencies = ["numpy", "pandas", "scikit-learn", "torch", "xgboost", "imbalanced-learn", "PyYAML", "joblib", "matplotlib"]
 
 [project.scripts]
-distress-ml = "distress_ml.cli:main"
+distress-ml = "distress_v2.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

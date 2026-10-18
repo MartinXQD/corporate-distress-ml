@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[2] / "docs/research_origin/initial_extension"
 PUBLIC = ROOT / "results/public"
 ART = ROOT / "artifacts"
 

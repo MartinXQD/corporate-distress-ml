@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "checks": 1631,
+  "immutable_source_files": 242,
+  "local_markdown_links": 195,
+  "executed_notebooks": [
+    "01_Data_and_Features.ipynb",
+    "02_Model_Comparison.ipynb"
+  ],
+  "private_model_reloads_performed": false,
+  "research_fits_added": 0,
+  "metrics": {
+    "mean_annual_AP": 0.37332002115945184,
+    "baseline_mean_annual_AP": 0.30283465614692073,
+    "AP_difference": 0.07048536501253111,
+    "pooled_ROC_AUC": 0.9216019160132053,
+    "mean_annual_recall_top5": 0.6198241281865251
+  }
+}

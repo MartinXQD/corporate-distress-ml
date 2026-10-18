@@ -10,7 +10,9 @@ __pycache__/
 *.pt
 *.pkl
 *.joblib
-reports/Resume_Bullets_EN_CN.md
-reports/Local_Case_Walkthrough_EN_CN.md
+*.csv.gz
+EXECUTION_STATE.json
 RUN_STATUS.json
 NEXT_ACTIONS.md
+reports/Resume_Bullets*
+*private*/

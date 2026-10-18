@@ -1,0 +1,1215 @@
+{
+  "source_commit": "75baf24e2b0388cd6b201ddbb9b6006683e6b6e7",
+  "files": [
+    {
+      "path": "configs/artifact_freeze.json",
+      "source_path": "performance_v2/configs/artifact_freeze.json",
+      "sha256": "0c85ff54affdfbb8b8b51be97add5554fa8332faecef6420f39a7e783ee68419"
+    },
+    {
+      "path": "configs/boosting_tail_budget.json",
+      "source_path": "performance_v2/configs/boosting_tail_budget.json",
+      "sha256": "49db17dfa80e7c54c266e30a2c488442485b40f754369fb3c66c8b521476f238"
+    },
+    {
+      "path": "configs/continuation_dispatch_policy.json",
+      "source_path": "performance_v2/configs/continuation_dispatch_policy.json",
+      "sha256": "053cd8f1663c8116f6cb8a0baca71bd01abf3a8d190be75e7214d9681eda6efc"
+    },
+    {
+      "path": "configs/continuation_window_02.json",
+      "source_path": "performance_v2/configs/continuation_window_02.json",
+      "sha256": "c49b3f0f288f57ceb86e3d459003254597920c14c3d1c6bc5830f1b99d389c4d"
+    },
+    {
+      "path": "configs/device_profile.json",
+      "source_path": "performance_v2/configs/device_profile.json",
+      "sha256": "a11a2337b9e793eae16664594152c545dcbc1ef4048f979078b18dd0ef5e4608"
+    },
+    {
+      "path": "configs/final_inventory.json",
+      "source_path": "performance_v2/configs/final_inventory.json",
+      "sha256": "c164eb93c0a236883be19f68627904751af9d724d0fd6d00d3ad8742329a9ee7"
+    },
+    {
+      "path": "configs/functional_duplicate_controls.json",
+      "source_path": "performance_v2/configs/functional_duplicate_controls.json",
+      "sha256": "ede235d2268a089dabe026e73f795f4375d14c862b04da612433868c5c2a16ce"
+    },
+    {
+      "path": "configs/hardware.json",
+      "source_path": "performance_v2/configs/hardware.json",
+      "sha256": "96be96fbac76ca856ea1be20446a6f5b1fa73fffcdcca3e56a49f7afe826a388"
+    },
+    {
+      "path": "configs/local_refinement_plan.json",
+      "source_path": "performance_v2/configs/local_refinement_plan.json",
+      "sha256": "11ee154ac7a7540c123e0717c9504659ea0e2fb7e3615123938abd52f25460b0"
+    },
+    {
+      "path": "configs/protocol_registration.json",
+      "source_path": "performance_v2/configs/protocol_registration.json",
+      "sha256": "6dd668b4d55138b94188e0193d5aacfbb7a0dbc49454614a6d64289b4fc2ac01"
+    },
+    {
+      "path": "configs/representation_completion_plan.json",
+      "source_path": "performance_v2/configs/representation_completion_plan.json",
+      "sha256": "cbc2d5595cf51e05d838df072988bb3bbd53d5dd1f3691a717fe81a31f97492d"
+    },
+    {
+      "path": "configs/representation_matched_controls.json",
+      "source_path": "performance_v2/configs/representation_matched_controls.json",
+      "sha256": "d043b95bc17da5f25dd1fc4fafe34383519c32f526c17327f5056a7543a14154"
+    },
+    {
+      "path": "configs/resource_feasibility_before_shortlist.json",
+      "source_path": "performance_v2/configs/resource_feasibility_before_shortlist.json",
+      "sha256": "83445abbe2f18dbfb5a03c1331655bb025005b7be710ae9c6d2b53867ec379fe"
+    },
+    {
+      "path": "configs/resource_reserve.json",
+      "source_path": "performance_v2/configs/resource_reserve.json",
+      "sha256": "d27c3430ee42776197637c71179b173dbaa130e134fa3b50366665aabee4e2cb"
+    },
+    {
+      "path": "configs/runtime_versions.json",
+      "source_path": "performance_v2/configs/runtime_versions.json",
+      "sha256": "998d9eb47edf12381717a81698aed7a6aa93c7dd39ca4bf0e1111fe12e2fa8ca"
+    },
+    {
+      "path": "configs/search_promotion_reserve.json",
+      "source_path": "performance_v2/configs/search_promotion_reserve.json",
+      "sha256": "2163214301f93fa36aac7ffa705f2bd5e4f132ae81b50aa0c5f2f4cbbbc8608a"
+    },
+    {
+      "path": "configs/search_schedule_revision.json",
+      "source_path": "performance_v2/configs/search_schedule_revision.json",
+      "sha256": "56e9ecbdc883ac1de6ef1c17c46c56f31cb0e7cf8d14f4952c9df58a7e7b0cde"
+    },
+    {
+      "path": "configs/selection_freeze.json",
+      "source_path": "performance_v2/configs/selection_freeze.json",
+      "sha256": "9fe7323afe01bcd99730b8af34a4b4fdc2c75a240eddfd51b46722afc39dda18"
+    },
+    {
+      "path": "configs/shortlist.json",
+      "source_path": "performance_v2/configs/shortlist.json",
+      "sha256": "a844461eec8495a3c3ee846d35ba742018c283e5d8d4407c1962810d1240aa3b"
+    },
+    {
+      "path": "configs/trial_baseline_legacy_strong_inner_l1.json",
+      "source_path": "performance_v2/configs/trial_baseline_legacy_strong_inner_l1.json",
+      "sha256": "ee2ea00758b86c66c69a73ab67e7cfaa842f3ef6e48938e6dc97741bc5f47ea4"
+    },
+    {
+      "path": "configs/trial_baseline_logistic.json",
+      "source_path": "performance_v2/configs/trial_baseline_logistic.json",
+      "sha256": "9a31590640f11646719415c2b69b0d9267c2d111c362d79c27b9340bd8f5ce77"
+    },
+    {
+      "path": "configs/trial_baseline_v1_lags_xgb.json",
+      "source_path": "performance_v2/configs/trial_baseline_v1_lags_xgb.json",
+      "sha256": "c1c9340e105392a2f4645dfcb5998465a9b8c86d5dec1a9636557a131082a7aa"
+    },
+    {
+      "path": "configs/trial_baseline_v1_raw_catboost.json",
+      "source_path": "performance_v2/configs/trial_baseline_v1_raw_catboost.json",
+      "sha256": "6197cb78ec8e0d896a82fa5032dac2c2d137f585549e915b16586795de126c5c"
+    },
+    {
+      "path": "configs/trial_baseline_v1_selected_dl.json",
+      "source_path": "performance_v2/configs/trial_baseline_v1_selected_dl.json",
+      "sha256": "03f558ebbd59148cacbb65bdbbfb7fd1e0fdd15596e7b1d9559e92ca4a77cd70"
+    },
+    {
+      "path": "configs/trial_baseline_v1_selected_dl_corrected_steps.json",
+      "source_path": "performance_v2/configs/trial_baseline_v1_selected_dl_corrected_steps.json",
+      "sha256": "69a7e0d98011084aa711d68154b1b4faa9302ef48ff24baff204721718c9c3ec"
+    },
+    {
+      "path": "configs/trial_baseline_v1_selected_rf.json",
+      "source_path": "performance_v2/configs/trial_baseline_v1_selected_rf.json",
+      "sha256": "8d32cfe874fec4ea695a51ccdd7881eb372ea7881216f47dcf65b53c31491185"
+    },
+    {
+      "path": "configs/trial_bridge_equal2000_none.json",
+      "source_path": "performance_v2/configs/trial_bridge_equal2000_none.json",
+      "sha256": "8b4bdbdeb5cbc21e90c77f70c60a5273c67a321406c5fce682fce583bb3aca9e"
+    },
+    {
+      "path": "configs/trial_bridge_equal2000_ros.json",
+      "source_path": "performance_v2/configs/trial_bridge_equal2000_ros.json",
+      "sha256": "fe1fe14b42983acb0cf40ff37948fa6a4a9fd3384ee7cc850dbdbf3cdbceccb4"
+    },
+    {
+      "path": "configs/trial_bridge_equal2000_smote.json",
+      "source_path": "performance_v2/configs/trial_bridge_equal2000_smote.json",
+      "sha256": "d3bf01f5fdebe25cd34aa6a960bad75af960810b591ad5a62b51da17ba8bc6a1"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_clip005.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_clip005.json",
+      "sha256": "2b513889de94bece99741a6cdb46ec622ca6c614612c8bb3cfbd9a7d7cc00cb9"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_epochrefit.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_epochrefit.json",
+      "sha256": "0ebc88a53e8f0883ffa930a6089da33a3e4fc1ba32e81ac15d7fa013fa5b912a"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_inner_l1.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_inner_l1.json",
+      "sha256": "419688ad8008ec7def567fc17bca6938b78f010f961583b2d563ffcd5bc2f6f6"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_keepbest.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_keepbest.json",
+      "sha256": "2ec2aa4f9a430b5e682f7bbf086278ff14bbd20304940fec2ecc04cafb548dfc"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_quantile.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_quantile.json",
+      "sha256": "c56cb738193465fdd8beff01918fd811ba2a51f2ebbfb037db7ea16616ba9f5b"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_raw17.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_raw17.json",
+      "sha256": "74ccf17d12be842591e69ff6c6c2728c3dc5a9708a0c1cc7df4aa8182a40ad17"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_raw18.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_raw18.json",
+      "sha256": "18db94fbd545d74d82ab2e7fd9be424982ae64d0b15fe205f9cd62239cb22b3f"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_ros_epochs.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_ros_epochs.json",
+      "sha256": "48de96270f46e5daa3fb3a7ef6f5e7f85e4d1bc6a90ce028615f2c47ba2e4298"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_ros_steps.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_ros_steps.json",
+      "sha256": "fef6937a0283f88ebb2f756f574ef9c67436f7fee45c21b055e3d027878e3e18"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_s1.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_s1.json",
+      "sha256": "afe5b3607bd3acb3b29e43e908ee25837a26ce1b64fdb7af8631faa4f6ae49d1"
+    },
+    {
+      "path": "configs/trial_bridge_legacy192_unweighted.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy192_unweighted.json",
+      "sha256": "2c2872a7234a1eb19ae2d7fc2b7aef97426ca00dc93da3e016397efa47fa2e0b"
+    },
+    {
+      "path": "configs/trial_bridge_legacy64_raw18.json",
+      "source_path": "performance_v2/configs/trial_bridge_legacy64_raw18.json",
+      "sha256": "b6c29a606f7655d60893af584e0666fb521201c3bcd471f83a998bcc2a08cee1"
+    },
+    {
+      "path": "configs/trial_bridge_xgb_LAGS_RAW3.json",
+      "source_path": "performance_v2/configs/trial_bridge_xgb_LAGS_RAW3.json",
+      "sha256": "8c6c6407280f418c06e6e22183a9c8fd4b9b146f982145f8c75f99b3b61c19ed"
+    },
+    {
+      "path": "configs/trial_bridge_xgb_RATIO_CORE.json",
+      "source_path": "performance_v2/configs/trial_bridge_xgb_RATIO_CORE.json",
+      "sha256": "ae56c1ecf641eec6142cf7f75527d8283dd78a96ab345b7fd83a9fdfb52a3a03"
+    },
+    {
+      "path": "configs/trial_bridge_xgb_RAW17.json",
+      "source_path": "performance_v2/configs/trial_bridge_xgb_RAW17.json",
+      "sha256": "3a11943bce34a18c0156538598f09b2c5277b6ff75588abd0eeb660715d19cc1"
+    },
+    {
+      "path": "configs/trial_bridge_xgb_raw_keepbest.json",
+      "source_path": "performance_v2/configs/trial_bridge_xgb_raw_keepbest.json",
+      "sha256": "085287a2596f4cec1e1e18e8376a48f2e7adfdda3a2c3fe8582390ac7a1e445a"
+    },
+    {
+      "path": "configs/trial_catboost_000_3f07afd8.json",
+      "source_path": "performance_v2/configs/trial_catboost_000_3f07afd8.json",
+      "sha256": "edb4bf244588e98dd482c5971a456ba756af0d235f72db4f515855139a85a570"
+    },
+    {
+      "path": "configs/trial_catboost_001_de32d0c1.json",
+      "source_path": "performance_v2/configs/trial_catboost_001_de32d0c1.json",
+      "sha256": "2fbc609ee70b8dfb22ab257396d4289b29c789bcb156d5ad77e8379720298ebe"
+    },
+    {
+      "path": "configs/trial_catboost_002_3c39e519.json",
+      "source_path": "performance_v2/configs/trial_catboost_002_3c39e519.json",
+      "sha256": "8b1054bcc575814f4828f520ffb800b04e2ed0f073b3ffa7b46987377d29f354"
+    },
+    {
+      "path": "configs/trial_catboost_003_b3969c92.json",
+      "source_path": "performance_v2/configs/trial_catboost_003_b3969c92.json",
+      "sha256": "e7ab5264863f4bf61f48e9fb51a54ac39663d847f6d0345d26be88c4008442b4"
+    },
+    {
+      "path": "configs/trial_catboost_004_0285ab76.json",
+      "source_path": "performance_v2/configs/trial_catboost_004_0285ab76.json",
+      "sha256": "857d2548dc6ec61920216982cd0e6f79470c39b83be23fd5eff1234bc50e7fd6"
+    },
+    {
+      "path": "configs/trial_catboost_005_0c27b7e3.json",
+      "source_path": "performance_v2/configs/trial_catboost_005_0c27b7e3.json",
+      "sha256": "08a1a6b2020afa89523470d940eed1c250c577b6cc20716327eccb7488d71f61"
+    },
+    {
+      "path": "configs/trial_catboost_006_4487ae53.json",
+      "source_path": "performance_v2/configs/trial_catboost_006_4487ae53.json",
+      "sha256": "986e37d22d394bf788a1a1561b316ad13ff2a193017ce5cb7041916754fb9d72"
+    },
+    {
+      "path": "configs/trial_catboost_007_d919c0d1.json",
+      "source_path": "performance_v2/configs/trial_catboost_007_d919c0d1.json",
+      "sha256": "4fcbe8fc796965fb5f7f22d07b41621e06f34c1a7e590b1f6799e29dc52c175a"
+    },
+    {
+      "path": "configs/trial_catboost_008_e86d6eb5.json",
+      "source_path": "performance_v2/configs/trial_catboost_008_e86d6eb5.json",
+      "sha256": "d4d5dbf686428fdf25088b57a8ce4a81f72e84149a6fbd5ce618911cd476f835"
+    },
+    {
+      "path": "configs/trial_catboost_009_288843d5.json",
+      "source_path": "performance_v2/configs/trial_catboost_009_288843d5.json",
+      "sha256": "ee292213a4b0cb55a826f08517757953dd3437437c2dd9ab16518814557169d8"
+    },
+    {
+      "path": "configs/trial_catboost_010_2e53f36e.json",
+      "source_path": "performance_v2/configs/trial_catboost_010_2e53f36e.json",
+      "sha256": "e3354fbe4fddbcf92d24b655fcd91ccd0ebf3018b692a5dfe0c1f24417928128"
+    },
+    {
+      "path": "configs/trial_catboost_011_0d564829.json",
+      "source_path": "performance_v2/configs/trial_catboost_011_0d564829.json",
+      "sha256": "22e419d7b16facdddcc47bf9cf5b71b4609008456889ae262328fe23f8eb5084"
+    },
+    {
+      "path": "configs/trial_catboost_012_189548ba.json",
+      "source_path": "performance_v2/configs/trial_catboost_012_189548ba.json",
+      "sha256": "7d26769e588d0167ab8a4c9cd7eb88ff443c15744e5c4b963d30dcb0ddf98444"
+    },
+    {
+      "path": "configs/trial_catboost_013_1ce4443c.json",
+      "source_path": "performance_v2/configs/trial_catboost_013_1ce4443c.json",
+      "sha256": "e05a6b35a371ec2a2c815c79716b6ff5699e3e0913e7cd183df05695ec7aa843"
+    },
+    {
+      "path": "configs/trial_catboost_014_0a44c66f.json",
+      "source_path": "performance_v2/configs/trial_catboost_014_0a44c66f.json",
+      "sha256": "a458ee2dca19cde4519e1dcb363a2931904785cd576eee4456b822f5a112a8f0"
+    },
+    {
+      "path": "configs/trial_catboost_015_4a066b1a.json",
+      "source_path": "performance_v2/configs/trial_catboost_015_4a066b1a.json",
+      "sha256": "84ffbf19440bc687290c85b06c36264e8d8b3a087f1f42c581e596b0a2b463d7"
+    },
+    {
+      "path": "configs/trial_catboost_016_efd795d3.json",
+      "source_path": "performance_v2/configs/trial_catboost_016_efd795d3.json",
+      "sha256": "6be9a49721f44f9319a042f2183cb7f5d5a70d18b3f63c7acf02f8723ed296e0"
+    },
+    {
+      "path": "configs/trial_catboost_017_eddd3af1.json",
+      "source_path": "performance_v2/configs/trial_catboost_017_eddd3af1.json",
+      "sha256": "d2c99899fc5a189cf0177391e87e2792494d67d3956207ab07bf45b6f70591ba"
+    },
+    {
+      "path": "configs/trial_catboost_018_308c5e1b.json",
+      "source_path": "performance_v2/configs/trial_catboost_018_308c5e1b.json",
+      "sha256": "acd139d0d7431367928f8d8d6005a789d08c88cb1944c9640f49b16b51a4530e"
+    },
+    {
+      "path": "configs/trial_catboost_019_9a3d8fa7.json",
+      "source_path": "performance_v2/configs/trial_catboost_019_9a3d8fa7.json",
+      "sha256": "a0b1b509302e09031101d4fa5b452fda137732f8f8b22af8f48f9062950c9712"
+    },
+    {
+      "path": "configs/trial_catboost_020_6fea3939.json",
+      "source_path": "performance_v2/configs/trial_catboost_020_6fea3939.json",
+      "sha256": "ea522ad262f2fad921ba1e5e7465365cef43283a1ebad7bf3f52ee9feb15a8bb"
+    },
+    {
+      "path": "configs/trial_catboost_021_4cbc3a4e.json",
+      "source_path": "performance_v2/configs/trial_catboost_021_4cbc3a4e.json",
+      "sha256": "8e83f03b0feb6db9ed5e2833fc3a055b379c3d6246305e1008afbf97f7750807"
+    },
+    {
+      "path": "configs/trial_catboost_022_bd0f1288.json",
+      "source_path": "performance_v2/configs/trial_catboost_022_bd0f1288.json",
+      "sha256": "fa2a2be350ce25284c3193494a9aaa3c919667e6eeacbc6f982b46d5779350fc"
+    },
+    {
+      "path": "configs/trial_catboost_023_32e44755.json",
+      "source_path": "performance_v2/configs/trial_catboost_023_32e44755.json",
+      "sha256": "7e8dec3d5d9d872307b6e0b46f73189aa4c3fe45368ac3ce99ec3f4f42fd6b6d"
+    },
+    {
+      "path": "configs/trial_catboost_024_fd743c83.json",
+      "source_path": "performance_v2/configs/trial_catboost_024_fd743c83.json",
+      "sha256": "7d9a8fe0773dc72117e1271970b9173ef89eafe197692466f858a9954cd1b2ee"
+    },
+    {
+      "path": "configs/trial_catboost_025_748399a2.json",
+      "source_path": "performance_v2/configs/trial_catboost_025_748399a2.json",
+      "sha256": "e2a7d92ee3190fa1e1e62b563dd429a17607ab4dcccc71e74ad1f05485f0814d"
+    },
+    {
+      "path": "configs/trial_catboost_026_c6f8c97e.json",
+      "source_path": "performance_v2/configs/trial_catboost_026_c6f8c97e.json",
+      "sha256": "c0f5104af8358528ec4e50bfc4d942e6aa97f6318302344c61897c583d9397a7"
+    },
+    {
+      "path": "configs/trial_catboost_027_aa21aaae.json",
+      "source_path": "performance_v2/configs/trial_catboost_027_aa21aaae.json",
+      "sha256": "5dfca407366ae366133eb5098d5ffeae2a053f211b172f3d2a7194b84661fdc0"
+    },
+    {
+      "path": "configs/trial_catboost_028_4b4901a6.json",
+      "source_path": "performance_v2/configs/trial_catboost_028_4b4901a6.json",
+      "sha256": "5727d5816f9b45d2c22fee30c79f1b02609a314864ae5e0ebd9d322229b50025"
+    },
+    {
+      "path": "configs/trial_catboost_029_f510440a.json",
+      "source_path": "performance_v2/configs/trial_catboost_029_f510440a.json",
+      "sha256": "090220de63ee854b5458dee8b1d03b1e69b39638fcac8ba4091a7f901b5d5b7c"
+    },
+    {
+      "path": "configs/trial_catboost_030_41870e24.json",
+      "source_path": "performance_v2/configs/trial_catboost_030_41870e24.json",
+      "sha256": "0b3c9bf771bace4cb05bf964abc0d9a2a0049a47be85217ff597a01340f16c13"
+    },
+    {
+      "path": "configs/trial_catboost_031_22f78c71.json",
+      "source_path": "performance_v2/configs/trial_catboost_031_22f78c71.json",
+      "sha256": "c2b874277063dbf55a868d7349351df9e7ba0da9f84dfc689ce47967c98f5561"
+    },
+    {
+      "path": "configs/trial_catboost_032_51fa7beb.json",
+      "source_path": "performance_v2/configs/trial_catboost_032_51fa7beb.json",
+      "sha256": "e5c6c188b287a22d746e6bbce919bb9aa301cd42af3dd3698018d798cc07b2a9"
+    },
+    {
+      "path": "configs/trial_catboost_033_bcc76f9f.json",
+      "source_path": "performance_v2/configs/trial_catboost_033_bcc76f9f.json",
+      "sha256": "a159e9097791960c19285d1172fde8f78903a438d37ecf6d9a273817843ab0c2"
+    },
+    {
+      "path": "configs/trial_catboost_034_f343117f.json",
+      "source_path": "performance_v2/configs/trial_catboost_034_f343117f.json",
+      "sha256": "c246a8c11956ada6a5b773ec945974835779cef09dec1068036fb01da0628809"
+    },
+    {
+      "path": "configs/trial_catboost_035_add562f6.json",
+      "source_path": "performance_v2/configs/trial_catboost_035_add562f6.json",
+      "sha256": "0d29af45b1317fa31328d071f91c376987224868b8003c175029729ddf7fdb47"
+    },
+    {
+      "path": "configs/trial_extra_trees_000_1d9a2e48.json",
+      "source_path": "performance_v2/configs/trial_extra_trees_000_1d9a2e48.json",
+      "sha256": "180e6f9b801c456d4aa51ff9d22e69f049317ab41e8e3cf668cbb553cdf8dd51"
+    },
+    {
+      "path": "configs/trial_extra_trees_001_df69482f.json",
+      "source_path": "performance_v2/configs/trial_extra_trees_001_df69482f.json",
+      "sha256": "2676dcdd315a34bb3e0a4415cb613c6d451e5943117e5fc484ec62e0f3167173"
+    },
+    {
+      "path": "configs/trial_extra_trees_002_72a22eef.json",
+      "source_path": "performance_v2/configs/trial_extra_trees_002_72a22eef.json",
+      "sha256": "533b57b844696ac78c0588a4f2a02c6c05ced9361a8057a6b82bd19b435c5760"
+    },
+    {
+      "path": "configs/trial_extra_trees_003_48539e56.json",
+      "source_path": "performance_v2/configs/trial_extra_trees_003_48539e56.json",
+      "sha256": "df92571212122cea0a109fe3253ef8c68373eb744a3ede02c082678bc232566c"
+    },
+    {
+      "path": "configs/trial_extra_trees_004_1d2bd66a.json",
+      "source_path": "performance_v2/configs/trial_extra_trees_004_1d2bd66a.json",
+      "sha256": "fed7d9f4ec0f779d57b74eb074f55f456ce9ca8477487d9c04b54c5259a356aa"
+    },
+    {
+      "path": "configs/trial_extra_trees_005_381f3c5f.json",
+      "source_path": "performance_v2/configs/trial_extra_trees_005_381f3c5f.json",
+      "sha256": "6d9e7304fe8e1a3d01afae035f7ac63057a2bb0e15eba1488fac5aeebd4ed671"
+    },
+    {
+      "path": "configs/trial_legacy_residual_000_ed2c13d5.json",
+      "source_path": "performance_v2/configs/trial_legacy_residual_000_ed2c13d5.json",
+      "sha256": "9c1d642f40279dc9bc4fda92d22917f35fdd1cd83302f8c7a99fa2a879fce185"
+    },
+    {
+      "path": "configs/trial_legacy_residual_001_19f89f0c.json",
+      "source_path": "performance_v2/configs/trial_legacy_residual_001_19f89f0c.json",
+      "sha256": "d49e51dde266987deb8e52c378b8c3b35f53a8ac334a1ef05c3a2ccecc43b308"
+    },
+    {
+      "path": "configs/trial_legacy_residual_002_cc7f8bee.json",
+      "source_path": "performance_v2/configs/trial_legacy_residual_002_cc7f8bee.json",
+      "sha256": "64cffe63f81b597936e7803bb61d24a5893692c6d07d5b932263f1eabd824b38"
+    },
+    {
+      "path": "configs/trial_legacy_residual_003_7c6aba88.json",
+      "source_path": "performance_v2/configs/trial_legacy_residual_003_7c6aba88.json",
+      "sha256": "74939afeece9608f0733cfe603a692323a38dcc1b45c932dbf9d956e6bab6c41"
+    },
+    {
+      "path": "configs/trial_legacy_residual_004_b7ffc591.json",
+      "source_path": "performance_v2/configs/trial_legacy_residual_004_b7ffc591.json",
+      "sha256": "6c009791bb4a9e28c548c6c14fbaeadc70db4d496abee000bb274815d5606410"
+    },
+    {
+      "path": "configs/trial_legacy_residual_005_20356a29.json",
+      "source_path": "performance_v2/configs/trial_legacy_residual_005_20356a29.json",
+      "sha256": "def8f2c2bd912910840ecb0e511ceb47e7a1e013cdeb086e6860e8798255099d"
+    },
+    {
+      "path": "configs/trial_legacy_residual_006_ef6527bd.json",
+      "source_path": "performance_v2/configs/trial_legacy_residual_006_ef6527bd.json",
+      "sha256": "6ce1ab00caf1d06440533a870ec4a0c77e0c0c9af724ad3d3f165503285fdb1e"
+    },
+    {
+      "path": "configs/trial_mlp_000_d4daf458.json",
+      "source_path": "performance_v2/configs/trial_mlp_000_d4daf458.json",
+      "sha256": "933617066713efbd94f62a33c99b46b3681d8629c753d02be1f8ab67651c0098"
+    },
+    {
+      "path": "configs/trial_mlp_001_123223a9.json",
+      "source_path": "performance_v2/configs/trial_mlp_001_123223a9.json",
+      "sha256": "3f7cb937b40b98c4f277c9d9cddbe6fd6b7b9e847c91d1df2829050cebdd48e5"
+    },
+    {
+      "path": "configs/trial_mlp_002_1e2a4889.json",
+      "source_path": "performance_v2/configs/trial_mlp_002_1e2a4889.json",
+      "sha256": "b7d88fceb4ff07884f99ba4cb19639b1f683b5d115a98a46eda522d130a751ff"
+    },
+    {
+      "path": "configs/trial_mlp_003_91660c59.json",
+      "source_path": "performance_v2/configs/trial_mlp_003_91660c59.json",
+      "sha256": "a9d1c83b5cd5683d2c2aa2c10085672ee698a17068bb2ef506629a379258e534"
+    },
+    {
+      "path": "configs/trial_mlp_004_67762d82.json",
+      "source_path": "performance_v2/configs/trial_mlp_004_67762d82.json",
+      "sha256": "fa1db59e18e489cc2154d16e8cac1165cd918f1c995902a9e908a62ed0e202ca"
+    },
+    {
+      "path": "configs/trial_mlp_005_f67bcbd0.json",
+      "source_path": "performance_v2/configs/trial_mlp_005_f67bcbd0.json",
+      "sha256": "13e26134904b8f3ad6330646214081fc6b3c4adf6b6e95d09f02d7514c41c22b"
+    },
+    {
+      "path": "configs/trial_num_mlp_000_ed456950.json",
+      "source_path": "performance_v2/configs/trial_num_mlp_000_ed456950.json",
+      "sha256": "beb002bf4a66308f878bd7749c617f5f0f293dd8325decd71b1a857943e8a802"
+    },
+    {
+      "path": "configs/trial_num_mlp_001_2e324aa9.json",
+      "source_path": "performance_v2/configs/trial_num_mlp_001_2e324aa9.json",
+      "sha256": "59980fb7657280c8653c5170c515d1cf4dd3394eaad693cb2c14ad3797d0ccdb"
+    },
+    {
+      "path": "configs/trial_num_mlp_002_e33add9b.json",
+      "source_path": "performance_v2/configs/trial_num_mlp_002_e33add9b.json",
+      "sha256": "aaea7a26e08b02f210f6542bca507094033195c0510ad64402e5e1f092ca8a23"
+    },
+    {
+      "path": "configs/trial_num_mlp_003_35291bb8.json",
+      "source_path": "performance_v2/configs/trial_num_mlp_003_35291bb8.json",
+      "sha256": "3598b64f94be1d7f75ef69edf010fd932f939b2556b8dd2872a7ddb6d70f31f1"
+    },
+    {
+      "path": "configs/trial_num_mlp_004_9a8ceae0.json",
+      "source_path": "performance_v2/configs/trial_num_mlp_004_9a8ceae0.json",
+      "sha256": "8b18c05a2d6582ffff41068b97e30a7bcb93830d1e5c1761a0ee6bd0ae604fa5"
+    },
+    {
+      "path": "configs/trial_num_mlp_005_b5b232c3.json",
+      "source_path": "performance_v2/configs/trial_num_mlp_005_b5b232c3.json",
+      "sha256": "6e42e997872ec4d26ba0ffbb394ab5a7fd3e06b0dbd12c07be97d4a78d76a450"
+    },
+    {
+      "path": "configs/trial_random_forest_000_5d83c7f8.json",
+      "source_path": "performance_v2/configs/trial_random_forest_000_5d83c7f8.json",
+      "sha256": "d7b0b8a26a33880a3ab2bfea8969926c444ede731236d499c7828798b93b4954"
+    },
+    {
+      "path": "configs/trial_random_forest_001_2b7e4332.json",
+      "source_path": "performance_v2/configs/trial_random_forest_001_2b7e4332.json",
+      "sha256": "5a580bbca17cd7a36efce664590b54ecf76f3f6eb4c98c1aa6764fc53caddb25"
+    },
+    {
+      "path": "configs/trial_random_forest_002_287082db.json",
+      "source_path": "performance_v2/configs/trial_random_forest_002_287082db.json",
+      "sha256": "06007b60a8804abcf252c1c4fc2b063ef552a6529bf9537e9972d4d6d5b893b8"
+    },
+    {
+      "path": "configs/trial_random_forest_003_ac15f9b6.json",
+      "source_path": "performance_v2/configs/trial_random_forest_003_ac15f9b6.json",
+      "sha256": "828c14042cee8b6570e56286b56a96df5612e486e35351aec3c156756d1aa34d"
+    },
+    {
+      "path": "configs/trial_random_forest_004_aee19105.json",
+      "source_path": "performance_v2/configs/trial_random_forest_004_aee19105.json",
+      "sha256": "fbc122b37cf1a77404e39b0f9221dfe772814d5be435ddb32bd078ed9d11a572"
+    },
+    {
+      "path": "configs/trial_random_forest_005_04e57600.json",
+      "source_path": "performance_v2/configs/trial_random_forest_005_04e57600.json",
+      "sha256": "4616f7781f15d1d20863764de4a2964437d6e8de5096a3e045b59966c0ff4c8a"
+    },
+    {
+      "path": "configs/trial_random_forest_007_6c9d9d15.json",
+      "source_path": "performance_v2/configs/trial_random_forest_007_6c9d9d15.json",
+      "sha256": "b8fe39e79bdc91f71865c7a4b3a75b4dd8538dd99e817aaaac5be2d753f08652"
+    },
+    {
+      "path": "configs/trial_refine_r1_00_0bf25fe5.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_00_0bf25fe5.json",
+      "sha256": "2a69725bdd6f87d99a101a44ee7e1f9c51ee6dd3f8eccb35545420a834a796c8"
+    },
+    {
+      "path": "configs/trial_refine_r1_00_11c21bbc.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_00_11c21bbc.json",
+      "sha256": "c7d85bf9c8e46bfa5bfdc7716d65327a780f3ff5ef40aacf59ac9f1fbf49b64c"
+    },
+    {
+      "path": "configs/trial_refine_r1_01_4ac2fa10.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_01_4ac2fa10.json",
+      "sha256": "2897c13be10e3ff33bd1c33e2f6dbf5d439f809323e5304f06cb02b3df01e7aa"
+    },
+    {
+      "path": "configs/trial_refine_r1_01_c474ef44.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_01_c474ef44.json",
+      "sha256": "e1b6399ea3d99c50ac618bd52d033d01f294469349325dc234fcfee5c0b4df4b"
+    },
+    {
+      "path": "configs/trial_refine_r1_02_8e8e1c65.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_02_8e8e1c65.json",
+      "sha256": "39236a02600a85eca276b39102d9f152e9f27d237e98fa5e741c31b55517874a"
+    },
+    {
+      "path": "configs/trial_refine_r1_02_d42024cf.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_02_d42024cf.json",
+      "sha256": "2699155192f8e732d26d1fa2affd7b66957ac4346351acb699ba5b190bf1b6b0"
+    },
+    {
+      "path": "configs/trial_refine_r1_03_6ef83d39.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_03_6ef83d39.json",
+      "sha256": "4a9c8c61372ffffe6dd1c3044736d7ee01c3565b7945ce5d417b99a35e5add47"
+    },
+    {
+      "path": "configs/trial_refine_r1_03_7327310b.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_03_7327310b.json",
+      "sha256": "1334e0f412557b63c26686f9bede37b8387d2237f7e3214210162028ea2d59da"
+    },
+    {
+      "path": "configs/trial_refine_r1_04_801186f9.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_04_801186f9.json",
+      "sha256": "6860545534f17fd82858a42aea98294416004512372da7699ac47a2f9f139a54"
+    },
+    {
+      "path": "configs/trial_refine_r1_05_99964ca5.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_05_99964ca5.json",
+      "sha256": "dd0aaf80a4418723a9a3b64983c40cd7144d9f0a85a9905eb883e39600e4b850"
+    },
+    {
+      "path": "configs/trial_refine_r1_06_411fe479.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_06_411fe479.json",
+      "sha256": "11cd0e40a5f355fc52181fc8fe69e63e949ed51cc15d1919ab3fb4a9c945ffa7"
+    },
+    {
+      "path": "configs/trial_refine_r1_07_3595ced2.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_07_3595ced2.json",
+      "sha256": "276f86c5a9620a882423796e22a64dd1276d8e18ada8c46340f45f43e9d9590e"
+    },
+    {
+      "path": "configs/trial_refine_r1_08_61556f29.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_08_61556f29.json",
+      "sha256": "b2265096953a615512b417dec1f1722dd0d3566446ba61be786ba5569cf8b516"
+    },
+    {
+      "path": "configs/trial_refine_r1_09_afb650de.json",
+      "source_path": "performance_v2/configs/trial_refine_r1_09_afb650de.json",
+      "sha256": "7ea03d1bdcceb78c71c8e638c01c987954ae0090c50b137ebfee69e2592725df"
+    },
+    {
+      "path": "configs/trial_refine_r2_10_dd8b4817.json",
+      "source_path": "performance_v2/configs/trial_refine_r2_10_dd8b4817.json",
+      "sha256": "f3c42a56bc106b6e799a531ee270b5fc31f05f464202eded587ac3aa4d34b420"
+    },
+    {
+      "path": "configs/trial_refine_r2_11_0a498b1e.json",
+      "source_path": "performance_v2/configs/trial_refine_r2_11_0a498b1e.json",
+      "sha256": "60d878d59b6f005bff738982bbf8db0ed504b56fada4f37f31ce42a4715559a5"
+    },
+    {
+      "path": "configs/trial_refine_r2_12_67034d77.json",
+      "source_path": "performance_v2/configs/trial_refine_r2_12_67034d77.json",
+      "sha256": "ea86aea6efbc77f3b8f61da0d422296d41a6a1fa758351c48eda9d56a972e5b5"
+    },
+    {
+      "path": "configs/trial_refine_r3_13_e44018a3.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_13_e44018a3.json",
+      "sha256": "a783f53d3b0db01726d00d98ccfb605b14e4e7fd724129405c9082a505dde7f4"
+    },
+    {
+      "path": "configs/trial_refine_r3_14_940cbdfc.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_14_940cbdfc.json",
+      "sha256": "a79a2fda82807376706bc5b4bff7b8556cc49fe70b6405502ee1d1fe2b10139e"
+    },
+    {
+      "path": "configs/trial_refine_r3_15_a028aa7a.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_15_a028aa7a.json",
+      "sha256": "c0a8454bf75fb8d049fc1f307aaf48a24de4a8268e201ddda1716ef293c133d8"
+    },
+    {
+      "path": "configs/trial_refine_r3_16_9309a25e.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_16_9309a25e.json",
+      "sha256": "0b95098278f0058d002668f7c6827be68f33a40f74de9fb93e3a051c6eea6aa6"
+    },
+    {
+      "path": "configs/trial_refine_r3_17_2777cc51.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_17_2777cc51.json",
+      "sha256": "eb3d7a79842dd541193dcbe64ac8ff2701a7d8c5603db8963c66eb651af420af"
+    },
+    {
+      "path": "configs/trial_refine_r3_18_119ab75b.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_18_119ab75b.json",
+      "sha256": "26527c3eb9b59c1d2f92b38555fb193d40445a08b9b073af0b0a0c4a47530526"
+    },
+    {
+      "path": "configs/trial_refine_r3_19_a9cf81da.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_19_a9cf81da.json",
+      "sha256": "d3b441c94a498e60984c8ca72f40e5e4bbdfe1e622dd4702dd2fff1b5e359c34"
+    },
+    {
+      "path": "configs/trial_refine_r3_20_5a53a97b.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_20_5a53a97b.json",
+      "sha256": "3f6c1d07aa10992ecc27ef2bc75ba8df42f66b645323a00150495d4648e1ae64"
+    },
+    {
+      "path": "configs/trial_refine_r3_21_bbf84fb1.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_21_bbf84fb1.json",
+      "sha256": "25020c8cca5b9747bc095784482bb362d06954fcbcd73333cb1c1965299c8780"
+    },
+    {
+      "path": "configs/trial_refine_r3_22_c5b19fbc.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_22_c5b19fbc.json",
+      "sha256": "dd3c7b12d8cd0a16044f22ce6a5e7d3e45c7ed805110fed5e1cc05cefe66ef0d"
+    },
+    {
+      "path": "configs/trial_refine_r3_23_900ac963.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_23_900ac963.json",
+      "sha256": "690bfeb5d39261172d30cd0e62ab7e3632ebd798c4718debbf737e8933864ac6"
+    },
+    {
+      "path": "configs/trial_refine_r3_24_db14c17c.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_24_db14c17c.json",
+      "sha256": "5d23d5460cfc599650567324e05973bea3ba9e71dd2f2298aa3afdfb3c2b2b02"
+    },
+    {
+      "path": "configs/trial_refine_r3_25_d8a6c4d7.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_25_d8a6c4d7.json",
+      "sha256": "d8829374f9aa6cdd4bb738ea725f2ccd1c4d1a39f0f21072fed928b59b7c4fe8"
+    },
+    {
+      "path": "configs/trial_refine_r3_26_c261a4b9.json",
+      "source_path": "performance_v2/configs/trial_refine_r3_26_c261a4b9.json",
+      "sha256": "5f46ec11408a0aafceeb605434d06efb86102f21174b31b59ef77f6e2b0ee168"
+    },
+    {
+      "path": "configs/trial_tabm_000_5c0bfd4d.json",
+      "source_path": "performance_v2/configs/trial_tabm_000_5c0bfd4d.json",
+      "sha256": "273c7bbc73aa2f9325a3f4ad689530f5f2ff51037852db7a63eeb0347945c878"
+    },
+    {
+      "path": "configs/trial_tabm_001_db7a6be5.json",
+      "source_path": "performance_v2/configs/trial_tabm_001_db7a6be5.json",
+      "sha256": "94e259457966af982697c1594d6893526245d6e2b30743515a49a7c5a8c0f0c4"
+    },
+    {
+      "path": "configs/trial_tabm_002_c9bcffa5.json",
+      "source_path": "performance_v2/configs/trial_tabm_002_c9bcffa5.json",
+      "sha256": "340b17c2c0ead280cc8181b754a79399cfbfdcf827531fec111d5cd3bd263ee5"
+    },
+    {
+      "path": "configs/trial_tabm_003_1c17403c.json",
+      "source_path": "performance_v2/configs/trial_tabm_003_1c17403c.json",
+      "sha256": "d874d3f4e481d4b4b908fea01f5f9eef7b8d721cbaea5ac58b18f43fe6bf1df9"
+    },
+    {
+      "path": "configs/trial_tabm_004_01248867.json",
+      "source_path": "performance_v2/configs/trial_tabm_004_01248867.json",
+      "sha256": "84c8e851fc02d0cd31954682ec0166f2c587f431b12088d35f9ef58053cfce9b"
+    },
+    {
+      "path": "configs/trial_tabm_005_6a648199.json",
+      "source_path": "performance_v2/configs/trial_tabm_005_6a648199.json",
+      "sha256": "e5a073b0caa0f7ae0c9696fc1d9697f71cf710f7e3dfeac5b3e5267e23f28f0e"
+    },
+    {
+      "path": "configs/trial_xgboost_000_8de916a7.json",
+      "source_path": "performance_v2/configs/trial_xgboost_000_8de916a7.json",
+      "sha256": "e041491acb34f83dd4b1ffa0f6831a7d504f31d39f1d9c711ee3b73d29b2551e"
+    },
+    {
+      "path": "configs/trial_xgboost_001_7326412f.json",
+      "source_path": "performance_v2/configs/trial_xgboost_001_7326412f.json",
+      "sha256": "02962670e9ab815a914fe8be7665c23631ddb2bcf6b221ff7b5cb472e8032a29"
+    },
+    {
+      "path": "configs/trial_xgboost_002_512d5bb0.json",
+      "source_path": "performance_v2/configs/trial_xgboost_002_512d5bb0.json",
+      "sha256": "37baf1a1467569887f4aba684aa1d2a190f8db5aecc2a9f3aeabd7cafcfc7e0b"
+    },
+    {
+      "path": "configs/trial_xgboost_003_ce5466fc.json",
+      "source_path": "performance_v2/configs/trial_xgboost_003_ce5466fc.json",
+      "sha256": "77ffc5fa29cfb0d4d7da56146cf7875e659ce565000c0fdeb5a46d54553d47e6"
+    },
+    {
+      "path": "configs/trial_xgboost_004_71bca76c.json",
+      "source_path": "performance_v2/configs/trial_xgboost_004_71bca76c.json",
+      "sha256": "c6b9a67cf440db3ae20d17094df16ef353eb29388e78f2dcd68ffafbaa8c9d23"
+    },
+    {
+      "path": "configs/trial_xgboost_005_7ed1ba3f.json",
+      "source_path": "performance_v2/configs/trial_xgboost_005_7ed1ba3f.json",
+      "sha256": "4795d98a5a98cfce69e13444f099a46ad3b02eb885b256c87d547c25be586760"
+    },
+    {
+      "path": "configs/trial_xgboost_006_d55efff0.json",
+      "source_path": "performance_v2/configs/trial_xgboost_006_d55efff0.json",
+      "sha256": "19d2eb0d2698738cc468d35c1db712d202bd436523b5f4d3cf60adaad208ca54"
+    },
+    {
+      "path": "configs/trial_xgboost_007_39823601.json",
+      "source_path": "performance_v2/configs/trial_xgboost_007_39823601.json",
+      "sha256": "c157f59d4643b7757d0a978618977fe93d86c515db3e980285cb5c84884ccfde"
+    },
+    {
+      "path": "configs/trial_xgboost_008_fa200758.json",
+      "source_path": "performance_v2/configs/trial_xgboost_008_fa200758.json",
+      "sha256": "06903829396e3910400d5d652bad362be19ff8f98206a5d4b2afd3d0e15fdc5d"
+    },
+    {
+      "path": "configs/trial_xgboost_009_196f09c6.json",
+      "source_path": "performance_v2/configs/trial_xgboost_009_196f09c6.json",
+      "sha256": "d8d3da56ce4fe486dae63b27215fa7d9d953a693067c247115946457090da9c9"
+    },
+    {
+      "path": "configs/trial_xgboost_010_4d24b304.json",
+      "source_path": "performance_v2/configs/trial_xgboost_010_4d24b304.json",
+      "sha256": "95ec3ab7720f7c104cfceaef3351d65b9d463efb0acd62c51e29905da9e3513c"
+    },
+    {
+      "path": "configs/trial_xgboost_011_e90011c3.json",
+      "source_path": "performance_v2/configs/trial_xgboost_011_e90011c3.json",
+      "sha256": "0a46056c8609183ce82b5f751f000c350d759b47651bff891e86c09db097c1e2"
+    },
+    {
+      "path": "configs/trial_xgboost_012_b69d1d2d.json",
+      "source_path": "performance_v2/configs/trial_xgboost_012_b69d1d2d.json",
+      "sha256": "9043c50efc7e297aff7012bd6b72927a8bc7a75c38bf44a79e48e91261d3c36f"
+    },
+    {
+      "path": "configs/trial_xgboost_013_0154ed26.json",
+      "source_path": "performance_v2/configs/trial_xgboost_013_0154ed26.json",
+      "sha256": "496547cf8d8a30925f39762264779ea1faf08ea1c6de205834693d09234ec95c"
+    },
+    {
+      "path": "configs/trial_xgboost_014_dee66057.json",
+      "source_path": "performance_v2/configs/trial_xgboost_014_dee66057.json",
+      "sha256": "42a1f4bf90310efa67cd1a9ab2e46c242ec41530b026a77c3395924693590d16"
+    },
+    {
+      "path": "configs/trial_xgboost_015_93905368.json",
+      "source_path": "performance_v2/configs/trial_xgboost_015_93905368.json",
+      "sha256": "b1127010eeb694f5c357bce3abf35caeb1f02ff179505ffc6c2b67300773015b"
+    },
+    {
+      "path": "configs/trial_xgboost_016_ae658a42.json",
+      "source_path": "performance_v2/configs/trial_xgboost_016_ae658a42.json",
+      "sha256": "8fc1ed42bb7a9baac71e8e522e74f7733ddfb89e47bffb120b4106424d641732"
+    },
+    {
+      "path": "configs/trial_xgboost_017_147f47e6.json",
+      "source_path": "performance_v2/configs/trial_xgboost_017_147f47e6.json",
+      "sha256": "1c9ae58e4c1c80cefa99d273ca7f281a1775d4956bf46d87006d5f782aaf6ee2"
+    },
+    {
+      "path": "configs/trial_xgboost_018_1ff25fdd.json",
+      "source_path": "performance_v2/configs/trial_xgboost_018_1ff25fdd.json",
+      "sha256": "4974e0cac4776f55551993e261b982a3772cac7e2e9dbf1ec9e16806d61024a5"
+    },
+    {
+      "path": "configs/trial_xgboost_019_8d72d38a.json",
+      "source_path": "performance_v2/configs/trial_xgboost_019_8d72d38a.json",
+      "sha256": "887ac25fa34a610359ec48a1cd3a65488a8596a586139c6492adcdd8f6fef85e"
+    },
+    {
+      "path": "configs/trial_xgboost_020_e79d8ee0.json",
+      "source_path": "performance_v2/configs/trial_xgboost_020_e79d8ee0.json",
+      "sha256": "b34131a67c3e098edaf0643ca38315eea912da18c6d9232de5c0ef9bc19798f0"
+    },
+    {
+      "path": "configs/trial_xgboost_021_733c7615.json",
+      "source_path": "performance_v2/configs/trial_xgboost_021_733c7615.json",
+      "sha256": "80ea379e869b57b1a68f7f4240401e2cb2a3b24645854f1069fed0f42f5650fc"
+    },
+    {
+      "path": "configs/trial_xgboost_022_6b6acfc2.json",
+      "source_path": "performance_v2/configs/trial_xgboost_022_6b6acfc2.json",
+      "sha256": "6cf72b661a65b223a73d63dd7ed23996db48363d7963d8c490bd26e233a73bb3"
+    },
+    {
+      "path": "configs/trial_xgboost_023_42d01c87.json",
+      "source_path": "performance_v2/configs/trial_xgboost_023_42d01c87.json",
+      "sha256": "1f0cd135c637ad054cbe81bb45486596dcd31f4d96b4078a343df7ec018ad103"
+    },
+    {
+      "path": "configs/trial_xgboost_024_83166726.json",
+      "source_path": "performance_v2/configs/trial_xgboost_024_83166726.json",
+      "sha256": "115700bf282374d607665f76edc0cf9ef7b49d9bbbe0b4cfad70d192586dc5ed"
+    },
+    {
+      "path": "configs/trial_xgboost_025_e6df8eb6.json",
+      "source_path": "performance_v2/configs/trial_xgboost_025_e6df8eb6.json",
+      "sha256": "861eb4a0186961c10c843b2b84b60cf7b73e4ee8d282127c0dcf6cf843980679"
+    },
+    {
+      "path": "configs/trial_xgboost_026_1ab21578.json",
+      "source_path": "performance_v2/configs/trial_xgboost_026_1ab21578.json",
+      "sha256": "0c7a23de03e03eba30b3aa33ca8d6f0a85222838f71f1c457b52b5e95c882c2b"
+    },
+    {
+      "path": "configs/trial_xgboost_027_633a10e6.json",
+      "source_path": "performance_v2/configs/trial_xgboost_027_633a10e6.json",
+      "sha256": "5ba790eb04888f7b5db923f21f749164f1172b46aa0e51683aeeadb5a9438520"
+    },
+    {
+      "path": "configs/trial_xgboost_028_c8efc9d9.json",
+      "source_path": "performance_v2/configs/trial_xgboost_028_c8efc9d9.json",
+      "sha256": "81d8fbc970db780ecbcbeb215ccebc01ca99c62be37a473589aaf1301ce89a9a"
+    },
+    {
+      "path": "configs/trial_xgboost_029_16f1b55c.json",
+      "source_path": "performance_v2/configs/trial_xgboost_029_16f1b55c.json",
+      "sha256": "b42dd44571b5e722ed5bf8f55f9416d36a742d451cb3c0b83df555e2a10fd269"
+    },
+    {
+      "path": "configs/trial_xgboost_030_10e7a72a.json",
+      "source_path": "performance_v2/configs/trial_xgboost_030_10e7a72a.json",
+      "sha256": "648034e59b02706829f1e634ac73a9bdc02386fb8ce1d95dd45666a80164ef84"
+    },
+    {
+      "path": "configs/trial_xgboost_031_845cdee0.json",
+      "source_path": "performance_v2/configs/trial_xgboost_031_845cdee0.json",
+      "sha256": "29f929b05e5575a73de6059d5cf92b5e2eaf44fabc29490b56e9bce730b39bff"
+    },
+    {
+      "path": "configs/trial_xgboost_032_09b04be8.json",
+      "source_path": "performance_v2/configs/trial_xgboost_032_09b04be8.json",
+      "sha256": "d128b0115f8b314d3f3fcc2a6f02df844af134946bd47fbbb4b30bd03c7d6709"
+    },
+    {
+      "path": "configs/trial_xgboost_033_a82ef61d.json",
+      "source_path": "performance_v2/configs/trial_xgboost_033_a82ef61d.json",
+      "sha256": "23417a8bf3d1bc4b4b9aee0afb328ada8605fb0613fca4b55ef1cf60a69a829b"
+    },
+    {
+      "path": "configs/trial_xgboost_034_67b8c132.json",
+      "source_path": "performance_v2/configs/trial_xgboost_034_67b8c132.json",
+      "sha256": "a2dc3074ef75cbff0766a91f10b69bfa4fb35ee82b7f3b28150462246534b1b0"
+    },
+    {
+      "path": "configs/trial_xgboost_035_0e0cbfd3.json",
+      "source_path": "performance_v2/configs/trial_xgboost_035_0e0cbfd3.json",
+      "sha256": "92fc178efcc5cdece911fed8904cd111ad61c14edeb78c17f6187cff4391f96d"
+    },
+    {
+      "path": "results/archive_alignment_correction.json",
+      "source_path": "performance_v2/results/archive_alignment_correction.json",
+      "sha256": "a9e93616c6b9cd9a9373664ac9ad1db73f2117f196f56e427e9372ac116b8f51"
+    },
+    {
+      "path": "results/archive_base_alignment_correction.json",
+      "source_path": "performance_v2/results/archive_base_alignment_correction.json",
+      "sha256": "6323b3b3e9c70734fb8f0b9918623c1dadb026ae741cdbe5df186e6048ce8d59"
+    },
+    {
+      "path": "results/baseline_bridge.csv",
+      "source_path": "performance_v2/results/baseline_bridge.csv",
+      "sha256": "5cbf0493acc7ceeaf63f273a115afbc9a0527e709d1ad211ebf425f4d9ecd8f1"
+    },
+    {
+      "path": "results/bootstrap_software_contract.json",
+      "source_path": "performance_v2/results/bootstrap_software_contract.json",
+      "sha256": "21c2883a6432296795f80c8617e403ca9bfbd9b8f976242f6b22eed3dfd08157"
+    },
+    {
+      "path": "results/claims.csv",
+      "source_path": "performance_v2/results/claims.csv",
+      "sha256": "1ce6cdfb4a2e022614a7a1cf481868815405d014d346bf5741f6ee09ec143b7c"
+    },
+    {
+      "path": "results/company_stress.csv",
+      "source_path": "performance_v2/results/company_stress.csv",
+      "sha256": "ac29a69d7878efba322b1cfe1438a012f3a2a92f0f629196e01c4fb6b8355425"
+    },
+    {
+      "path": "results/company_stress_summary.csv",
+      "source_path": "performance_v2/results/company_stress_summary.csv",
+      "sha256": "06e7337188adcae55c8ebba56816dea2f2862e3c0916886edc7cc684b00c7c9c"
+    },
+    {
+      "path": "results/company_weight_software_contract.json",
+      "source_path": "performance_v2/results/company_weight_software_contract.json",
+      "sha256": "2a6b7054e4a51b894ded8817f3715356908bffebd85caeac0cba197038d5708e"
+    },
+    {
+      "path": "results/confirmation_2014.csv",
+      "source_path": "performance_v2/results/confirmation_2014.csv",
+      "sha256": "275b34877c853551211c9d42aa256f8bcfd7714ee72ccc67822716e3ccde6d12"
+    },
+    {
+      "path": "results/costs.csv",
+      "source_path": "performance_v2/results/costs.csv",
+      "sha256": "166424d5f555c14f055625d7c756bb9db726240be8f67b88dedd28e7decee407"
+    },
+    {
+      "path": "results/development_by_year.csv",
+      "source_path": "performance_v2/results/development_by_year.csv",
+      "sha256": "e656aa22a7c9ec254eeb3608aa8b90864932841084c1d8457f3563ecef28f227"
+    },
+    {
+      "path": "results/diagnostic_source_checks.json",
+      "source_path": "performance_v2/results/diagnostic_source_checks.json",
+      "sha256": "545635f3d8d3fe04defd8caa133bdf596f26808f2600c2eb19dfdd7f942b9a10"
+    },
+    {
+      "path": "results/ensemble_complementarity.csv",
+      "source_path": "performance_v2/results/ensemble_complementarity.csv",
+      "sha256": "9663e00f749a79cdc2236b3ab8fc6702035571410287fcbcec2e7cce8f9fe912"
+    },
+    {
+      "path": "results/ensemble_development.csv",
+      "source_path": "performance_v2/results/ensemble_development.csv",
+      "sha256": "61c975fa3601b4e2df1f71c32ab09a1d757bc4717bf12811b8b57f61eadf1c32"
+    },
+    {
+      "path": "results/experiment_summary.json",
+      "source_path": "performance_v2/results/experiment_summary.json",
+      "sha256": "dfdbf4f41bd3c2df61939a108ac3cac07ab709af0e9d90e759aabedef7ec56a7"
+    },
+    {
+      "path": "results/feature_preprocess_ablation.csv",
+      "source_path": "performance_v2/results/feature_preprocess_ablation.csv",
+      "sha256": "879855fac556d9c691342d4f281bfd2fddeb7b4a4068c3eb1e4ff61b6ee5657f"
+    },
+    {
+      "path": "results/figures/historical_years.png",
+      "source_path": "performance_v2/results/figures/historical_years.png",
+      "sha256": "e8d3d40b68cf2dbf32b7827330091b1f0b45d048507145f76835c43fbaa56a4f"
+    },
+    {
+      "path": "results/figures/search_cost.png",
+      "source_path": "performance_v2/results/figures/search_cost.png",
+      "sha256": "e83d9144cb5b11efd62fae2e4c5e38414316be29d2455d8e2901901e774a9ad5"
+    },
+    {
+      "path": "results/figures/update_budget.png",
+      "source_path": "performance_v2/results/figures/update_budget.png",
+      "sha256": "787aabbe50d708e7f0c832ca93a1ec1aea5554dfa15ec7feee78a2832b466126"
+    },
+    {
+      "path": "results/final_training_populations.csv",
+      "source_path": "performance_v2/results/final_training_populations.csv",
+      "sha256": "77501bd87301f43ec1c61c7d959f22e872ec0e34e56b0436958e3ef64e3357af"
+    },
+    {
+      "path": "results/fit_accounting.csv",
+      "source_path": "performance_v2/results/fit_accounting.csv",
+      "sha256": "9892be70e32280bac7622b7ea977451f15d9ef0978bec9a50f80bce982b5fdfb"
+    },
+    {
+      "path": "results/historical_2015_2018.csv",
+      "source_path": "performance_v2/results/historical_2015_2018.csv",
+      "sha256": "9e029c646bb8937ce69a38479b8da0517516a1837c7681429dc96c8dee0ab48c"
+    },
+    {
+      "path": "results/historical_by_year.csv",
+      "source_path": "performance_v2/results/historical_by_year.csv",
+      "sha256": "1a7264fbd5e33bf750423d6185652f0c05c1b1d668cfd0c38a62524db50e9030"
+    },
+    {
+      "path": "results/legacy_archived_metrics.csv",
+      "source_path": "performance_v2/results/legacy_archived_metrics.csv",
+      "sha256": "6fb9aeda6f9511cbee0e7dc725ab8613c2998a842367efce6c031395be7239c0"
+    },
+    {
+      "path": "results/legacy_vs_v1_config.csv",
+      "source_path": "performance_v2/results/legacy_vs_v1_config.csv",
+      "sha256": "42efc62d204ca9e55023beb836a4a2faeb37155819c8d14b53c3000a3294837b"
+    },
+    {
+      "path": "results/local_refinement_trace.csv",
+      "source_path": "performance_v2/results/local_refinement_trace.csv",
+      "sha256": "969952a9876ab3fce6451ad62f2fa09e3e8186af5f2689ebdfacec7368b2e02e"
+    },
+    {
+      "path": "results/matched_input_controls.csv",
+      "source_path": "performance_v2/results/matched_input_controls.csv",
+      "sha256": "7e0ff77de83e1b267372cfb9dfa4fef8dba1fa303b7715f51fb3520a24d13254"
+    },
+    {
+      "path": "results/metric_contract.csv",
+      "source_path": "performance_v2/results/metric_contract.csv",
+      "sha256": "2f9b8fda2a5f3401852004349023b7468608d4f4f4bf71ca51445cdabe8c7935"
+    },
+    {
+      "path": "results/model_artifacts_status.json",
+      "source_path": "performance_v2/results/model_artifacts_status.json",
+      "sha256": "94115df87d2819e5b68d40be1c85c2256a08e992822397c687c8ba38bdface12"
+    },
+    {
+      "path": "results/notebook_verification.json",
+      "source_path": "performance_v2/results/notebook_verification.json",
+      "sha256": "a788fc2731abd692aaa84d2835a1d786a2cafcf68d672f4a39fb0fd4d3a4a007"
+    },
+    {
+      "path": "results/numeric_matched_controls.csv",
+      "source_path": "performance_v2/results/numeric_matched_controls.csv",
+      "sha256": "abbf8a5ac7370a981d7421141a8a50d4fc792f8f28596ae710438aa6ef4b67af"
+    },
+    {
+      "path": "results/optimization_checkpoint_verification.json",
+      "source_path": "performance_v2/results/optimization_checkpoint_verification.json",
+      "sha256": "7476b6006c0b7d22dbd47288a4e26c57dc2e1af6880eafdbf770f5d6ab73bf35"
+    },
+    {
+      "path": "results/optimization_controls.csv",
+      "source_path": "performance_v2/results/optimization_controls.csv",
+      "sha256": "ff33d42932ee11b88e570ebe5325d1c17ad32488192bcc3183045b97ed0013d9"
+    },
+    {
+      "path": "results/optimization_sanity.json",
+      "source_path": "performance_v2/results/optimization_sanity.json",
+      "sha256": "220a7df815e97b0ed85f340bb361efd5b0f4709ba9bda377633f4105ab2e26a2"
+    },
+    {
+      "path": "results/p1_probability_supplement.csv",
+      "source_path": "performance_v2/results/p1_probability_supplement.csv",
+      "sha256": "02051902fd2b7ab729d33f0c40bd9bca24836ef49aba0556c8b1e4ca5acba8c9"
+    },
+    {
+      "path": "results/paired_company_intervals.csv",
+      "source_path": "performance_v2/results/paired_company_intervals.csv",
+      "sha256": "f227f587da23590be417d2a8612a014fafcde8772ca757e14449d61754e52301"
+    },
+    {
+      "path": "results/partial_results_verification.json",
+      "source_path": "performance_v2/results/partial_results_verification.json",
+      "sha256": "e2f13291c523d17f27664e9e63ce7600c801593b2f7b15887e637bc392ac652b"
+    },
+    {
+      "path": "results/pdf_quality_checks.json",
+      "source_path": "performance_v2/results/pdf_quality_checks.json",
+      "sha256": "7a59388775a726ef2873cea623f44048ff39fafff3f10e219f2c42c4aff3d6fe"
+    },
+    {
+      "path": "results/pipeline_row_alignment_reloads.json",
+      "source_path": "performance_v2/results/pipeline_row_alignment_reloads.json",
+      "sha256": "d0399e4bc4fb8cfd526d53b113e0d2fdb14d7bb754f02218863050d3c4e01d28"
+    },
+    {
+      "path": "results/publication_blocked.json",
+      "source_path": "performance_v2/results/publication_blocked.json",
+      "sha256": "fcf6bd8297758970b50d44744cb6316f85e7018237f4077e8f9412e440c0a39f"
+    },
+    {
+      "path": "results/ranking_pair_accounting.csv",
+      "source_path": "performance_v2/results/ranking_pair_accounting.csv",
+      "sha256": "dc713e16d2afd3a5160d22d9a8c20efcf62462f97221a29681823d5cd5284fa4"
+    },
+    {
+      "path": "results/ranking_pair_accounting_verification.json",
+      "source_path": "performance_v2/results/ranking_pair_accounting_verification.json",
+      "sha256": "0098897cfe37205bd02e9009fd6fbe17bdeb93bf052b8219b7d9775b01cdc5aa"
+    },
+    {
+      "path": "results/representation_screen_verification.json",
+      "source_path": "performance_v2/results/representation_screen_verification.json",
+      "sha256": "b112090585d8b757327ed83a821cced241f0c80c521b527dc3a2cde2c5d71ebf"
+    },
+    {
+      "path": "results/search_budget_summary.csv",
+      "source_path": "performance_v2/results/search_budget_summary.csv",
+      "sha256": "7a9fcdc22a1f4a19edaabc1ab7e39258588b3f9b4ccb220cedacb63640abb49d"
+    },
+    {
+      "path": "results/seeds.csv",
+      "source_path": "performance_v2/results/seeds.csv",
+      "sha256": "42079ab704d14f090f6b53e002d52e6599307c844766481e2914baf17016bfd0"
+    },
+    {
+      "path": "results/seen_unseen.csv",
+      "source_path": "performance_v2/results/seen_unseen.csv",
+      "sha256": "0d9072bafc61d2b4e5a0b34b5f80236e69f1fef5171c3c3eff007fa394fdf5df"
+    },
+    {
+      "path": "results/selected_candidates.json",
+      "source_path": "performance_v2/results/selected_candidates.json",
+      "sha256": "9fe7323afe01bcd99730b8af34a4b4fdc2c75a240eddfd51b46722afc39dda18"
+    },
+    {
+      "path": "results/selection_trace.csv",
+      "source_path": "performance_v2/results/selection_trace.csv",
+      "sha256": "cf668edec7f8ab90ec34f4a9b72a2f160fb3e76028c5231f05fef5682cc8cae0"
+    },
+    {
+      "path": "results/software_contracts.json",
+      "source_path": "performance_v2/results/software_contracts.json",
+      "sha256": "0abfb0464371235d7ac129ee39339da12647638d1d8dd6b08a795b528b2b76d3"
+    },
+    {
+      "path": "results/training_budget_ablation.csv",
+      "source_path": "performance_v2/results/training_budget_ablation.csv",
+      "sha256": "d3b697c67797c5c9a2a8ce2c0e51a6db0a7b1fa10004fe4930e4846c592b1367"
+    },
+    {
+      "path": "results/trial_attempts.csv",
+      "source_path": "performance_v2/results/trial_attempts.csv",
+      "sha256": "113d22267dd05963f199ffb4ca30d8632ebad235d0d83ff0d6854a07440b8cb7"
+    },
+    {
+      "path": "results/trial_coverage.csv",
+      "source_path": "performance_v2/results/trial_coverage.csv",
+      "sha256": "4c71e0660bda1cb296c545d0a08df41f2fa35e6d964a2bcc912fe07a0a78a061"
+    },
+    {
+      "path": "results/trials.csv",
+      "source_path": "performance_v2/results/trials.csv",
+      "sha256": "e92491db18e5a755ecc63022d8cb1037c088615b4cc0bf3402fe71786586230c"
+    },
+    {
+      "path": "results/verification.json",
+      "source_path": "performance_v2/results/verification.json",
+      "sha256": "6c01024ae7742bb5d0dfbe174bf648c661e6cdb70020a8bac997302008624c5e"
+    },
+    {
+      "path": "reports/Research_Report_EN.pdf",
+      "source_path": "performance_v2/reports/Research_Report_V2_EN.pdf",
+      "sha256": "443397abeff9d18f36fc3da1571a32183a6e4fdb5f7a3f5402a007e571889475"
+    },
+    {
+      "path": "reports/Research_Guide_CN.pdf",
+      "source_path": "performance_v2/reports/PERFORMANCE_DELTA_CN.pdf",
+      "sha256": "86db106c0c906cce438332073eb2267f2ce839bf8af14bdf7a68071625251b3d"
+    }
+  ]
+}

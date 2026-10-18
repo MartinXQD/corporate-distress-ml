@@ -10,15 +10,17 @@ This independent extension uses the user's existing `american_bankruptcy.csv`: S
 
 ## Variables and units
 
-See `results/public/feature_registry.csv` and `financial_field_audit.csv`. Definitions were checked against the original project dictionary. X17 means total liabilities, not exclusively interest-bearing debt. X9 and X16 are exact duplicates. Currency, monetary scaling, inflation adjustments, accounting restatements and point-in-time availability are not independently verified. Ratios use current assets/denominators; no average assets or missing cash-flow variables are invented. The Altman formula is an interpretable descriptive benchmark across a universe lacking a verified manufacturing restriction.
+See `research_origin/initial_extension/results/public/feature_registry.csv` and `research_origin/initial_extension/results/public/financial_field_audit.csv`. Definitions were checked against the original project dictionary. X17 means total liabilities, not exclusively interest-bearing debt. X9 and X16 are exact duplicates. Currency, monetary scaling, inflation adjustments, accounting restatements and point-in-time availability are not independently verified. Ratios use current assets/denominators; no average assets or missing cash-flow variables are invented. The Altman formula is an interpretable descriptive benchmark across a universe lacking a verified manufacturing restriction.
 
 ## Coverage and quality
 
 There are no raw missing cells or duplicate company-years. Engineered ratios can be missing: nonpositive denominators are invalidated and flagged; extreme positive denominators/ratios are retained before train-only winsorization. 710 companies have calendar gaps. Exact t-1/t-2 joins preserve these gaps; no backward filling or future lifecycle summaries are permitted. All target records remain in model comparisons. Historical inputs for each target company are permitted only through its target year.
 
-## Roles and exposure
+## Initial extension roles and exposure
 
 Fit 1999-2012; Platt calibration 2013; fixed F1 threshold 2014; previously inspected historical evaluation 2015-2018. Development uses four expanding calendar folds. See `split_audit.csv` for independently calculated row and company counts. The historical evaluation contains 119 positive companies. Only 16 positive companies were unseen through 2012, so unseen-company estimates are especially uncertain. Three deterministic company groups provide additional untuned sensitivity checks, not external validation.
+
+The formal project refits the selected recipes and strong baselines through 2014. Its natural unseen-company cohort contains only five failed companies; the earlier cutoff-2012 numbers above belong to the initial extension. See [current methods](METHODOLOGY.md).
 
 ## Acquisition and rights
 

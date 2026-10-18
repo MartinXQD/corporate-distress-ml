@@ -1,14 +1,13 @@
-# References checked during implementation
+# Implementation sources
 
-- scikit-learn, leakage and preprocessing: https://scikit-learn.org/stable/common_pitfalls.html
-- scikit-learn, Average Precision (non-interpolated weighted recall increments): https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html
-- scikit-learn, probability calibration: https://scikit-learn.org/stable/modules/calibration.html
-- imbalanced-learn, resampling pitfalls: https://imbalanced-learn.org/stable/common_pitfalls.html
-- Gorishniy et al. (2021), Revisiting Deep Learning Models for Tabular Data: https://arxiv.org/abs/2106.11959
-- Authors' official tabular-model repository: https://github.com/yandex-research/rtdl-revisiting-models
-- Candidate upstream dataset, README and citation requests: https://github.com/sowide/bankruptcy_dataset
-- Current upstream license (CC BY 4.0): https://github.com/sowide/bankruptcy_dataset/blob/main/LICENSE.md
+Primary documentation checked on October 17, 2026. Installed versions, rather than the latest website versions, govern the executed API: see [runtime versions](../configs/runtime_versions.json) and [software contracts](../results/software_contracts.json). No external benchmark score is imported as a result on this dataset.
 
-The installed package versions, not the current website version, are recorded in `results/public/environment.json` and the lock files. Reference links explain algorithm/protocol choices; they do not validate the local label as a forward default event. The local snapshot and live upstream comparison are recorded by hash. PyTorch loss uses BCEWithLogitsLoss and evaluation uses sigmoid; installed-runtime behavior is exercised by software tests. No FT-Transformer paper performance is claimed for this compact implementation.
+- Gorishniy et al., *TabM: Advancing Tabular Deep Learning With Parameter-Efficient Ensembling*, ICLR 2025. [Paper](https://arxiv.org/abs/2410.24210), [official implementation and training/inference contract](https://github.com/yandex-research/tabm). Installed `tabm==0.0.3`; the local code trains the shared heads with mean per-head BCE and predicts mean per-head sigmoid probabilities.
+- Gorishniy et al., *On Embeddings for Numerical Features in Tabular Deep Learning*, NeurIPS 2022. [Paper](https://arxiv.org/abs/2203.05556), [official modules](https://github.com/yandex-research/rtdl-num-embeddings). Installed `rtdl-num-embeddings==0.0.12`; unsupervised piecewise knots fit the current training role only. Binary masks bypass continuous embeddings.
+- Gorishniy et al., *Revisiting Deep Learning Models for Tabular Data*, NeurIPS 2021. [Paper](https://arxiv.org/abs/2106.11959), [official implementation](https://github.com/yandex-research/rtdl-revisiting-models). Installed `rtdl-revisiting-models==0.0.2`. Conditional FT trials, if completed, are identified separately from V1's educational implementation.
+- [CatBoost parameter tuning](https://catboost.ai/docs/en/concepts/parameter-tuning): legal bootstrap-specific parameter pairs and inner early stopping. Installed `catboost==1.2.10`; internal PRAUC is named separately from external sklearn AP.
+- [XGBoost learning to rank](https://xgboost.readthedocs.io/en/stable/tutorials/learning_to_rank.html): qid defines year-level ranking queries, not company-constant labels. Installed `xgboost==3.4.1`; classification uses internal `aucpr`, while final comparisons use sklearn AP. The live documentation may describe a later patch version.
+- [QuantileTransformer](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.QuantileTransformer.html), [calibration](https://scikit-learn.org/stable/modules/calibration.html). Installed `scikit-learn==1.7.2`; training-role CDFs are frozen at inference. P1 calibration attaches only to its own base model.
+- [Optuna TPE](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html). Installed `optuna==5.0.0`; per-family SQLite studies and sampler states preserve actual trials and failures.
 
-The upstream README requests citations to its dataset papers. Publisher full-text retrieval returned HTTP 429 during this run, so no additional paper-specific empirical or event-timing claim is inferred from those inaccessible pages. Their citation request is attributed to the checked README, not presented as a full-text review.
+Data provenance, the unresolved accounting dictionary and label limitations remain in the [data card](DATA_CARD.md) and [initial source references](research_origin/initial_extension/docs/REFERENCES.md). The authorized local snapshot, not a substituted public download, is used throughout.

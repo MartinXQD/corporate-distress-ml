@@ -1,0 +1,35 @@
+{
+  "project": "Corporate Financial Distress Classification",
+  "selection_source": "configs/selection_freeze.json",
+  "fit_cutoff": 2014,
+  "historical_years": [
+    2015,
+    2016,
+    2017,
+    2018
+  ],
+  "seeds": [
+    42,
+    2026,
+    31415,
+    7,
+    2718
+  ],
+  "components": [
+    {
+      "family": "xgboost",
+      "candidate": "refine_r3_15_a028aa7a",
+      "config": "configs/trial_refine_r3_15_a028aa7a.json",
+      "weight": 0.5
+    },
+    {
+      "family": "mlp",
+      "candidate": "refine_r3_21_bbf84fb1",
+      "config": "configs/trial_refine_r3_21_bbf84fb1.json",
+      "weight": 0.5
+    }
+  ],
+  "blend": "mean of within-year percentile ranks of family seed-mean scores",
+  "strongest_fixed_baseline": "baseline_v1_lags_xgb",
+  "historical_exposure": "Previously inspected; not a new holdout"
+}
